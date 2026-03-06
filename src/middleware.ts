@@ -8,6 +8,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Match all routes except static files and api
-    "/((?!_next/static|_next/image|favicon.ico|images|api|preview|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|images|api|preview|menu|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
