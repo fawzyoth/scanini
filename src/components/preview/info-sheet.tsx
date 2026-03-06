@@ -73,6 +73,18 @@ export function InfoSheet({ open, onClose, restaurant }: InfoSheetProps) {
     });
   }
 
+  if (restaurant.socialMedia?.tiktok) {
+    items.push({
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-700">
+          <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+        </svg>
+      ),
+      label: "TikTok",
+      action: <ChevronRight size={18} className="text-gray-400" />,
+    });
+  }
+
   return (
     <div className="absolute inset-0 z-30 flex flex-col justify-end">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
