@@ -74,6 +74,7 @@ export default function MenuEditorPage() {
     await (supabase.from("menus") as any).update({ name: menuName.trim() }).eq("id", menu.id);
     setMenu((prev) => prev ? { ...prev, name: menuName.trim() } : prev);
     setEditingName(false);
+    await reload();
   }
 
   async function handleSaveDish(dish: Dish) {
