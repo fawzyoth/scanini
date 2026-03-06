@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { MenuHeader, PublicCategorySection, RateButton } from "@/components/public-menu";
+import { HomeScreen, MenuScreen, DishDetailSheet, ReviewSheet, InfoSheet } from "@/components/preview";
 import type { Restaurant, Menu, Category, Dish, Review } from "@/types";
+
+type Screen = { type: "home" } | { type: "menu"; menu: Menu };
 
 function toRestaurant(db: any): Restaurant {
   return {
@@ -65,6 +67,11 @@ export default function PublicMenuPage() {
   const [menus, setMenus] = useState<Menu[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
 
+  const [screen, setScreen] = useState<Screen>({ type: "home" });
+  const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
+
   useEffect(() => {
     async function load() {
       try {
@@ -115,23 +122,42 @@ export default function PublicMenuPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-24">
-      <MenuHeader restaurant={restaurant} reviews={reviews} />
+    <div className="h-dvh bg-white flex flex-col relative max-w-lg mx-auto">
+      {screen.type === "home" && (
+        <HomeScreen
+          restaurant={restaurant}
+          menus={menus}
+          reviews={reviews}
+          onMenuClick={(menu) => setScreen({ type: "menu", menu })}
+          onReviewClick={() => setReviewOpen(true)}
+          onInfoClick={() => setInfoOpen(true)}
+        />
+      )}
 
-      <div className="max-w-2xl mx-auto px-4 mt-6">
-        {menus.map((menu) => (
-          <div key={menu.id}>
-            {menus.length > 1 && (
-              <h2 className="text-lg font-bold text-gray-900 mb-4 mt-8">{menu.name}</h2>
-            )}
-            {menu.categories.map((category) => (
-              <PublicCategorySection key={category.id} category={category} />
-            ))}
-          </div>
-        ))}
-      </div>
+      {screen.type === "menu" && (
+        <MenuScreen
+          menu={screen.menu}
+          onBack={() => setScreen({ type: "home" })}
+          onDishClick={(dish) => setSelectedDish(dish)}
+          onReviewClick={() => setReviewOpen(true)}
+        />
+      )}
 
-      <RateButton />
+      <DishDetailSheet
+        dish={selectedDish}
+        onClose={() => setSelectedDish(null)}
+      />
+
+      <ReviewSheet
+        open={reviewOpen}
+        onClose={() => setReviewOpen(false)}
+      />
+
+      <InfoSheet
+        open={infoOpen}
+        onClose={() => setInfoOpen(false)}
+        restaurant={restaurant}
+      />
     </div>
   );
 }
