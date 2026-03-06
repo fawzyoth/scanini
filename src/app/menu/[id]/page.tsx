@@ -1,5 +1,6 @@
 "use client";
 
+// Build: 2026-03-06T15:30 — force fresh JS bundle
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
