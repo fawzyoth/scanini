@@ -209,11 +209,16 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const updateRestaurant = useCallback(async (updates: Partial<Restaurant>) => {
     if (!restaurant) return;
     const supabase = createClient();
-    await (supabase.from("restaurants") as any)
+    const { error } = await (supabase.from("restaurants") as any)
       .update(updates)
       .eq("id", restaurant.id);
+    if (error) {
+      console.error("Failed to update restaurant:", error);
+      return;
+    }
     setRestaurant((prev) => prev ? { ...prev, ...updates } : prev);
-  }, [restaurant]);
+    await reload();
+  }, [restaurant, reload]);
 
   const updateProfile = useCallback(async (updates: Partial<Profile>) => {
     if (!profile) return;
