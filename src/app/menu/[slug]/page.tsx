@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { MenuHeader, PublicCategorySection, RateButton } from "@/components/public-menu";
-import { createClient } from "@/lib/supabase/client";
 import type { Restaurant, Menu, Category, Dish, Review } from "@/types";
 
 function toRestaurant(db: any): Restaurant {
@@ -23,6 +22,42 @@ function toRestaurant(db: any): Restaurant {
   };
 }
 
+function buildMenus(dbMenus: any[], dbCategories: any[], dbDishes: any[]): Menu[] {
+  return dbMenus.map((m: any): Menu => {
+    const menuCats = dbCategories
+      .filter((c: any) => c.menu_id === m.id)
+      .sort((a: any, b: any) => a.sort_order - b.sort_order)
+      .map((c: any): Category => ({
+        id: c.id,
+        name: c.name,
+        dishes: dbDishes
+          .filter((d: any) => d.category_id === c.id)
+          .sort((a: any, b: any) => a.sort_order - b.sort_order)
+          .map((d: any): Dish => ({
+            id: d.id,
+            name: d.name,
+            description: d.description ?? "",
+            price: Number(d.price),
+            currency: d.currency ?? "DT",
+            image: d.image_url ?? undefined,
+            allergens: d.allergens ?? [],
+            available: d.available ?? true,
+            variants: d.variants ?? undefined,
+          })),
+      }));
+
+    return {
+      id: m.id,
+      name: m.name,
+      icon: m.icon ?? "utensils-crossed",
+      dishCount: menuCats.reduce((sum, c) => sum + c.dishes.length, 0),
+      availability: m.availability ?? "Every day",
+      visible: m.visible ?? true,
+      categories: menuCats,
+    };
+  });
+}
+
 export default function PublicMenuPage() {
   const { slug } = useParams();
   const [loading, setLoading] = useState(true);
@@ -32,101 +67,32 @@ export default function PublicMenuPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient();
+      try {
+        const res = await fetch(`/api/public-menu?slug=${encodeURIComponent(slug as string)}`);
+        if (!res.ok) {
+          setLoading(false);
+          return;
+        }
 
-      // Find restaurant by slug (name lowercased with hyphens)
-      const { data: restaurants } = await supabase
-        .from("restaurants")
-        .select("*");
+        const data = await res.json();
 
-      const dbRestaurant = (restaurants ?? []).find((r: any) => {
-        const rSlug = r.name?.toLowerCase().replace(/\s+/g, "-");
-        return rSlug === slug;
-      }) as any;
-
-      if (!dbRestaurant) {
-        setLoading(false);
-        return;
+        setRestaurant(toRestaurant(data.restaurant));
+        setMenus(buildMenus(data.menus, data.categories, data.dishes));
+        setReviews(
+          (data.reviews ?? []).map((rev: any): Review => ({
+            id: rev.id,
+            rating: rev.rating,
+            meal: rev.meal,
+            service: rev.service,
+            atmosphere: rev.atmosphere,
+            cleanliness: rev.cleanliness,
+            comment: rev.comment ?? undefined,
+            date: rev.created_at,
+          }))
+        );
+      } catch {
+        // fetch failed
       }
-
-      setRestaurant(toRestaurant(dbRestaurant));
-
-      // Fetch menus
-      const { data: dbMenus } = await supabase
-        .from("menus")
-        .select("*")
-        .eq("restaurant_id", dbRestaurant.id)
-        .eq("visible", true)
-        .order("sort_order");
-
-      const menuIds = (dbMenus ?? []).map((m: any) => m.id);
-
-      const { data: dbCategories } = menuIds.length > 0
-        ? await supabase.from("categories").select("*").in("menu_id", menuIds).order("sort_order")
-        : { data: [] };
-
-      const catIds = (dbCategories ?? []).map((c: any) => c.id);
-
-      const { data: dbDishes } = catIds.length > 0
-        ? await supabase.from("dishes").select("*").in("category_id", catIds).order("sort_order")
-        : { data: [] };
-
-      const frontendMenus = (dbMenus ?? []).map((m: any): Menu => {
-        const menuCats = (dbCategories ?? [])
-          .filter((c: any) => c.menu_id === m.id)
-          .sort((a: any, b: any) => a.sort_order - b.sort_order)
-          .map((c: any): Category => ({
-            id: c.id,
-            name: c.name,
-            dishes: (dbDishes ?? [])
-              .filter((d: any) => d.category_id === c.id)
-              .sort((a: any, b: any) => a.sort_order - b.sort_order)
-              .map((d: any): Dish => ({
-                id: d.id,
-                name: d.name,
-                description: d.description ?? "",
-                price: Number(d.price),
-                currency: d.currency ?? "DT",
-                image: d.image_url ?? undefined,
-                allergens: d.allergens ?? [],
-                available: d.available ?? true,
-                variants: d.variants ?? undefined,
-              })),
-          }));
-
-        return {
-          id: m.id,
-          name: m.name,
-          icon: m.icon ?? "utensils-crossed",
-          dishCount: menuCats.reduce((sum, c) => sum + c.dishes.length, 0),
-          availability: m.availability ?? "Every day",
-          visible: m.visible ?? true,
-          categories: menuCats,
-        };
-      });
-
-      setMenus(frontendMenus);
-
-      // Fetch reviews
-      const { data: dbReviews } = await supabase
-        .from("reviews")
-        .select("*")
-        .eq("restaurant_id", dbRestaurant.id)
-        .order("created_at", { ascending: false });
-
-      setReviews(
-        (dbReviews ?? []).map((rev: any): Review => ({
-          id: rev.id,
-          rating: rev.rating,
-          meal: rev.meal,
-          service: rev.service,
-          atmosphere: rev.atmosphere,
-          cleanliness: rev.cleanliness,
-          comment: rev.comment ?? undefined,
-          date: rev.created_at,
-        }))
-      );
-
       setLoading(false);
     }
     load();
