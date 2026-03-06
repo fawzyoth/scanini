@@ -1,26 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { Button } from "@/components/ui/button";
+import { useDashboard } from "@/lib/dashboard-context";
 
 export function AppearanceSection() {
+  const { restaurant, updateRestaurant } = useDashboard();
   const [primaryColor, setPrimaryColor] = useState("#4F46E5");
-  const [backgroundColor, setBackgroundColor] = useState("#FFFFFF");
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (restaurant) {
+      setPrimaryColor((restaurant as any).primary_color ?? "#4F46E5");
+    }
+  }, [restaurant]);
+
+  async function handleSave() {
+    await updateRestaurant({ primary_color: primaryColor } as any);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
 
   return (
     <div className="space-y-4">
       <ColorPicker label="Primary color" value={primaryColor} onChange={setPrimaryColor} />
-      <ColorPicker label="Background color" value={backgroundColor} onChange={setBackgroundColor} />
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Cover image</label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-          <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
-          <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</p>
-        </div>
-      </div>
-      <div className="pt-2">
-        <Button size="sm">Save changes</Button>
+      <p className="text-xs text-gray-400">
+        This color is used for buttons and accents on your public menu page.
+      </p>
+      <div className="pt-2 flex items-center gap-3">
+        <Button size="sm" onClick={handleSave}>Save changes</Button>
+        {saved && <span className="text-sm text-green-600 font-medium">Saved!</span>}
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ interface MenuScreenProps {
   menu: Menu;
   onBack: () => void;
   onDishClick: (dish: Dish) => void;
-  onReviewClick: () => void;
+  onReviewClick?: () => void;
 }
 
 export function MenuScreen({ menu, onBack, onDishClick, onReviewClick }: MenuScreenProps) {
@@ -86,17 +86,19 @@ export function MenuScreen({ menu, onBack, onDishClick, onReviewClick }: MenuScr
       </div>
 
       {/* Rate button */}
-      <div className="shrink-0 px-4 pb-3 pt-2 bg-white border-t border-gray-100">
-        <button
-          onClick={onReviewClick}
-          className="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-900 text-white rounded-full text-sm font-medium"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
-          </svg>
-          Evaluez votre experience
-        </button>
-      </div>
+      {onReviewClick && (
+        <div className="shrink-0 px-4 pb-3 pt-2 bg-white border-t border-gray-100">
+          <button
+            onClick={onReviewClick}
+            className="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-900 text-white rounded-full text-sm font-medium"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+            </svg>
+            Evaluez votre experience
+          </button>
+        </div>
+      )}
     </>
   );
 }

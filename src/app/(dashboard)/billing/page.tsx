@@ -212,18 +212,29 @@ export default function BillingPage() {
 
                     <p className="text-[10px] text-gray-400 mb-3">Best for: {plan.bestFor}</p>
 
-                    <button
-                      disabled={isCurrent}
-                      className={`w-full text-center text-sm font-medium py-2 rounded-lg transition-colors ${
-                        isCurrent
-                          ? "bg-gray-100 text-gray-400 cursor-default"
-                          : plan.popular
+                    {isCurrent ? (
+                      <button
+                        disabled
+                        className="w-full text-center text-sm font-medium py-2 rounded-lg bg-gray-100 text-gray-400 cursor-default"
+                      >
+                        Current plan
+                      </button>
+                    ) : (
+                      <a
+                        href={`https://wa.me/32465987804?text=${encodeURIComponent(
+                          `Hi, I'd like to upgrade my Scanini plan to ${plan.name} (${billing}). Restaurant: ${restaurant?.name ?? "N/A"}`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`w-full block text-center text-sm font-medium py-2 rounded-lg transition-colors ${
+                          plan.popular
                             ? "bg-indigo-600 text-white hover:bg-indigo-700"
                             : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                      }`}
-                    >
-                      {isCurrent ? "Current plan" : "Upgrade"}
-                    </button>
+                        }`}
+                      >
+                        Upgrade
+                      </a>
+                    )}
                   </div>
                 );
               })}

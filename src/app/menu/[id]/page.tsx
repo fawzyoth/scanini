@@ -66,6 +66,7 @@ export default function PublicMenuPage() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menus, setMenus] = useState<Menu[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsEnabled, setReviewsEnabled] = useState(true);
 
   const [screen, setScreen] = useState<Screen>({ type: "home" });
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
@@ -84,6 +85,7 @@ export default function PublicMenuPage() {
         const data = await res.json();
 
         setRestaurant(toRestaurant(data.restaurant));
+        setReviewsEnabled(data.restaurant.reviews_enabled ?? true);
         setMenus(buildMenus(data.menus, data.categories, data.dishes));
 
         // Record scan
@@ -134,9 +136,9 @@ export default function PublicMenuPage() {
         <HomeScreen
           restaurant={restaurant}
           menus={menus}
-          reviews={reviews}
+          reviews={reviewsEnabled ? reviews : []}
           onMenuClick={(menu) => setScreen({ type: "menu", menu })}
-          onReviewClick={() => setReviewOpen(true)}
+          onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
           onInfoClick={() => setInfoOpen(true)}
         />
       )}
@@ -146,7 +148,7 @@ export default function PublicMenuPage() {
           menu={screen.menu}
           onBack={() => setScreen({ type: "home" })}
           onDishClick={(dish) => setSelectedDish(dish)}
-          onReviewClick={() => setReviewOpen(true)}
+          onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
         />
       )}
 
