@@ -63,7 +63,7 @@ export function AllergenIcons({
   const extra = allergens.length - max;
 
   return (
-    <span className="inline-flex items-center gap-0.5 ml-1">
+    <span className="inline-flex items-center gap-0.5 mt-1">
       {shown.map((a) => {
         const info = getAllergenInfo(a);
         if (!info) return null;

@@ -64,12 +64,9 @@ export function MenuScreenCard({ menu, onBack, onDishClick, onReviewClick }: Men
                   className="w-full flex items-start gap-3 p-3 bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all text-left"
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm font-semibold text-gray-900 line-clamp-1">
-                        {dish.name}
-                      </span>
-                      <AllergenIcons allergens={dish.allergens} />
-                    </div>
+                    <span className="text-sm font-semibold text-gray-900 line-clamp-1">
+                      {dish.name}
+                    </span>
                     {dish.description && (
                       <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
                         {dish.description}
@@ -89,6 +86,7 @@ export function MenuScreenCard({ menu, onBack, onDishClick, onReviewClick }: Men
                         Add to Cart
                       </span>
                     </div>
+                    <AllergenIcons allergens={dish.allergens} />
                   </div>
                   {dish.image && (
                     <div className="w-20 h-20 rounded-xl bg-gray-200 shrink-0 overflow-hidden">

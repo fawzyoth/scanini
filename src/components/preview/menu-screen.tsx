@@ -46,10 +46,7 @@ export function MenuScreen({ menu, onBack, onDishClick, onReviewClick }: MenuScr
                     className="w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-sm font-semibold text-gray-900">{dish.name}</span>
-                        <AllergenIcons allergens={dish.allergens} />
-                      </div>
+                      <span className="text-sm font-semibold text-gray-900">{dish.name}</span>
                       {dish.description && (
                         <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{dish.description}</p>
                       )}
@@ -67,6 +64,7 @@ export function MenuScreen({ menu, onBack, onDishClick, onReviewClick }: MenuScr
                           {formatCurrency(dish.price, dish.currency)}
                         </p>
                       )}
+                      <AllergenIcons allergens={dish.allergens} />
                     </div>
                     {dish.image && (
                       <div className="w-16 h-16 rounded-xl bg-gray-200 shrink-0 overflow-hidden">
