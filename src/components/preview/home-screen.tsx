@@ -67,7 +67,7 @@ export function HomeScreen({ restaurant, menus, reviews, onMenuClick, onReviewCl
 
         {/* Menu list */}
         <div className="px-4 pb-6 space-y-2">
-          {menus.filter((m) => m.visible).map((menu) => (
+          {menus.filter((m) => m.visible !== false).map((menu) => (
             <button
               key={menu.id}
               onClick={() => onMenuClick(menu)}

@@ -20,7 +20,7 @@ export function PhonePreview() {
     (restaurant as any)?.address && "Adresse",
   ].filter(Boolean);
 
-  const visibleMenus = menus.filter((m) => m.visible);
+  const visibleMenus = menus.filter((m) => m.visible !== false);
 
   return (
     <div className="w-[280px] h-[560px] bg-black rounded-[2.5rem] p-2 shadow-2xl mx-auto">
