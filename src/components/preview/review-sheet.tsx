@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 interface ReviewSheetProps {
   open: boolean;
   onClose: () => void;
+  restaurantId?: string;
 }
 
 const CATEGORIES = [
@@ -52,16 +53,45 @@ function InteractiveStars({
   );
 }
 
-export function ReviewSheet({ open, onClose }: ReviewSheetProps) {
+export function ReviewSheet({ open, onClose, restaurantId }: ReviewSheetProps) {
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   function updateRating(key: string, value: number) {
     setRatings((prev) => ({ ...prev, [key]: value }));
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
+    if (submitting) return;
+
+    if (restaurantId) {
+      setSubmitting(true);
+      try {
+        const overall = Math.round(
+          Object.values(ratings).reduce((a, b) => a + b, 0) /
+            Math.max(Object.values(ratings).length, 1)
+        );
+        await fetch("/api/public-review", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            restaurant_id: restaurantId,
+            rating: overall,
+            meal: ratings.meal || 0,
+            service: ratings.service || 0,
+            atmosphere: ratings.atmosphere || 0,
+            cleanliness: ratings.cleanliness || 0,
+            comment: comment || null,
+          }),
+        });
+      } catch {
+        // silent fail
+      }
+      setSubmitting(false);
+    }
+
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);

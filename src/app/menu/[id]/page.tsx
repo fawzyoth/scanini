@@ -122,7 +122,7 @@ export default function PublicMenuPage() {
   }
 
   return (
-    <div className="h-dvh bg-white flex flex-col relative max-w-lg mx-auto">
+    <div className="h-dvh bg-white flex flex-col relative max-w-lg mx-auto overflow-hidden">
       {screen.type === "home" && (
         <HomeScreen
           restaurant={restaurant}
@@ -151,6 +151,7 @@ export default function PublicMenuPage() {
       <ReviewSheet
         open={reviewOpen}
         onClose={() => setReviewOpen(false)}
+        restaurantId={restaurant.id}
       />
 
       <InfoSheet
