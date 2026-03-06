@@ -33,6 +33,21 @@ export default function MenuEditorPage() {
     open: false,
   });
 
+  async function handleReorderCategories(reordered: Category[]) {
+    setMenu((prev) => prev ? { ...prev, categories: reordered } : prev);
+    const supabase = createClient();
+    const updates = reordered.map((c, i) =>
+      (supabase.from("categories") as any).update({ sort_order: i }).eq("id", c.id)
+    );
+    await Promise.all(updates);
+  }
+
+  const { getDragProps: getCategoryDragProps, getItemStyle: getCategoryStyle } = useDragReorder({
+    items: menu?.categories ?? [],
+    getId: (c) => c.id,
+    onReorder: handleReorderCategories,
+  });
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = sessionStorage.getItem("digitized-menu");
@@ -181,15 +196,6 @@ export default function MenuEditorPage() {
     router.push("/menus");
   }
 
-  async function handleReorderCategories(reordered: Category[]) {
-    setMenu((prev) => prev ? { ...prev, categories: reordered } : prev);
-    const supabase = createClient();
-    const updates = reordered.map((c, i) =>
-      (supabase.from("categories") as any).update({ sort_order: i }).eq("id", c.id)
-    );
-    await Promise.all(updates);
-  }
-
   async function handleReorderDishes(categoryId: string, reordered: Dish[]) {
     setMenu((prev) => prev ? {
       ...prev,
@@ -203,12 +209,6 @@ export default function MenuEditorPage() {
     );
     await Promise.all(updates);
   }
-
-  const { getDragProps: getCategoryDragProps, getItemStyle: getCategoryStyle } = useDragReorder({
-    items: menu.categories,
-    getId: (c) => c.id,
-    onReorder: handleReorderCategories,
-  });
 
   const filteredCategories = menu.categories.map((cat) => ({
     ...cat,
