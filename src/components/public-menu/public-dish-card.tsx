@@ -20,12 +20,25 @@ export function PublicDishCard({ dish }: PublicDishCardProps) {
         {dish.description && (
           <p className="text-xs text-gray-500 mt-0.5">{dish.description}</p>
         )}
-        <p className="text-sm font-semibold text-gray-900 mt-1">
-          {formatCurrency(dish.price, dish.currency)}
-        </p>
+        {dish.variants && dish.variants.length > 0 ? (
+          <div className="mt-1 space-y-0.5">
+            {dish.variants.map((v, i) => (
+              <div key={i} className="flex gap-2 text-sm">
+                <span className="text-gray-500">{v.label}</span>
+                <span className="font-semibold text-gray-900">{formatCurrency(v.price, dish.currency)}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm font-semibold text-gray-900 mt-1">
+            {formatCurrency(dish.price, dish.currency)}
+          </p>
+        )}
       </div>
       {dish.image && (
-        <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-orange-200 to-orange-400 shrink-0" />
+        <div className="w-16 h-16 rounded-xl bg-gray-200 shrink-0 overflow-hidden">
+          <img src={dish.image} alt={dish.name} className="w-full h-full object-cover" />
+        </div>
       )}
     </div>
   );

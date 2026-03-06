@@ -15,7 +15,10 @@ export function MenuHeader({ restaurant, reviews }: MenuHeaderProps) {
   return (
     <div>
       {/* Cover */}
-      <div className="relative h-48 sm:h-64 bg-gradient-to-br from-amber-200 via-orange-300 to-red-300">
+      <div className="relative h-48 sm:h-64 bg-gradient-to-br from-amber-200 via-orange-300 to-red-300 overflow-hidden">
+        {restaurant.coverImage && (
+          <img src={restaurant.coverImage} alt={restaurant.name} className="absolute inset-0 w-full h-full object-cover" />
+        )}
         <button className="absolute top-4 right-4 w-10 h-10 bg-white/80 backdrop-blur rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-colors">
           <Search size={18} />
         </button>

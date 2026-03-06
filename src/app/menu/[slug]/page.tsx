@@ -1,20 +1,167 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { MenuHeader, PublicCategorySection, RateButton } from "@/components/public-menu";
-import { mockRestaurant, mockMenus, mockReviews } from "@/data/mock";
+import { createClient } from "@/lib/supabase/client";
+import type { Restaurant, Menu, Category, Dish, Review } from "@/types";
+
+function toRestaurant(db: any): Restaurant {
+  return {
+    id: db.id,
+    name: db.name,
+    coverImage: db.cover_image ?? "",
+    phone: db.phone ?? "",
+    address: db.address ?? "",
+    wifi: db.wifi_ssid ? { ssid: db.wifi_ssid, password: db.wifi_password ?? "" } : undefined,
+    socialMedia: {
+      instagram: db.social_instagram ?? undefined,
+      facebook: db.social_facebook ?? undefined,
+      tiktok: db.social_tiktok ?? undefined,
+    },
+  };
+}
 
 export default function PublicMenuPage() {
-  const restaurant = mockRestaurant;
-  const menu = mockMenus[0];
-  const reviews = mockReviews;
+  const { slug } = useParams();
+  const [loading, setLoading] = useState(true);
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [menus, setMenus] = useState<Menu[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
+
+  useEffect(() => {
+    async function load() {
+      const supabase = createClient();
+
+      // Find restaurant by slug (name lowercased with hyphens)
+      const { data: restaurants } = await supabase
+        .from("restaurants")
+        .select("*");
+
+      const dbRestaurant = (restaurants ?? []).find((r: any) => {
+        const rSlug = r.name?.toLowerCase().replace(/\s+/g, "-");
+        return rSlug === slug;
+      }) as any;
+
+      if (!dbRestaurant) {
+        setLoading(false);
+        return;
+      }
+
+      setRestaurant(toRestaurant(dbRestaurant));
+
+      // Fetch menus
+      const { data: dbMenus } = await supabase
+        .from("menus")
+        .select("*")
+        .eq("restaurant_id", dbRestaurant.id)
+        .eq("visible", true)
+        .order("sort_order");
+
+      const menuIds = (dbMenus ?? []).map((m: any) => m.id);
+
+      const { data: dbCategories } = menuIds.length > 0
+        ? await supabase.from("categories").select("*").in("menu_id", menuIds).order("sort_order")
+        : { data: [] };
+
+      const catIds = (dbCategories ?? []).map((c: any) => c.id);
+
+      const { data: dbDishes } = catIds.length > 0
+        ? await supabase.from("dishes").select("*").in("category_id", catIds).order("sort_order")
+        : { data: [] };
+
+      const frontendMenus = (dbMenus ?? []).map((m: any): Menu => {
+        const menuCats = (dbCategories ?? [])
+          .filter((c: any) => c.menu_id === m.id)
+          .sort((a: any, b: any) => a.sort_order - b.sort_order)
+          .map((c: any): Category => ({
+            id: c.id,
+            name: c.name,
+            dishes: (dbDishes ?? [])
+              .filter((d: any) => d.category_id === c.id)
+              .sort((a: any, b: any) => a.sort_order - b.sort_order)
+              .map((d: any): Dish => ({
+                id: d.id,
+                name: d.name,
+                description: d.description ?? "",
+                price: Number(d.price),
+                currency: d.currency ?? "DT",
+                image: d.image_url ?? undefined,
+                allergens: d.allergens ?? [],
+                available: d.available ?? true,
+                variants: d.variants ?? undefined,
+              })),
+          }));
+
+        return {
+          id: m.id,
+          name: m.name,
+          icon: m.icon ?? "utensils-crossed",
+          dishCount: menuCats.reduce((sum, c) => sum + c.dishes.length, 0),
+          availability: m.availability ?? "Every day",
+          visible: m.visible ?? true,
+          categories: menuCats,
+        };
+      });
+
+      setMenus(frontendMenus);
+
+      // Fetch reviews
+      const { data: dbReviews } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("restaurant_id", dbRestaurant.id)
+        .order("created_at", { ascending: false });
+
+      setReviews(
+        (dbReviews ?? []).map((rev: any): Review => ({
+          id: rev.id,
+          rating: rev.rating,
+          meal: rev.meal,
+          service: rev.service,
+          atmosphere: rev.atmosphere,
+          cleanliness: rev.cleanliness,
+          comment: rev.comment ?? undefined,
+          date: rev.created_at,
+        }))
+      );
+
+      setLoading(false);
+    }
+    load();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 size={24} className="animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  if (!restaurant) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="text-gray-500">Restaurant not found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white pb-24">
       <MenuHeader restaurant={restaurant} reviews={reviews} />
 
       <div className="max-w-2xl mx-auto px-4 mt-6">
-        {menu.categories.map((category) => (
-          <PublicCategorySection key={category.id} category={category} />
+        {menus.map((menu) => (
+          <div key={menu.id}>
+            {menus.length > 1 && (
+              <h2 className="text-lg font-bold text-gray-900 mb-4 mt-8">{menu.name}</h2>
+            )}
+            {menu.categories.map((category) => (
+              <PublicCategorySection key={category.id} category={category} />
+            ))}
+          </div>
         ))}
       </div>
 

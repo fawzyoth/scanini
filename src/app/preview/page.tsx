@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Smartphone } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { PhoneShell, HomeScreen, MenuScreen, DishDetailSheet, ReviewSheet, InfoSheet } from "@/components/preview";
 import { createClient } from "@/lib/supabase/client";
 import type { Menu, Category, Dish, Restaurant, Review } from "@/types";
@@ -146,45 +147,82 @@ export default function PreviewPage() {
     );
   }
 
+  const slug = restaurant.name.toLowerCase().replace(/\s+/g, "-");
+  const menuUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/menu/${slug}`
+    : `/menu/${slug}`;
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-10 px-4">
-      <PhoneShell>
-        {screen.type === "home" && (
-          <HomeScreen
+      <div className="flex items-center gap-12">
+        {/* Phone mockup */}
+        <PhoneShell>
+          {screen.type === "home" && (
+            <HomeScreen
+              restaurant={restaurant}
+              menus={menus}
+              reviews={reviews}
+              onMenuClick={(menu) => setScreen({ type: "menu", menu })}
+              onReviewClick={() => setReviewOpen(true)}
+              onInfoClick={() => setInfoOpen(true)}
+            />
+          )}
+
+          {screen.type === "menu" && (
+            <MenuScreen
+              menu={screen.menu}
+              onBack={() => setScreen({ type: "home" })}
+              onDishClick={(dish) => setSelectedDish(dish)}
+              onReviewClick={() => setReviewOpen(true)}
+            />
+          )}
+
+          <DishDetailSheet
+            dish={selectedDish}
+            onClose={() => setSelectedDish(null)}
+          />
+
+          <ReviewSheet
+            open={reviewOpen}
+            onClose={() => setReviewOpen(false)}
+          />
+
+          <InfoSheet
+            open={infoOpen}
+            onClose={() => setInfoOpen(false)}
             restaurant={restaurant}
-            menus={menus}
-            reviews={reviews}
-            onMenuClick={(menu) => setScreen({ type: "menu", menu })}
-            onReviewClick={() => setReviewOpen(true)}
-            onInfoClick={() => setInfoOpen(true)}
           />
-        )}
+        </PhoneShell>
 
-        {screen.type === "menu" && (
-          <MenuScreen
-            menu={screen.menu}
-            onBack={() => setScreen({ type: "home" })}
-            onDishClick={(dish) => setSelectedDish(dish)}
-            onReviewClick={() => setReviewOpen(true)}
-          />
-        )}
-
-        <DishDetailSheet
-          dish={selectedDish}
-          onClose={() => setSelectedDish(null)}
-        />
-
-        <ReviewSheet
-          open={reviewOpen}
-          onClose={() => setReviewOpen(false)}
-        />
-
-        <InfoSheet
-          open={infoOpen}
-          onClose={() => setInfoOpen(false)}
-          restaurant={restaurant}
-        />
-      </PhoneShell>
+        {/* QR Code panel */}
+        <div className="hidden lg:flex flex-col items-center gap-4">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col items-center gap-4">
+            <div className="flex items-center gap-2 text-gray-700">
+              <Smartphone size={18} />
+              <span className="text-sm font-semibold">Try it on your phone</span>
+            </div>
+            <QRCodeSVG
+              value={menuUrl}
+              size={180}
+              bgColor="#FFFFFF"
+              fgColor="#000000"
+              level="M"
+              style={{ borderRadius: 8 }}
+            />
+            <p className="text-xs text-gray-400 text-center max-w-[200px]">
+              Scan this QR code to see your menu exactly as your customers will
+            </p>
+          </div>
+          <a
+            href={menuUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+          >
+            Open in browser &rarr;
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
