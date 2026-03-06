@@ -3,6 +3,7 @@
 import { Menu, Dish } from "@/types";
 import { ArrowLeft, Search } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { AllergenIcons } from "./allergen-icons";
 
 interface MenuScreenProps {
   menu: Menu;
@@ -47,13 +48,7 @@ export function MenuScreen({ menu, onBack, onDishClick, onReviewClick }: MenuScr
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className="text-sm font-semibold text-gray-900">{dish.name}</span>
-                        {dish.allergens.length > 0 && (
-                          <span className="text-xs text-gray-400">
-                            {dish.allergens.slice(0, 2).map((a) =>
-                              a === "spicy" ? "🌶️" : a === "dairy" ? "🥛" : ""
-                            ).join(" ")}
-                          </span>
-                        )}
+                        <AllergenIcons allergens={dish.allergens} />
                       </div>
                       {dish.description && (
                         <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{dish.description}</p>

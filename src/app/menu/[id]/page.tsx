@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { HomeScreen, MenuScreen, DishDetailSheet, ReviewSheet, InfoSheet } from "@/components/preview";
+import { HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, DishDetailSheet, ReviewSheet, InfoSheet } from "@/components/preview";
 import type { Restaurant, Menu, Category, Dish, Review } from "@/types";
 
 type Screen = { type: "home" } | { type: "menu"; menu: Menu };
@@ -15,6 +15,7 @@ function toRestaurant(db: any): Restaurant {
     coverImage: db.cover_image ?? "",
     phone: db.phone ?? "",
     address: db.address ?? "",
+    template: db.template ?? "classic",
     wifi: db.wifi_ssid ? { ssid: db.wifi_ssid, password: db.wifi_password ?? "" } : undefined,
     socialMedia: {
       instagram: db.social_instagram ?? undefined,
@@ -130,26 +131,49 @@ export default function PublicMenuPage() {
     );
   }
 
+  const isCard = restaurant.template === "card";
+
   return (
     <div className="h-dvh bg-white flex flex-col relative max-w-lg mx-auto overflow-hidden">
       {screen.type === "home" && (
-        <HomeScreen
-          restaurant={restaurant}
-          menus={menus}
-          reviews={reviewsEnabled ? reviews : []}
-          onMenuClick={(menu) => setScreen({ type: "menu", menu })}
-          onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
-          onInfoClick={() => setInfoOpen(true)}
-        />
+        isCard ? (
+          <HomeScreenCard
+            restaurant={restaurant}
+            menus={menus}
+            reviews={reviewsEnabled ? reviews : []}
+            onMenuClick={(menu) => setScreen({ type: "menu", menu })}
+            onDishClick={(dish) => setSelectedDish(dish)}
+            onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
+            onInfoClick={() => setInfoOpen(true)}
+          />
+        ) : (
+          <HomeScreen
+            restaurant={restaurant}
+            menus={menus}
+            reviews={reviewsEnabled ? reviews : []}
+            onMenuClick={(menu) => setScreen({ type: "menu", menu })}
+            onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
+            onInfoClick={() => setInfoOpen(true)}
+          />
+        )
       )}
 
       {screen.type === "menu" && (
-        <MenuScreen
-          menu={screen.menu}
-          onBack={() => setScreen({ type: "home" })}
-          onDishClick={(dish) => setSelectedDish(dish)}
-          onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
-        />
+        isCard ? (
+          <MenuScreenCard
+            menu={screen.menu}
+            onBack={() => setScreen({ type: "home" })}
+            onDishClick={(dish) => setSelectedDish(dish)}
+            onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
+          />
+        ) : (
+          <MenuScreen
+            menu={screen.menu}
+            onBack={() => setScreen({ type: "home" })}
+            onDishClick={(dish) => setSelectedDish(dish)}
+            onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
+          />
+        )
       )}
 
       <DishDetailSheet

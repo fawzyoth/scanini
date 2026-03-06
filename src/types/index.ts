@@ -1,9 +1,12 @@
+export type MenuTemplate = "classic" | "card";
+
 export interface Restaurant {
   id: string;
   name: string;
   coverImage: string;
   phone: string;
   address: string;
+  template: MenuTemplate;
   wifi?: {
     ssid: string;
     password: string;

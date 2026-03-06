@@ -2,6 +2,7 @@
 
 import { Dish } from "@/types";
 import { formatCurrency } from "@/lib/utils";
+import { AllergenBadges } from "./allergen-icons";
 
 interface DishDetailSheetProps {
   dish: Dish | null;
@@ -55,28 +56,12 @@ export function DishDetailSheet({ dish, onClose }: DishDetailSheetProps) {
             <p className="text-sm text-gray-500 mt-2">{dish.description}</p>
           )}
 
-          {/* Tags placeholder */}
+          {/* Allergens */}
           {dish.allergens.length > 0 && (
-            <>
-              <div className="flex flex-wrap gap-2 mt-4">
-                {dish.allergens.slice(0, 3).map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 rounded-full text-xs font-medium text-gray-700"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              {/* Allergens detail */}
-              <div className="mt-4">
-                <h4 className="text-sm font-bold text-gray-900 mb-1">Allergenes</h4>
-                <p className="text-sm text-gray-500">
-                  Contient {dish.allergens.join(", ")}
-                </p>
-              </div>
-            </>
+            <div className="mt-4">
+              <h4 className="text-sm font-bold text-gray-900 mb-2">Allergenes</h4>
+              <AllergenBadges allergens={dish.allergens} />
+            </div>
           )}
         </div>
       </div>

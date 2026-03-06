@@ -35,11 +35,14 @@ export default function MenuEditorPage() {
 
   async function handleReorderCategories(reordered: Category[]) {
     setMenu((prev) => prev ? { ...prev, categories: reordered } : prev);
-    const supabase = createClient();
-    const updates = reordered.map((c, i) =>
-      (supabase.from("categories") as any).update({ sort_order: i }).eq("id", c.id)
-    );
-    await Promise.all(updates);
+    await fetch("/api/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        table: "categories",
+        items: reordered.map((c, i) => ({ id: c.id, sort_order: i })),
+      }),
+    });
   }
 
   const { getDragProps: getCategoryDragProps, getItemStyle: getCategoryStyle } = useDragReorder({
@@ -203,11 +206,14 @@ export default function MenuEditorPage() {
         cat.id === categoryId ? { ...cat, dishes: reordered } : cat
       ),
     } : prev);
-    const supabase = createClient();
-    const updates = reordered.map((d, i) =>
-      (supabase.from("dishes") as any).update({ sort_order: i }).eq("id", d.id)
-    );
-    await Promise.all(updates);
+    await fetch("/api/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        table: "dishes",
+        items: reordered.map((d, i) => ({ id: d.id, sort_order: i })),
+      }),
+    });
   }
 
   const filteredCategories = menu.categories.map((cat) => ({

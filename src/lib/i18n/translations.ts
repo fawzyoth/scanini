@@ -152,6 +152,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     "general.address": "Adresse",
 
     // ── Appearance section ──
+    "appearance.template": "Modele de menu",
+    "appearance.templateClassic": "Classique",
+    "appearance.templateCard": "Carte",
     "appearance.primaryColor": "Couleur principale",
     "appearance.colorDesc": "Cette couleur est utilisee pour les boutons et les accents sur votre page de menu publique.",
 
@@ -222,6 +225,19 @@ export const translations: Record<Locale, Record<string, string>> = {
     "qr.pdf1": "PDF avec 1 grand QR",
     "qr.pngImage": "Image PNG",
     "qr.svgVector": "Vecteur SVG",
+    "qr.frame": "Cadre",
+    "qr.frameType": "Type de cadre",
+    "qr.backgroundColor": "Couleur de fond",
+    "qr.text": "Texte",
+    "qr.textColor": "Couleur du texte",
+    "qr.typographicFont": "Police typographique",
+    "qr.fontSize": "Taille de police",
+    "qr.shapeAndColor": "Forme et couleur",
+    "qr.dotColor": "Couleur des points",
+    "qr.cornerColor": "Couleur des coins",
+    "qr.logo": "Logo",
+    "qr.logoDesc": "Telechargez le logo de votre restaurant pour l'afficher au centre du QR code.",
+    "qr.uploadLogo": "Telecharger le logo",
 
     // ── Billing page ──
     "billing.title": "Plan & facturation",
@@ -447,6 +463,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     "general.address": "Address",
 
     // ── Appearance section ──
+    "appearance.template": "Menu template",
+    "appearance.templateClassic": "Classic",
+    "appearance.templateCard": "Card",
     "appearance.primaryColor": "Primary color",
     "appearance.colorDesc": "This color is used for buttons and accents on your public menu page.",
 
@@ -517,6 +536,19 @@ export const translations: Record<Locale, Record<string, string>> = {
     "qr.pdf1": "PDF with 1 large QR",
     "qr.pngImage": "PNG image",
     "qr.svgVector": "SVG vector",
+    "qr.frame": "Frame",
+    "qr.frameType": "Frame type",
+    "qr.backgroundColor": "Background color",
+    "qr.text": "Text",
+    "qr.textColor": "Text color",
+    "qr.typographicFont": "Typographic font",
+    "qr.fontSize": "Font size",
+    "qr.shapeAndColor": "Shape and color",
+    "qr.dotColor": "Dot color",
+    "qr.cornerColor": "Corner color",
+    "qr.logo": "Logo",
+    "qr.logoDesc": "Upload your restaurant logo to display in the center of the QR code.",
+    "qr.uploadLogo": "Upload logo",
 
     // ── Billing page ──
     "billing.title": "Plan & billing",

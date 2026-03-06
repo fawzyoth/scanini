@@ -6,6 +6,7 @@ export const mockRestaurant: Restaurant = {
   coverImage: "/images/cover.jpg",
   phone: "+33 1 23 45 67 89",
   address: "12 Rue de la Paix, 75002 Paris",
+  template: "classic",
   wifi: {
     ssid: "LaBouffe-Guest",
     password: "bienvenue2024",

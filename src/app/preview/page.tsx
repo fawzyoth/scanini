@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Loader2, Smartphone } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { PhoneShell, HomeScreen, MenuScreen, DishDetailSheet, ReviewSheet, InfoSheet } from "@/components/preview";
+import { PhoneShell, HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, DishDetailSheet, ReviewSheet, InfoSheet } from "@/components/preview";
 import { createClient } from "@/lib/supabase/client";
 import type { Menu, Category, Dish, Restaurant, Review } from "@/types";
 
@@ -50,6 +50,7 @@ function toFrontendRestaurant(db: any): Restaurant {
     coverImage: db.cover_image ?? "",
     phone: db.phone ?? "",
     address: db.address ?? "",
+    template: db.template ?? "classic",
     wifi: db.wifi_ssid ? { ssid: db.wifi_ssid, password: db.wifi_password ?? "" } : undefined,
     socialMedia: {
       instagram: db.social_instagram ?? undefined,
@@ -157,23 +158,44 @@ export default function PreviewPage() {
         {/* Phone mockup */}
         <PhoneShell>
           {screen.type === "home" && (
-            <HomeScreen
-              restaurant={restaurant}
-              menus={menus}
-              reviews={reviews}
-              onMenuClick={(menu) => setScreen({ type: "menu", menu })}
-              onReviewClick={() => setReviewOpen(true)}
-              onInfoClick={() => setInfoOpen(true)}
-            />
+            restaurant.template === "card" ? (
+              <HomeScreenCard
+                restaurant={restaurant}
+                menus={menus}
+                reviews={reviews}
+                onMenuClick={(menu) => setScreen({ type: "menu", menu })}
+                onDishClick={(dish) => setSelectedDish(dish)}
+                onReviewClick={() => setReviewOpen(true)}
+                onInfoClick={() => setInfoOpen(true)}
+              />
+            ) : (
+              <HomeScreen
+                restaurant={restaurant}
+                menus={menus}
+                reviews={reviews}
+                onMenuClick={(menu) => setScreen({ type: "menu", menu })}
+                onReviewClick={() => setReviewOpen(true)}
+                onInfoClick={() => setInfoOpen(true)}
+              />
+            )
           )}
 
           {screen.type === "menu" && (
-            <MenuScreen
-              menu={screen.menu}
-              onBack={() => setScreen({ type: "home" })}
-              onDishClick={(dish) => setSelectedDish(dish)}
-              onReviewClick={() => setReviewOpen(true)}
-            />
+            restaurant.template === "card" ? (
+              <MenuScreenCard
+                menu={screen.menu}
+                onBack={() => setScreen({ type: "home" })}
+                onDishClick={(dish) => setSelectedDish(dish)}
+                onReviewClick={() => setReviewOpen(true)}
+              />
+            ) : (
+              <MenuScreen
+                menu={screen.menu}
+                onBack={() => setScreen({ type: "home" })}
+                onDishClick={(dish) => setSelectedDish(dish)}
+                onReviewClick={() => setReviewOpen(true)}
+              />
+            )
           )}
 
           <DishDetailSheet

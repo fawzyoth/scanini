@@ -13,7 +13,7 @@ import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function MenusPage() {
   const router = useRouter();
-  const { menus: ctxMenus, loading, restaurant, reload } = useDashboard();
+  const { menus: ctxMenus, loading, reload } = useDashboard();
   const { t } = useTranslation();
   const [menus, setMenus] = useState<Menu[]>([]);
   const [editingMenu, setEditingMenu] = useState<Menu | null>(null);
@@ -38,16 +38,10 @@ export default function MenusPage() {
   }
 
   async function handleDuplicate(id: string) {
-    const menu = menus.find((m) => m.id === id);
-    if (!menu || !restaurant) return;
-    const supabase = createClient();
-    await (supabase.from("menus") as any).insert({
-      restaurant_id: restaurant.id,
-      name: `${menu.name} (copy)`,
-      icon: menu.icon,
-      availability: menu.availability,
-      visible: menu.visible,
-      sort_order: menus.length,
+    await fetch("/api/duplicate-menu", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ menuId: id }),
     });
     await reload();
   }
@@ -112,11 +106,14 @@ export default function MenusPage() {
 
   async function handleReorderMenus(reordered: Menu[]) {
     setMenus(reordered);
-    const supabase = createClient();
-    const updates = reordered.map((m, i) =>
-      (supabase.from("menus") as any).update({ sort_order: i }).eq("id", m.id)
-    );
-    await Promise.all(updates);
+    await fetch("/api/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        table: "menus",
+        items: reordered.map((m, i) => ({ id: m.id, sort_order: i })),
+      }),
+    });
   }
 
   if (loading) {
