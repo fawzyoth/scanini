@@ -35,9 +35,20 @@ export function DishCard({ dish, onEdit, onDelete }: DishCardProps) {
         )}
       </div>
 
-      <span className="text-sm font-medium text-gray-900 whitespace-nowrap">
-        {formatCurrency(dish.price, dish.currency)}
-      </span>
+      {dish.variants && dish.variants.length > 0 ? (
+        <div className="text-right">
+          {dish.variants.map((v, i) => (
+            <div key={i} className="text-xs text-gray-600 whitespace-nowrap">
+              <span className="text-gray-400">{v.label}:</span>{" "}
+              <span className="font-medium text-gray-900">{formatCurrency(v.price, dish.currency)}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <span className="text-sm font-medium text-gray-900 whitespace-nowrap">
+          {formatCurrency(dish.price, dish.currency)}
+        </span>
+      )}
 
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <button onClick={onEdit} className="p-1 text-gray-400 hover:text-gray-600 rounded">

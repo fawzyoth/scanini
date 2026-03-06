@@ -31,6 +31,11 @@ export interface Category {
   dishes: Dish[];
 }
 
+export interface DishVariant {
+  label: string;
+  price: number;
+}
+
 export interface Dish {
   id: string;
   name: string;
@@ -40,6 +45,7 @@ export interface Dish {
   image?: string;
   allergens: string[];
   available: boolean;
+  variants?: DishVariant[];
 }
 
 export interface Review {

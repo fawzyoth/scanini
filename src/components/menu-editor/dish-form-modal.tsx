@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Dish } from "@/types";
+import { Dish, DishVariant } from "@/types";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { TagChip } from "@/components/ui/tag-chip";
@@ -36,22 +36,34 @@ export function DishFormModal({ open, onClose, onSave, dish }: DishFormModalProp
       setImage(dish?.image);
       setAllergens(dish?.allergens ?? []);
       setTags([]);
-      setUseVariants(false);
-      setVariants(DEFAULT_VARIANTS);
+      const hasVariants = dish?.variants && dish.variants.length > 0;
+      setUseVariants(!!hasVariants);
+      setVariants(
+        hasVariants
+          ? dish!.variants!.map((v) => ({ label: v.label, price: v.price.toString() }))
+          : DEFAULT_VARIANTS
+      );
     }
   }, [open, dish]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const parsedVariants: DishVariant[] | undefined = useVariants
+      ? variants
+          .filter((v) => v.label.trim() && v.price.trim())
+          .map((v) => ({ label: v.label, price: parseFloat(v.price) || 0 }))
+      : undefined;
+
     onSave({
       id: dish?.id ?? generateId(),
       name,
       description,
-      price: parseFloat(price) || 0,
+      price: useVariants ? 0 : parseFloat(price) || 0,
       currency: "EUR",
       image,
       allergens,
       available: true,
+      variants: parsedVariants && parsedVariants.length > 0 ? parsedVariants : undefined,
     });
     onClose();
   }

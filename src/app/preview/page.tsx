@@ -27,6 +27,7 @@ function toFrontendMenu(dbMenu: any, categories: any[], dishes: any[]): Menu {
           image: d.image_url ?? undefined,
           allergens: d.allergens ?? [],
           available: d.available ?? true,
+          variants: d.variants ?? undefined,
         })),
     }));
 

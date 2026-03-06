@@ -35,9 +35,20 @@ export function DishDetailSheet({ dish, onClose }: DishDetailSheetProps) {
           <h3 className="text-xl font-bold text-gray-900">{dish.name}</h3>
 
           {/* Price */}
-          <p className="text-lg font-bold text-gray-900 mt-1">
-            {formatCurrency(dish.price, dish.currency)}
-          </p>
+          {dish.variants && dish.variants.length > 0 ? (
+            <div className="mt-2 space-y-1">
+              {dish.variants.map((v, i) => (
+                <div key={i} className="flex justify-between text-sm">
+                  <span className="text-gray-600">{v.label}</span>
+                  <span className="font-bold text-gray-900">{formatCurrency(v.price, dish.currency)}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-lg font-bold text-gray-900 mt-1">
+              {formatCurrency(dish.price, dish.currency)}
+            </p>
+          )}
 
           {/* Description */}
           {dish.description && (

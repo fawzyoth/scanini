@@ -51,6 +51,7 @@ function toFrontendMenu(
           image: d.image_url ?? undefined,
           allergens: d.allergens ?? [],
           available: d.available ?? true,
+          variants: d.variants ?? undefined,
         })),
     }));
 

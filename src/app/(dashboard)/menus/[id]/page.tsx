@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  ArrowLeft, Eye, Search, UtensilsCrossed, FolderPlus, Loader2,
+  ArrowLeft, Search, UtensilsCrossed, FolderPlus, Loader2,
   Pencil, Check, X, Plus, Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui";
@@ -92,6 +92,7 @@ export default function MenuEditorPage() {
         image_url: dish.image ?? null,
         allergens: dish.allergens,
         available: dish.available,
+        variants: dish.variants ?? null,
       }).eq("id", dish.id);
     } else {
       await (supabase.from("dishes") as any).insert({
@@ -103,6 +104,7 @@ export default function MenuEditorPage() {
         image_url: dish.image ?? null,
         allergens: dish.allergens,
         available: dish.available,
+        variants: dish.variants ?? null,
         sort_order: 0,
       });
     }
@@ -263,39 +265,36 @@ export default function MenuEditorPage() {
 
         {/* ── GUIDED SETUP for new/empty menus ── */}
         {isNewMenu && (
-          <div className="space-y-6">
-            {/* Step indicator */}
-            <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-1">Let's build your menu</h2>
-              <p className="text-sm text-gray-500 mb-5">Start by adding a category (e.g. Starters, Main Dishes, Desserts), then add dishes to it.</p>
+          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">Let's build your menu</h2>
+            <p className="text-sm text-gray-500 mb-5">Start by adding a category (e.g. Starters, Main Dishes, Desserts), then add dishes to it.</p>
 
-              {/* Quick category suggestions */}
-              <div className="space-y-3">
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Quick add a category</p>
-                <div className="flex flex-wrap gap-2">
-                  {["Starters", "Main Dishes", "Desserts", "Drinks", "Salads", "Pizzas", "Burgers", "Sandwiches", "Soups", "Sides"].map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => handleQuickAddCategory(cat)}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 transition-colors shadow-sm"
-                    >
-                      <Plus size={14} />
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-3 pt-2">
-                  <div className="h-px flex-1 bg-gray-200" />
-                  <span className="text-xs text-gray-400">or</span>
-                  <div className="h-px flex-1 bg-gray-200" />
-                </div>
-
-                <Button variant="outline" onClick={() => setCategoryModal({ open: true })}>
-                  <FolderPlus size={16} />
-                  Custom category name
-                </Button>
+            {/* Quick category suggestions */}
+            <div className="space-y-3">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Quick add a category</p>
+              <div className="flex flex-wrap gap-2">
+                {["Starters", "Main Dishes", "Desserts", "Drinks", "Salads", "Pizzas", "Burgers", "Sandwiches", "Soups", "Sides"].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => handleQuickAddCategory(cat)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 transition-colors shadow-sm"
+                  >
+                    <Plus size={14} />
+                    {cat}
+                  </button>
+                ))}
               </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <div className="h-px flex-1 bg-gray-200" />
+                <span className="text-xs text-gray-400">or</span>
+                <div className="h-px flex-1 bg-gray-200" />
+              </div>
+
+              <Button variant="outline" onClick={() => setCategoryModal({ open: true })}>
+                <FolderPlus size={16} />
+                Custom category name
+              </Button>
             </div>
           </div>
         )}
@@ -316,39 +315,35 @@ export default function MenuEditorPage() {
                     setCategoryModal({ open: true, categoryId: category.id })
                   }
                   onDeleteCategory={() => handleDeleteCategory(category.id)}
+                  onAddDish={() => setDishModal({ open: true, categoryId: category.id })}
                 />
-
-                {/* Empty category prompt */}
-                {category.dishes.length === 0 && !search && (
-                  <div className="ml-4 mb-6 p-4 border border-dashed border-gray-300 rounded-lg text-center">
-                    <p className="text-sm text-gray-400 mb-3">No dishes yet in "{category.name}"</p>
-                    <Button
-                      size="sm"
-                      onClick={() => setDishModal({ open: true, categoryId: category.id })}
-                    >
-                      <Plus size={14} />
-                      Add first dish
-                    </Button>
-                  </div>
-                )}
               </div>
             ))}
 
-            {/* Action buttons */}
-            <div className="flex items-center gap-3 mt-6 pt-4 border-t border-gray-100">
-              <Button
-                onClick={() => {
-                  const catId = menu.categories[menu.categories.length - 1]?.id ?? "";
-                  if (catId) setDishModal({ open: true, categoryId: catId });
-                }}
-              >
-                <UtensilsCrossed size={16} />
-                New dish
-              </Button>
-              <Button variant="outline" onClick={() => setCategoryModal({ open: true })}>
-                <FolderPlus size={16} />
-                New category
-              </Button>
+            {/* Add more categories */}
+            <div className="mt-6 pt-4 border-t border-gray-100">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Add category</p>
+              <div className="flex flex-wrap gap-2">
+                {["Starters", "Main Dishes", "Desserts", "Drinks", "Salads", "Pizzas", "Burgers", "Sandwiches", "Soups", "Sides"]
+                  .filter((cat) => !menu.categories.some((c) => c.name === cat))
+                  .map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => handleQuickAddCategory(cat)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
+                    >
+                      <Plus size={12} />
+                      {cat}
+                    </button>
+                  ))}
+                <button
+                  onClick={() => setCategoryModal({ open: true })}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-indigo-300 hover:text-indigo-600 transition-colors"
+                >
+                  <FolderPlus size={12} />
+                  Custom
+                </button>
+              </div>
             </div>
           </>
         )}

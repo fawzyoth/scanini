@@ -4,8 +4,7 @@ import { useState } from "react";
 import { Category } from "@/types";
 import { DishCard } from "./dish-card";
 import { Dropdown } from "@/components/ui/dropdown";
-import { EmptyState } from "@/components/ui";
-import { MoreVertical, Edit, Trash2, UtensilsCrossed } from "lucide-react";
+import { MoreVertical, Edit, Trash2, UtensilsCrossed, Plus } from "lucide-react";
 
 interface CategorySectionProps {
   category: Category;
@@ -13,6 +12,7 @@ interface CategorySectionProps {
   onDeleteDish: (dishId: string) => void;
   onDeleteCategory: () => void;
   onEditCategory: () => void;
+  onAddDish: () => void;
 }
 
 export function CategorySection({
@@ -21,6 +21,7 @@ export function CategorySection({
   onDeleteDish,
   onDeleteCategory,
   onEditCategory,
+  onAddDish,
 }: CategorySectionProps) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -52,21 +53,37 @@ export function CategorySection({
       {!collapsed && (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
           {category.dishes.length === 0 ? (
-            <EmptyState
-              icon={<UtensilsCrossed size={40} className="text-blue-400" />}
-              title="Dishes in this category will appear here."
-            />
-          ) : (
-            <div className="divide-y divide-gray-100">
-              {category.dishes.map((dish) => (
-                <DishCard
-                  key={dish.id}
-                  dish={dish}
-                  onEdit={() => onEditDish(dish.id)}
-                  onDelete={() => onDeleteDish(dish.id)}
-                />
-              ))}
+            <div className="flex flex-col items-center justify-center py-8 px-4">
+              <UtensilsCrossed size={32} className="text-gray-300 mb-2" />
+              <p className="text-sm text-gray-400 mb-3">No dishes yet</p>
+              <button
+                onClick={onAddDish}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                <Plus size={14} />
+                Add first dish
+              </button>
             </div>
+          ) : (
+            <>
+              <div className="divide-y divide-gray-100">
+                {category.dishes.map((dish) => (
+                  <DishCard
+                    key={dish.id}
+                    dish={dish}
+                    onEdit={() => onEditDish(dish.id)}
+                    onDelete={() => onDeleteDish(dish.id)}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={onAddDish}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 text-sm text-indigo-600 font-medium hover:bg-indigo-50 transition-colors border-t border-gray-100 rounded-b-xl"
+              >
+                <Plus size={14} />
+                Add dish
+              </button>
+            </>
           )}
         </div>
       )}
