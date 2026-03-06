@@ -18,7 +18,7 @@ export default function PendingApprovalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center px-4 py-12">
+    <div className="flex-1 bg-gradient-to-b from-gray-50 to-white flex items-center justify-center px-4 py-12">
       <div className="max-w-lg w-full">
         {/* Logo */}
         <div className="text-center mb-10">
