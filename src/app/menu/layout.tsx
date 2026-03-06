@@ -1,4 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Menu",
