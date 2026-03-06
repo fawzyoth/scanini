@@ -1,6 +1,7 @@
 "use client";
 
 import { Eye, Star, MessageSquare, UtensilsCrossed } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 interface KpiCardsProps {
   totalScans: number;
@@ -11,27 +12,28 @@ interface KpiCardsProps {
 }
 
 export function KpiCards({ totalScans, totalReviews, avgRating, totalMenus, totalDishes }: KpiCardsProps) {
+  const { t } = useTranslation();
   const cards = [
     {
-      label: "Total scans",
+      label: t("stats.totalScans"),
       value: totalScans.toLocaleString(),
       icon: Eye,
       color: "text-blue-600 bg-blue-50",
     },
     {
-      label: "Reviews",
+      label: t("stats.reviews"),
       value: totalReviews.toLocaleString(),
       icon: MessageSquare,
       color: "text-purple-600 bg-purple-50",
     },
     {
-      label: "Avg. rating",
+      label: t("stats.avgRating"),
       value: avgRating > 0 ? avgRating.toFixed(1) : "—",
       icon: Star,
       color: "text-yellow-600 bg-yellow-50",
     },
     {
-      label: "Menus / Dishes",
+      label: t("stats.menusDishes"),
       value: `${totalMenus} / ${totalDishes}`,
       icon: UtensilsCrossed,
       color: "text-green-600 bg-green-50",

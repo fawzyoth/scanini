@@ -6,6 +6,7 @@ import { Button, PageHeader, Select } from "@/components/ui";
 import { QRPreview, QRSettingsPanel } from "@/components/qr-code";
 import { useDashboard } from "@/lib/dashboard-context";
 import { QRSettings } from "@/types";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 const DEFAULT_QR: QRSettings = {
   frameType: "bottom",
@@ -20,15 +21,9 @@ const DEFAULT_QR: QRSettings = {
   cornerColor: "#000000",
 };
 
-const DOWNLOAD_OPTIONS = [
-  { value: "pdf-16", label: "PDF with 16 small QR" },
-  { value: "pdf-1", label: "PDF with 1 large QR" },
-  { value: "png", label: "PNG image" },
-  { value: "svg", label: "SVG vector" },
-];
-
 export default function QRCodePage() {
   const { qrSettings, restaurant, loading } = useDashboard();
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<QRSettings>(DEFAULT_QR);
   const [downloadFormat, setDownloadFormat] = useState("pdf-16");
 
@@ -52,15 +47,22 @@ export default function QRCodePage() {
     ? `${window.location.origin}/menu/${restaurant?.id ?? ""}`
     : `/menu/${restaurant?.id ?? ""}`;
 
+  const DOWNLOAD_OPTIONS = [
+    { value: "pdf-16", label: t("qr.pdf16") },
+    { value: "pdf-1", label: t("qr.pdf1") },
+    { value: "png", label: t("qr.pngImage") },
+    { value: "svg", label: t("qr.svgVector") },
+  ];
+
   return (
     <>
-      <PageHeader title="QR code">
+      <PageHeader title={t("qr.title")}>
         <div className="flex items-center gap-1 text-gray-400">
           <Info size={16} />
         </div>
         <Button variant="outline" size="md" onClick={() => { navigator.clipboard.writeText(menuUrl); }}>
           <Link2 size={16} />
-          Copy link
+          {t("qr.copyLink")}
         </Button>
       </PageHeader>
 
@@ -78,22 +80,22 @@ export default function QRCodePage() {
             />
 
             <Button fullWidth size="lg">
-              Download QR
+              {t("qr.downloadQr")}
             </Button>
 
             <button
               onClick={handleReset}
               className="w-full text-center text-sm text-indigo-600 hover:text-indigo-700"
             >
-              Reset settings
+              {t("qr.resetSettings")}
             </button>
 
             <div className="bg-green-50 rounded-xl p-4 border border-green-200">
               <h4 className="text-sm font-semibold text-green-800">
-                Claim your free QR stickers
+                {t("qr.claimStickers")}
               </h4>
               <p className="text-xs text-green-700 mt-1">
-                We provide adhesive laminated vinyl QR codes for you to distribute on the tables of your restaurant.
+                {t("qr.stickersDesc")}
               </p>
             </div>
           </div>

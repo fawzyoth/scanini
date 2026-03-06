@@ -11,11 +11,14 @@ import { Button } from "@/components/ui";
 import { CategorySection, DishFormModal, CategoryFormModal } from "@/components/menu-editor";
 import { useDashboard } from "@/lib/dashboard-context";
 import { createClient } from "@/lib/supabase/client";
-import { Menu, Dish } from "@/types";
+import { useDragReorder } from "@/lib/use-drag-reorder";
+import { Menu, Dish, Category } from "@/types";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function MenuEditorPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { t } = useTranslation();
   const { menus, loading, reload } = useDashboard();
   const [deleting, setDeleting] = useState(false);
   const [menu, setMenu] = useState<Menu | null>(null);
@@ -170,13 +173,42 @@ export default function MenuEditorPage() {
 
   async function handleDeleteMenu() {
     if (!menu || deleting) return;
-    if (!confirm("Are you sure you want to delete this menu? This will also delete all categories and dishes in it.")) return;
+    if (!confirm(t("editor.confirmDeleteMenu"))) return;
     setDeleting(true);
     const supabase = createClient();
     await supabase.from("menus").delete().eq("id", menu.id);
     await reload();
     router.push("/menus");
   }
+
+  async function handleReorderCategories(reordered: Category[]) {
+    setMenu((prev) => prev ? { ...prev, categories: reordered } : prev);
+    const supabase = createClient();
+    const updates = reordered.map((c, i) =>
+      (supabase.from("categories") as any).update({ sort_order: i }).eq("id", c.id)
+    );
+    await Promise.all(updates);
+  }
+
+  async function handleReorderDishes(categoryId: string, reordered: Dish[]) {
+    setMenu((prev) => prev ? {
+      ...prev,
+      categories: prev.categories.map((cat) =>
+        cat.id === categoryId ? { ...cat, dishes: reordered } : cat
+      ),
+    } : prev);
+    const supabase = createClient();
+    const updates = reordered.map((d, i) =>
+      (supabase.from("dishes") as any).update({ sort_order: i }).eq("id", d.id)
+    );
+    await Promise.all(updates);
+  }
+
+  const { getDragProps: getCategoryDragProps, getItemStyle: getCategoryStyle } = useDragReorder({
+    items: menu.categories,
+    getId: (c) => c.id,
+    onReorder: handleReorderCategories,
+  });
 
   const filteredCategories = menu.categories.map((cat) => ({
     ...cat,
@@ -187,52 +219,79 @@ export default function MenuEditorPage() {
 
   const totalDishes = menu.categories.reduce((sum, c) => sum + c.dishes.length, 0);
 
+  const categoryNames: Record<string, string> = {
+    "Starters": t("editor.starters"),
+    "Main Dishes": t("editor.mainDishes"),
+    "Desserts": t("editor.desserts"),
+    "Drinks": t("editor.drinks"),
+    "Salads": t("editor.salads"),
+    "Pizzas": t("editor.pizzas"),
+    "Burgers": t("editor.burgers"),
+    "Sandwiches": t("editor.sandwiches"),
+    "Soups": t("editor.soups"),
+    "Sides": t("editor.sides"),
+  };
+
   return (
     <>
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-6">
-        <Link href="/menus" className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
-          <ArrowLeft size={16} />
-          My menus
-        </Link>
-        <div className="flex items-center gap-3">
-          {!isNewMenu && (
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search dishes..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-          )}
-          <Button
-            variant="outline"
-            size="md"
-            className="text-red-600 border-red-200 hover:bg-red-50"
-            onClick={handleDeleteMenu}
-            disabled={deleting}
-          >
-            <Trash2 size={16} />
-            Delete
-          </Button>
-          <Link href="/menus">
-            <Button size="md">
-              <Check size={16} />
-              Done
-            </Button>
+      <div className="flex flex-col gap-3 mb-6">
+        <div className="flex items-center justify-between">
+          <Link href="/menus" className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
+            <ArrowLeft size={16} />
+            {t("editor.myMenus")}
           </Link>
+          <div className="flex items-center gap-2 sm:gap-3">
+            {!isNewMenu && (
+              <div className="relative hidden sm:block">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder={t("editor.searchDishes")}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-48"
+                />
+              </div>
+            )}
+            <Button
+              variant="outline"
+              size="md"
+              className="text-red-600 border-red-200 hover:bg-red-50"
+              onClick={handleDeleteMenu}
+              disabled={deleting}
+            >
+              <Trash2 size={16} />
+              <span className="hidden sm:inline">{t("editor.delete")}</span>
+            </Button>
+            <Link href="/menus">
+              <Button size="md">
+                <Check size={16} />
+                <span className="hidden sm:inline">{t("editor.done")}</span>
+              </Button>
+            </Link>
+          </div>
         </div>
+        {!isNewMenu && (
+          <div className="relative sm:hidden">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder={t("editor.searchDishes")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        )}
       </div>
 
       <div className="max-w-3xl mx-auto">
-        {/* Menu name — editable */}
-        <div className="flex items-center gap-3 mb-2">
-          <UtensilsCrossed size={24} className="text-gray-400" />
+        {/* Menu name -- editable */}
+        <div className="flex items-center gap-2 sm:gap-3 mb-2">
+          <UtensilsCrossed size={20} className="text-gray-400 shrink-0 sm:w-6 sm:h-6" />
           {editingName ? (
-            <div className="flex items-center gap-2 flex-1">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
               <input
                 type="text"
                 value={menuName}
@@ -242,71 +301,73 @@ export default function MenuEditorPage() {
                   if (e.key === "Enter") handleSaveMenuName();
                   if (e.key === "Escape") { setEditingName(false); setMenuName(menu.name); }
                 }}
-                className="text-2xl font-bold text-gray-900 border-b-2 border-indigo-500 focus:outline-none bg-transparent flex-1"
+                className="text-xl sm:text-2xl font-bold text-gray-900 border-b-2 border-indigo-500 focus:outline-none bg-transparent flex-1 min-w-0"
               />
-              <button onClick={handleSaveMenuName} className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg">
+              <button onClick={handleSaveMenuName} className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg shrink-0">
                 <Check size={18} />
               </button>
-              <button onClick={() => { setEditingName(false); setMenuName(menu.name); }} className="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg">
+              <button onClick={() => { setEditingName(false); setMenuName(menu.name); }} className="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg shrink-0">
                 <X size={18} />
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2 group cursor-pointer" onClick={() => setEditingName(true)}>
-              <h1 className="text-2xl font-bold text-gray-900">{menu.name}</h1>
-              <Pencil size={16} className="text-gray-300 group-hover:text-gray-500 transition-colors" />
+            <div className="flex items-center gap-2 group cursor-pointer min-w-0" onClick={() => setEditingName(true)}>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{menu.name}</h1>
+              <Pencil size={16} className="text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" />
             </div>
           )}
         </div>
 
         {/* Stats bar */}
         <p className="text-sm text-gray-400 mb-8 ml-9">
-          {menu.categories.length} {menu.categories.length === 1 ? "category" : "categories"} · {totalDishes} {totalDishes === 1 ? "dish" : "dishes"}
+          {menu.categories.length} {menu.categories.length === 1 ? t("editor.category") : t("editor.categories")} · {totalDishes} {totalDishes === 1 ? t("editor.dish") : t("editor.dishesPlural")}
         </p>
 
-        {/* ── GUIDED SETUP for new/empty menus ── */}
+        {/* -- GUIDED SETUP for new/empty menus -- */}
         {isNewMenu && (
-          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">Let's build your menu</h2>
-            <p className="text-sm text-gray-500 mb-5">Start by adding a category (e.g. Starters, Main Dishes, Desserts), then add dishes to it.</p>
+          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 p-4 sm:p-6 mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">{t("editor.letsBuiltMenu")}</h2>
+            <p className="text-sm text-gray-500 mb-4 sm:mb-5">{t("editor.startByAdding")}</p>
 
             {/* Quick category suggestions */}
             <div className="space-y-3">
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Quick add a category</p>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t("editor.quickAddCategory")}</p>
               <div className="flex flex-wrap gap-2">
-                {["Starters", "Main Dishes", "Desserts", "Drinks", "Salads", "Pizzas", "Burgers", "Sandwiches", "Soups", "Sides"].map((cat) => (
+                {(["Starters", "Main Dishes", "Desserts", "Drinks", "Salads", "Pizzas", "Burgers", "Sandwiches", "Soups", "Sides"] as const).map((cat) => (
                   <button
                     key={cat}
-                    onClick={() => handleQuickAddCategory(cat)}
+                    onClick={() => handleQuickAddCategory(categoryNames[cat])}
                     className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 transition-colors shadow-sm"
                   >
                     <Plus size={14} />
-                    {cat}
+                    {categoryNames[cat]}
                   </button>
                 ))}
               </div>
 
               <div className="flex items-center gap-3 pt-2">
                 <div className="h-px flex-1 bg-gray-200" />
-                <span className="text-xs text-gray-400">or</span>
+                <span className="text-xs text-gray-400">{t("common.or")}</span>
                 <div className="h-px flex-1 bg-gray-200" />
               </div>
 
               <Button variant="outline" onClick={() => setCategoryModal({ open: true })}>
                 <FolderPlus size={16} />
-                Custom category name
+                {t("editor.customCategoryName")}
               </Button>
             </div>
           </div>
         )}
 
-        {/* ── CATEGORIES WITH DISHES ── */}
+        {/* -- CATEGORIES WITH DISHES -- */}
         {!isNewMenu && (
           <>
             {filteredCategories.map((category) => (
               <div key={category.id} className="mb-2">
                 <CategorySection
                   category={category}
+                  categoryDragProps={getCategoryDragProps(category.id)}
+                  categoryDragStyle={getCategoryStyle(category.id)}
                   onEditDish={(dishId) => {
                     const dish = category.dishes.find((d) => d.id === dishId);
                     setDishModal({ open: true, categoryId: category.id, dish });
@@ -317,24 +378,25 @@ export default function MenuEditorPage() {
                   }
                   onDeleteCategory={() => handleDeleteCategory(category.id)}
                   onAddDish={() => setDishModal({ open: true, categoryId: category.id })}
+                  onReorderDishes={handleReorderDishes}
                 />
               </div>
             ))}
 
             {/* Add more categories */}
             <div className="mt-6 pt-4 border-t border-gray-100">
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Add category</p>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">{t("editor.addCategory")}</p>
               <div className="flex flex-wrap gap-2">
-                {["Starters", "Main Dishes", "Desserts", "Drinks", "Salads", "Pizzas", "Burgers", "Sandwiches", "Soups", "Sides"]
-                  .filter((cat) => !menu.categories.some((c) => c.name === cat))
+                {(["Starters", "Main Dishes", "Desserts", "Drinks", "Salads", "Pizzas", "Burgers", "Sandwiches", "Soups", "Sides"] as const)
+                  .filter((cat) => !menu.categories.some((c) => c.name === categoryNames[cat]))
                   .map((cat) => (
                     <button
                       key={cat}
-                      onClick={() => handleQuickAddCategory(cat)}
+                      onClick={() => handleQuickAddCategory(categoryNames[cat])}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
                     >
                       <Plus size={12} />
-                      {cat}
+                      {categoryNames[cat]}
                     </button>
                   ))}
                 <button
@@ -342,7 +404,7 @@ export default function MenuEditorPage() {
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-indigo-300 hover:text-indigo-600 transition-colors"
                 >
                   <FolderPlus size={12} />
-                  Custom
+                  {t("editor.custom")}
                 </button>
               </div>
             </div>

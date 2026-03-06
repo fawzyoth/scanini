@@ -1,6 +1,6 @@
 export const NAV_ITEMS = [
-  { label: "Menus", href: "/menus", icon: "utensils-crossed" },
-  { label: "Stats", href: "/stats", icon: "bar-chart-3" },
-  { label: "QR code", href: "/qr-code", icon: "qr-code" },
-  { label: "Settings", href: "/settings", icon: "settings" },
+  { labelKey: "nav.menus", href: "/menus", icon: "utensils-crossed" },
+  { labelKey: "nav.stats", href: "/stats", icon: "bar-chart-3" },
+  { labelKey: "nav.qrCode", href: "/qr-code", icon: "qr-code" },
+  { labelKey: "nav.settings", href: "/settings", icon: "settings" },
 ] as const;

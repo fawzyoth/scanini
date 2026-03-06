@@ -3,6 +3,8 @@
 import { Menu } from "@/types";
 import { MenuTableRow } from "./menu-table-row";
 import { MenuCard } from "./menu-card";
+import { useDragReorder } from "@/lib/use-drag-reorder";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export interface MenuActionHandlers {
   onToggleVisibility: (id: string) => void;
@@ -13,13 +15,21 @@ export interface MenuActionHandlers {
   onMoveDown: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onReorder?: (reordered: Menu[]) => void;
 }
 
 interface MenuTableProps extends MenuActionHandlers {
   menus: Menu[];
 }
 
-export function MenuTable({ menus, ...handlers }: MenuTableProps) {
+export function MenuTable({ menus, onReorder, ...handlers }: MenuTableProps) {
+  const { t } = useTranslation();
+  const { getDragProps, getItemStyle } = useDragReorder({
+    items: menus,
+    getId: (m) => m.id,
+    onReorder: (reordered) => onReorder?.(reordered),
+  });
+
   return (
     <>
       {/* Desktop table */}
@@ -27,17 +37,18 @@ export function MenuTable({ menus, ...handlers }: MenuTableProps) {
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-200">
+              <th className="px-6 py-3 w-8"></th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Name
+                {t("menus.name")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Dishes
+                {t("menus.dishes")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Availability
+                {t("menus.availability")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Visibility
+                {t("menus.visibility")}
               </th>
               <th className="px-6 py-3 w-12"></th>
             </tr>
@@ -48,6 +59,8 @@ export function MenuTable({ menus, ...handlers }: MenuTableProps) {
                 key={menu.id}
                 menu={menu}
                 isLast={index === menus.length - 1}
+                dragProps={getDragProps(menu.id)}
+                dragStyle={getItemStyle(menu.id)}
                 {...handlers}
               />
             ))}
@@ -62,6 +75,8 @@ export function MenuTable({ menus, ...handlers }: MenuTableProps) {
             key={menu.id}
             menu={menu}
             isLast={index === menus.length - 1}
+            dragProps={getDragProps(menu.id)}
+            dragStyle={getItemStyle(menu.id)}
             {...handlers}
           />
         ))}

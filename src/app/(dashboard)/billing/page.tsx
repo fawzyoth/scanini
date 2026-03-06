@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/ui";
 import { Check, Zap, Crown, Loader2 } from "lucide-react";
 import { useDashboard } from "@/lib/dashboard-context";
 import { PLAN_LIMITS } from "@/data/admin-mock";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 const PLANS = [
   {
@@ -69,6 +70,7 @@ const PLANS = [
 
 export default function BillingPage() {
   const { restaurant, usage, loading } = useDashboard();
+  const { t } = useTranslation();
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
 
   if (loading) {
@@ -85,13 +87,13 @@ export default function BillingPage() {
 
   return (
     <>
-      <PageHeader title="Plan & billing" />
+      <PageHeader title={t("billing.title")} />
 
       <div className="max-w-5xl space-y-6">
         {/* Current plan overview */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
           <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-semibold text-gray-900">Current plan</h2>
+            <h2 className="text-base font-semibold text-gray-900">{t("billing.currentPlan")}</h2>
           </div>
           <div className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -99,11 +101,11 @@ export default function BillingPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-gray-900">{currentPlan.name}</span>
                   <span className="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-                    Active
+                    {t("common.active")}
                   </span>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  {currentPlan.price === 0 ? "Free forever" : `${currentPlan.price} DT / month`}
+                  {currentPlan.price === 0 ? t("billing.freeForever") : `${currentPlan.price} DT ${t("billing.perMonth")}`}
                 </p>
               </div>
               <a
@@ -111,7 +113,7 @@ export default function BillingPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
               >
                 <Zap size={16} />
-                Upgrade plan
+                {t("billing.upgradePlan")}
               </a>
             </div>
           </div>
@@ -120,13 +122,13 @@ export default function BillingPage() {
         {/* Usage & limits */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
           <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-semibold text-gray-900">Usage & limits</h2>
-            <p className="text-sm text-gray-500 mt-0.5">Your current usage on the {currentPlan.name} plan</p>
+            <h2 className="text-base font-semibold text-gray-900">{t("billing.usageLimits")}</h2>
+            <p className="text-sm text-gray-500 mt-0.5">{t("billing.yourUsageOn")} {currentPlan.name}</p>
           </div>
           <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <UsageMeter label="Menus" current={usage.menus} max={limits.menus} />
-            <UsageMeter label="Dishes" current={usage.dishes} max={limits.dishes} />
-            <UsageMeter label="Scans this month" current={usage.scansThisMonth} max={limits.scans} />
+            <UsageMeter label={t("billing.menus")} current={usage.menus} max={limits.menus} />
+            <UsageMeter label={t("billing.dishes")} current={usage.dishes} max={limits.dishes} />
+            <UsageMeter label={t("billing.scansThisMonth")} current={usage.scansThisMonth} max={limits.scans} />
           </div>
         </div>
 
@@ -135,8 +137,8 @@ export default function BillingPage() {
           <div className="px-6 py-4 border-b border-gray-100">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <h2 className="text-base font-semibold text-gray-900">Plans</h2>
-                <p className="text-sm text-gray-500 mt-0.5">Choose the plan that fits your restaurant</p>
+                <h2 className="text-base font-semibold text-gray-900">{t("billing.plans")}</h2>
+                <p className="text-sm text-gray-500 mt-0.5">{t("billing.choosePlan")}</p>
               </div>
 
               <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
@@ -148,7 +150,7 @@ export default function BillingPage() {
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  Monthly
+                  {t("billing.monthly")}
                 </button>
                 <button
                   onClick={() => setBilling("yearly")}
@@ -158,8 +160,8 @@ export default function BillingPage() {
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  Yearly
-                  <span className="ml-1 text-xs text-green-600 font-semibold">Save 2 months</span>
+                  {t("billing.yearly")}
+                  <span className="ml-1 text-xs text-green-600 font-semibold">{t("billing.save2Months")}</span>
                 </button>
               </div>
             </div>
@@ -184,7 +186,7 @@ export default function BillingPage() {
                     {plan.popular && (
                       <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-indigo-600 text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full">
                         <Crown size={10} />
-                        Most popular
+                        {t("billing.mostPopular")}
                       </div>
                     )}
 
@@ -192,7 +194,7 @@ export default function BillingPage() {
 
                     <div className="mt-3 mb-4">
                       {price === 0 ? (
-                        <span className="text-2xl font-bold text-gray-900">Free</span>
+                        <span className="text-2xl font-bold text-gray-900">{t("billing.free")}</span>
                       ) : (
                         <>
                           <span className="text-2xl font-bold text-gray-900">{price} DT</span>
@@ -210,14 +212,14 @@ export default function BillingPage() {
                       ))}
                     </ul>
 
-                    <p className="text-[10px] text-gray-400 mb-3">Best for: {plan.bestFor}</p>
+                    <p className="text-[10px] text-gray-400 mb-3">{t("billing.bestFor")} {plan.bestFor}</p>
 
                     {isCurrent ? (
                       <button
                         disabled
                         className="w-full text-center text-sm font-medium py-2 rounded-lg bg-gray-100 text-gray-400 cursor-default"
                       >
-                        Current plan
+                        {t("billing.currentPlanBtn")}
                       </button>
                     ) : (
                       <a
@@ -232,7 +234,7 @@ export default function BillingPage() {
                             : "border border-gray-300 text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        Upgrade
+                        {t("common.upgrade")}
                       </a>
                     )}
                   </div>
@@ -247,7 +249,8 @@ export default function BillingPage() {
 }
 
 function UsageMeter({ label, current, max }: { label: string; current: number; max: number }) {
-  const displayMax = max >= 999 ? "Unlimited" : max.toString();
+  const { t } = useTranslation();
+  const displayMax = max >= 999 ? t("billing.unlimited") : max.toString();
   const pct = max >= 999 ? Math.min((current / 100) * 10, 100) : Math.min((current / max) * 100, 100);
   const overLimit = max < 999 && current > max;
 
@@ -268,7 +271,7 @@ function UsageMeter({ label, current, max }: { label: string; current: number; m
         />
       </div>
       {overLimit && (
-        <p className="text-xs text-red-500 mt-1">Over limit - upgrade to continue</p>
+        <p className="text-xs text-red-500 mt-1">{t("billing.overLimit")}</p>
       )}
     </div>
   );

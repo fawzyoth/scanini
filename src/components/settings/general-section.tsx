@@ -5,9 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/lib/dashboard-context";
 import { ImageIcon, Loader2, X } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export function GeneralSection() {
   const { restaurant, updateRestaurant } = useDashboard();
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
@@ -58,7 +60,7 @@ export function GeneralSection() {
     <div className="space-y-4">
       {/* Cover image */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Cover image</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t("general.coverImage")}</label>
         <label className="block cursor-pointer">
           {coverImage ? (
             <div className="relative w-full h-40 rounded-xl overflow-hidden bg-gray-100">
@@ -83,8 +85,8 @@ export function GeneralSection() {
               ) : (
                 <>
                   <ImageIcon size={32} className="text-gray-300" />
-                  <span className="text-sm text-indigo-600 font-medium">Upload cover image</span>
-                  <span className="text-xs text-gray-400">Recommended: 1200 x 400px</span>
+                  <span className="text-sm text-indigo-600 font-medium">{t("general.uploadCover")}</span>
+                  <span className="text-xs text-gray-400">{t("general.recommended")}</span>
                 </>
               )}
             </div>
@@ -93,12 +95,12 @@ export function GeneralSection() {
         </label>
       </div>
 
-      <Input label="Restaurant name" value={name} onChange={(e) => setName(e.target.value)} />
-      <Input label="Phone number" value={phone} onChange={(e) => setPhone(e.target.value)} />
-      <Input label="Address" value={address} onChange={(e) => setAddress(e.target.value)} />
+      <Input label={t("general.restaurantName")} value={name} onChange={(e) => setName(e.target.value)} />
+      <Input label={t("general.phoneNumber")} value={phone} onChange={(e) => setPhone(e.target.value)} />
+      <Input label={t("general.address")} value={address} onChange={(e) => setAddress(e.target.value)} />
       <div className="pt-2 flex items-center gap-3">
-        <Button size="sm" onClick={handleSave}>Save changes</Button>
-        {saved && <span className="text-sm text-green-600 font-medium">Saved!</span>}
+        <Button size="sm" onClick={handleSave}>{t("common.saveChanges")}</Button>
+        {saved && <span className="text-sm text-green-600 font-medium">{t("common.saved")}</span>}
       </div>
     </div>
   );

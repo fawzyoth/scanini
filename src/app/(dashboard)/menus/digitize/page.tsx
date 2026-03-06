@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Upload, Loader2, Sparkles, ArrowLeft, X, Plus, Trash2, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { Button, Input } from "@/components/ui";
 import { generateId } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 interface ParsedDish {
   name: string;
@@ -26,6 +27,7 @@ type Step = "upload" | "processing" | "review";
 
 export default function DigitizePage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const fileRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<Step>("upload");
   const [preview, setPreview] = useState<string | null>(null);
@@ -36,11 +38,11 @@ export default function DigitizePage() {
 
   const handleFile = useCallback(async (file: File) => {
     if (!file.type.startsWith("image/")) {
-      setError("Please upload an image file (JPG, PNG, etc.)");
+      setError(t("digitize.imageError"));
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setError("Image must be smaller than 10MB");
+      setError(t("digitize.sizeError"));
       return;
     }
 
@@ -68,7 +70,7 @@ export default function DigitizePage() {
       setError(err instanceof Error ? err.message : "Failed to process image");
       setStep("upload");
     }
-  }, []);
+  }, [t]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -190,8 +192,8 @@ export default function DigitizePage() {
           <ArrowLeft size={20} />
         </button>
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Digitize with AI</h1>
-          <p className="text-sm text-gray-500">Upload a photo of your menu to extract dishes automatically</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t("digitize.title")}</h1>
+          <p className="text-sm text-gray-500">{t("digitize.subtitle")}</p>
         </div>
       </div>
 
@@ -207,15 +209,15 @@ export default function DigitizePage() {
             <Upload size={28} className="text-indigo-600" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-1">
-            Upload your menu
+            {t("digitize.uploadTitle")}
           </h3>
           <p className="text-sm text-gray-500 mb-4 max-w-sm">
-            Take a clear photo or drag and drop an image of your menu. We&apos;ll extract all the dishes, prices, and categories.
+            {t("digitize.uploadDesc")}
           </p>
           <Button variant="outline" size="md" onClick={(e) => { e.stopPropagation(); fileRef.current?.click(); }}>
-            Choose image
+            {t("digitize.chooseImage")}
           </Button>
-          <p className="text-xs text-gray-400 mt-3">JPG, PNG up to 10MB</p>
+          <p className="text-xs text-gray-400 mt-3">{t("digitize.imageFormats")}</p>
           <input
             ref={fileRef}
             type="file"
@@ -239,9 +241,9 @@ export default function DigitizePage() {
             <Loader2 size={24} className="text-indigo-600 animate-spin" />
             <Sparkles size={20} className="text-indigo-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">Analyzing your menu...</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">{t("digitize.analyzing")}</h3>
           <p className="text-sm text-gray-500">
-            Our AI is reading the text, detecting dishes and prices. This may take a few seconds.
+            {t("digitize.analyzingDesc")}
           </p>
         </div>
       )}
@@ -251,7 +253,7 @@ export default function DigitizePage() {
         <div className="space-y-4">
           {/* Menu name */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Menu name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("digitize.menuName")}</label>
             <input
               type="text"
               value={menu.name}
@@ -263,7 +265,7 @@ export default function DigitizePage() {
           {/* Detected text (collapsible) */}
           <details className="bg-gray-50 rounded-xl border border-gray-200 p-4">
             <summary className="text-sm font-medium text-gray-600 cursor-pointer select-none">
-              Raw detected text
+              {t("digitize.rawText")}
             </summary>
             <pre className="mt-2 text-xs text-gray-500 whitespace-pre-wrap max-h-48 overflow-y-auto">
               {rawText}
@@ -285,7 +287,7 @@ export default function DigitizePage() {
                   className="flex-1 text-sm font-semibold text-gray-900 bg-transparent border-none focus:outline-none focus:ring-0 p-0"
                 />
                 <span className="text-xs text-gray-400 shrink-0">
-                  {cat.dishes.length} dish{cat.dishes.length !== 1 ? "es" : ""}
+                  {cat.dishes.length} {cat.dishes.length !== 1 ? t("editor.dishesPlural") : t("editor.dish")}
                 </span>
                 <button
                   onClick={() => removeCategory(catIdx)}
@@ -306,7 +308,7 @@ export default function DigitizePage() {
                             type="text"
                             value={dish.name}
                             onChange={(e) => updateDish(catIdx, dishIdx, "name", e.target.value)}
-                            placeholder="Dish name"
+                            placeholder={t("digitize.dishName")}
                             className="flex-1 min-w-0 text-sm font-medium text-gray-900 bg-transparent border-none focus:outline-none p-0 placeholder:text-gray-300"
                           />
                           <div className="flex items-center gap-1 shrink-0">
@@ -326,7 +328,7 @@ export default function DigitizePage() {
                           type="text"
                           value={dish.description}
                           onChange={(e) => updateDish(catIdx, dishIdx, "description", e.target.value)}
-                          placeholder="Description (optional)"
+                          placeholder={t("digitize.descriptionOptional")}
                           className="w-full text-xs text-gray-500 bg-transparent border-none focus:outline-none p-0 placeholder:text-gray-300"
                         />
                       </div>
@@ -344,7 +346,7 @@ export default function DigitizePage() {
                     className="w-full flex items-center gap-2 px-4 sm:px-6 py-2.5 text-sm text-indigo-600 hover:bg-indigo-50 transition-colors"
                   >
                     <Plus size={14} />
-                    Add dish
+                    {t("digitize.addDish")}
                   </button>
                 </div>
               )}
@@ -357,7 +359,7 @@ export default function DigitizePage() {
             className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-gray-600 bg-white rounded-xl border border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors"
           >
             <Plus size={16} />
-            Add category
+            {t("digitize.addCategory")}
           </button>
 
           {/* Actions */}
@@ -372,11 +374,11 @@ export default function DigitizePage() {
               }}
               className="sm:w-auto"
             >
-              Start over
+              {t("common.startOver")}
             </Button>
             <Button fullWidth onClick={handleSave} className="sm:w-auto sm:ml-auto">
               <Check size={16} />
-              Create menu
+              {t("digitize.createMenu")}
             </Button>
           </div>
         </div>
@@ -392,7 +394,7 @@ export default function DigitizePage() {
               onClick={() => setError(null)}
               className="text-xs text-red-600 hover:underline mt-1"
             >
-              Dismiss
+              {t("common.dismiss")}
             </button>
           </div>
         </div>

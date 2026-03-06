@@ -10,6 +10,7 @@ import { AllergenSelector } from "./allergen-selector";
 import { PriceVariants, DEFAULT_VARIANTS, type Variant } from "./price-variants";
 import { TAGS } from "@/constants/dish-options";
 import { generateId } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 interface DishFormModalProps {
   open: boolean;
@@ -19,6 +20,7 @@ interface DishFormModalProps {
 }
 
 export function DishFormModal({ open, onClose, onSave, dish }: DishFormModalProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -73,13 +75,13 @@ export function DishFormModal({ open, onClose, onSave, dish }: DishFormModalProp
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={dish ? "Edit dish" : "New dish"} size="lg">
+    <Modal open={open} onClose={onClose} title={dish ? t("dishForm.editDish") : t("dishForm.newDish")} size="lg">
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Name + Image row */}
         <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-6">
           <div className="space-y-5">
             <div>
-              <label className="block text-base font-semibold text-gray-900 mb-2">Name</label>
+              <label className="block text-base font-semibold text-gray-900 mb-2">{t("dishForm.name")}</label>
               <input
                 type="text"
                 value={name}
@@ -90,7 +92,7 @@ export function DishFormModal({ open, onClose, onSave, dish }: DishFormModalProp
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-900 mb-2">Description</label>
+              <label className="block text-base font-semibold text-gray-900 mb-2">{t("dishForm.description")}</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -106,13 +108,13 @@ export function DishFormModal({ open, onClose, onSave, dish }: DishFormModalProp
         {/* Price */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="text-base font-semibold text-gray-900">Price</label>
+            <label className="text-base font-semibold text-gray-900">{t("dishForm.price")}</label>
             <button
               type="button"
               onClick={() => setUseVariants(!useVariants)}
               className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
             >
-              {useVariants ? "Change to single price" : "Add variants"}
+              {useVariants ? t("dishForm.singlePrice") : t("dishForm.addVariants")}
             </button>
           </div>
 
@@ -136,7 +138,7 @@ export function DishFormModal({ open, onClose, onSave, dish }: DishFormModalProp
 
         {/* Tags */}
         <div>
-          <label className="block text-base font-semibold text-gray-900 mb-3">Tags</label>
+          <label className="block text-base font-semibold text-gray-900 mb-3">{t("dishForm.tags")}</label>
           <div className="flex flex-wrap gap-2">
             {TAGS.map((tag) => (
               <TagChip
@@ -151,13 +153,13 @@ export function DishFormModal({ open, onClose, onSave, dish }: DishFormModalProp
 
         {/* Allergens */}
         <div>
-          <label className="block text-base font-semibold text-gray-900 mb-3">Allergens</label>
+          <label className="block text-base font-semibold text-gray-900 mb-3">{t("dishForm.allergens")}</label>
           <AllergenSelector selected={allergens} onChange={setAllergens} />
         </div>
 
         {/* Save button */}
         <div className="flex justify-end pt-2">
-          <Button type="submit">Save</Button>
+          <Button type="submit">{t("dishForm.save")}</Button>
         </div>
       </form>
     </Modal>

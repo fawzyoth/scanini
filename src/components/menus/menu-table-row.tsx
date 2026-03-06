@@ -4,12 +4,16 @@ import Link from "next/link";
 import { Menu } from "@/types";
 import { Toggle } from "@/components/ui";
 import { Dropdown } from "@/components/ui/dropdown";
-import { MoreVertical, Copy, Edit, Calendar, Image, ArrowDown, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical, Copy, Edit, Calendar, Image, ArrowDown, Pencil, Trash2, GripVertical } from "lucide-react";
 import { MenuIcon } from "./menu-icon";
+import { DragProps } from "@/lib/use-drag-reorder";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 interface MenuTableRowProps {
   menu: Menu;
   isLast: boolean;
+  dragProps: DragProps;
+  dragStyle: string;
   onToggleVisibility: (id: string) => void;
   onDuplicate: (id: string) => void;
   onRename: (id: string) => void;
@@ -21,11 +25,17 @@ interface MenuTableRowProps {
 }
 
 export function MenuTableRow({
-  menu, isLast, onToggleVisibility, onDuplicate,
+  menu, isLast, dragProps, dragStyle, onToggleVisibility, onDuplicate,
   onRename, onAdjustAvailability, onChangeIcon, onMoveDown, onEdit, onDelete,
 }: MenuTableRowProps) {
+  const { t } = useTranslation();
   return (
-    <tr className="hover:bg-gray-50 transition-colors">
+    <tr className={`hover:bg-gray-50 transition-colors ${dragStyle}`} {...dragProps}>
+      <td className="px-2 py-4">
+        <button className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 p-1">
+          <GripVertical size={16} />
+        </button>
+      </td>
       <td className="px-6 py-4">
         <Link href={`/menus/${menu.id}`} className="flex items-center gap-3 group">
           <MenuIcon name={menu.icon} size={18} className="text-gray-400" />
@@ -47,13 +57,13 @@ export function MenuTableRow({
             </button>
           }
           items={[
-            { label: "Edit menu", icon: <Pencil size={16} />, onClick: () => onEdit(menu.id) },
-            { label: "Adjust availability", icon: <Calendar size={16} />, onClick: () => onAdjustAvailability(menu.id) },
-            { label: "Rename", icon: <Edit size={16} />, onClick: () => onRename(menu.id) },
-            { label: "Change icon", icon: <Image size={16} />, onClick: () => onChangeIcon(menu.id) },
-            { label: "Duplicate", icon: <Copy size={16} />, onClick: () => onDuplicate(menu.id) },
-            ...(!isLast ? [{ label: "Move down", icon: <ArrowDown size={16} />, onClick: () => onMoveDown(menu.id) }] : []),
-            { label: "Delete menu", icon: <Trash2 size={16} />, onClick: () => onDelete(menu.id), danger: true, separator: true },
+            { label: t("menus.editMenu"), icon: <Pencil size={16} />, onClick: () => onEdit(menu.id) },
+            { label: t("menus.adjustAvailability"), icon: <Calendar size={16} />, onClick: () => onAdjustAvailability(menu.id) },
+            { label: t("menus.rename"), icon: <Edit size={16} />, onClick: () => onRename(menu.id) },
+            { label: t("menus.changeIcon"), icon: <Image size={16} />, onClick: () => onChangeIcon(menu.id) },
+            { label: t("menus.duplicate"), icon: <Copy size={16} />, onClick: () => onDuplicate(menu.id) },
+            ...(!isLast ? [{ label: t("menus.moveDown"), icon: <ArrowDown size={16} />, onClick: () => onMoveDown(menu.id) }] : []),
+            { label: t("menus.deleteMenu"), icon: <Trash2 size={16} />, onClick: () => onDelete(menu.id), danger: true, separator: true },
           ]}
         />
       </td>

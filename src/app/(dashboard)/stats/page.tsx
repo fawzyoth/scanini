@@ -7,13 +7,7 @@ import { KpiCards, VisitsChart, ReviewsSummary, RatingDistribution, ReviewsList 
 import { useDashboard } from "@/lib/dashboard-context";
 import { createClient } from "@/lib/supabase/client";
 import { VisitData } from "@/types";
-
-const PERIOD_OPTIONS = [
-  { value: "last_week", label: "Last week" },
-  { value: "last_month", label: "Last month" },
-  { value: "last_3_months", label: "Last 3 months" },
-  { value: "last_year", label: "Last year" },
-];
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 const PERIOD_DAYS: Record<string, number> = {
   last_week: 7,
@@ -24,9 +18,17 @@ const PERIOD_DAYS: Record<string, number> = {
 
 export default function StatsPage() {
   const { reviews, restaurant, menus, usage, loading } = useDashboard();
+  const { t } = useTranslation();
   const [period, setPeriod] = useState("last_week");
   const [visits, setVisits] = useState<VisitData[]>([]);
   const [totalScans, setTotalScans] = useState(0);
+
+  const PERIOD_OPTIONS = [
+    { value: "last_week", label: t("stats.lastWeek") },
+    { value: "last_month", label: t("stats.lastMonth") },
+    { value: "last_3_months", label: t("stats.last3Months") },
+    { value: "last_year", label: t("stats.lastYear") },
+  ];
 
   useEffect(() => {
     if (!restaurant) return;
@@ -82,7 +84,7 @@ export default function StatsPage() {
 
   return (
     <>
-      <PageHeader title="Stats">
+      <PageHeader title={t("stats.title")}>
         <Select
           value={period}
           onChange={(e) => setPeriod(e.target.value)}

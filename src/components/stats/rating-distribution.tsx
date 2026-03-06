@@ -2,12 +2,14 @@
 
 import { Review } from "@/types";
 import { Star } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 interface RatingDistributionProps {
   reviews: Review[];
 }
 
 export function RatingDistribution({ reviews }: RatingDistributionProps) {
+  const { t } = useTranslation();
   const distribution = [5, 4, 3, 2, 1].map((stars) => ({
     stars,
     count: reviews.filter((r) => Math.round(r.rating) === stars).length,
@@ -17,12 +19,12 @@ export function RatingDistribution({ reviews }: RatingDistributionProps) {
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Rating distribution</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("stats.ratingDistribution")}</h3>
 
       {reviews.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <Star size={20} className="text-gray-300 mb-2" />
-          <p className="text-sm text-gray-500">No reviews yet</p>
+          <p className="text-sm text-gray-500">{t("stats.noReviewsYet")}</p>
         </div>
       ) : (
         <div className="space-y-2.5">

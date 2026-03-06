@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { UtensilsCrossed, BarChart3, QrCode, Settings } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
   "utensils-crossed": UtensilsCrossed,
@@ -13,16 +14,18 @@ const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
 };
 
 interface NavItemProps {
-  label: string;
+  labelKey: string;
   href: string;
   icon: string;
   mobile?: boolean;
 }
 
-export function NavItem({ label, href, icon, mobile }: NavItemProps) {
+export function NavItem({ labelKey, href, icon, mobile }: NavItemProps) {
   const pathname = usePathname();
   const isActive = pathname.startsWith(href);
   const Icon = iconMap[icon];
+  const { t } = useTranslation();
+  const label = t(labelKey);
 
   if (mobile) {
     return (

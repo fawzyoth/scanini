@@ -5,9 +5,11 @@ import { PageHeader } from "@/components/ui";
 import { Camera, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useDashboard } from "@/lib/dashboard-context";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function ProfilePage() {
   const { profile, loading, updateProfile } = useDashboard();
+  const { t } = useTranslation();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -53,11 +55,11 @@ export default function ProfilePage() {
     setPasswordError("");
 
     if (newPassword.length < 8) {
-      setPasswordError("New password must be at least 8 characters");
+      setPasswordError(t("profile.passwordMinLength"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError("Passwords do not match");
+      setPasswordError(t("profile.passwordMismatch"));
       return;
     }
 
@@ -78,14 +80,14 @@ export default function ProfilePage() {
 
   return (
     <>
-      <PageHeader title="Profile settings" />
+      <PageHeader title={t("profile.title")} />
 
       <div className="max-w-2xl space-y-6">
         {/* Account Info */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
           <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-semibold text-gray-900">Account information</h2>
-            <p className="text-sm text-gray-500 mt-0.5">Update your personal details</p>
+            <h2 className="text-base font-semibold text-gray-900">{t("profile.accountInfo")}</h2>
+            <p className="text-sm text-gray-500 mt-0.5">{t("profile.updateDetails")}</p>
           </div>
 
           <form onSubmit={handleSaveProfile} className="p-6 space-y-5">
@@ -103,8 +105,8 @@ export default function ProfilePage() {
                 </button>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Profile picture</p>
-                <p className="text-xs text-gray-500">JPG or PNG. Max 2MB.</p>
+                <p className="text-sm font-medium text-gray-900">{t("profile.profilePicture")}</p>
+                <p className="text-xs text-gray-500">{t("profile.pictureFormat")}</p>
               </div>
             </div>
 
@@ -112,7 +114,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1.5">
-                  First name
+                  {t("profile.firstName")}
                 </label>
                 <input
                   id="firstName"
@@ -124,14 +126,14 @@ export default function ProfilePage() {
               </div>
               <div>
                 <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Last name
+                  {t("profile.lastName")}
                 </label>
                 <input
                   id="lastName"
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Your last name"
+                  placeholder={t("profile.lastNamePlaceholder")}
                   className="block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 />
               </div>
@@ -140,7 +142,7 @@ export default function ProfilePage() {
             {/* Email (read-only) */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Email
+                {t("profile.email")}
               </label>
               <input
                 id="email"
@@ -149,18 +151,18 @@ export default function ProfilePage() {
                 disabled
                 className="block w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-500 cursor-not-allowed"
               />
-              <p className="text-xs text-gray-400 mt-1">Contact support to change your email</p>
+              <p className="text-xs text-gray-400 mt-1">{t("profile.emailChangeHint")}</p>
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-2">
               {profileSaved && (
-                <span className="text-sm text-green-600 font-medium">Saved!</span>
+                <span className="text-sm text-green-600 font-medium">{t("common.saved")}</span>
               )}
               <button
                 type="submit"
                 className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
               >
-                Save changes
+                {t("common.saveChanges")}
               </button>
             </div>
           </form>
@@ -169,8 +171,8 @@ export default function ProfilePage() {
         {/* Security */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
           <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-semibold text-gray-900">Security</h2>
-            <p className="text-sm text-gray-500 mt-0.5">Change your password</p>
+            <h2 className="text-base font-semibold text-gray-900">{t("profile.security")}</h2>
+            <p className="text-sm text-gray-500 mt-0.5">{t("profile.changePassword")}</p>
           </div>
 
           <form onSubmit={handleChangePassword} className="p-6 space-y-4">
@@ -182,7 +184,7 @@ export default function ProfilePage() {
 
             <div>
               <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Current password
+                {t("profile.currentPassword")}
               </label>
               <div className="relative">
                 <input
@@ -205,7 +207,7 @@ export default function ProfilePage() {
 
             <div>
               <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1.5">
-                New password
+                {t("profile.newPassword")}
               </label>
               <div className="relative">
                 <input
@@ -213,7 +215,7 @@ export default function ProfilePage() {
                   type={showNew ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Minimum 8 characters"
+                  placeholder={t("profile.newPasswordPlaceholder")}
                   required
                   minLength={8}
                   className="block w-full rounded-lg border border-gray-300 px-3 pr-10 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -230,7 +232,7 @@ export default function ProfilePage() {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Confirm new password
+                {t("profile.confirmPassword")}
               </label>
               <input
                 id="confirmPassword"
@@ -244,13 +246,13 @@ export default function ProfilePage() {
 
             <div className="flex items-center justify-end gap-3 pt-2">
               {passwordSaved && (
-                <span className="text-sm text-green-600 font-medium">Password updated!</span>
+                <span className="text-sm text-green-600 font-medium">{t("profile.passwordUpdated")}</span>
               )}
               <button
                 type="submit"
                 className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
               >
-                Change password
+                {t("profile.changePassword")}
               </button>
             </div>
           </form>

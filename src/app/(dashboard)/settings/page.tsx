@@ -12,39 +12,42 @@ import {
   PhonePreview,
 } from "@/components/settings";
 import { Info, Palette, Globe, Star, Wifi, FileText, Share2 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function SettingsPage() {
+  const { t } = useTranslation();
+
   return (
     <>
-      <PageHeader title="Settings" />
+      <PageHeader title={t("settings.title")} />
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
         <div className="lg:col-span-3 space-y-3 sm:space-y-4">
-          <Accordion icon={<Info size={20} />} title="General" description="All the details about your establishment.">
+          <Accordion icon={<Info size={20} />} title={t("settings.general")} description={t("settings.generalDesc")}>
             <GeneralSection />
           </Accordion>
 
-          <Accordion icon={<Palette size={20} />} title="Appearance" description="Customize the look and feel of your menus.">
+          <Accordion icon={<Palette size={20} />} title={t("settings.appearance")} description={t("settings.appearanceDesc")}>
             <AppearanceSection />
           </Accordion>
 
-          <Accordion icon={<Globe size={20} />} title="Menu languages" description="Present your menus in additional languages.">
+          <Accordion icon={<Globe size={20} />} title={t("settings.menuLanguages")} description={t("settings.menuLanguagesDesc")}>
             <LanguagesSection />
           </Accordion>
 
-          <Accordion icon={<Star size={20} />} title="Reviews" description="Get feedback from your customers">
+          <Accordion icon={<Star size={20} />} title={t("settings.reviews")} description={t("settings.reviewsDesc")}>
             <ReviewsSection />
           </Accordion>
 
-          <Accordion icon={<Wifi size={20} />} title="Wi-Fi" description="Allow your customers to connect to your Wi-Fi network.">
+          <Accordion icon={<Wifi size={20} />} title={t("settings.wifi")} description={t("settings.wifiDesc")}>
             <WifiSection />
           </Accordion>
 
-          <Accordion icon={<FileText size={20} />} title="Extra information" description="Show a text with additional information on the public page.">
+          <Accordion icon={<FileText size={20} />} title={t("settings.extraInfo")} description={t("settings.extraInfoDesc")}>
             <ExtraInfoSection />
           </Accordion>
 
-          <Accordion icon={<Share2 size={20} />} title="Social media" description="Link your profiles for better visibility.">
+          <Accordion icon={<Share2 size={20} />} title={t("settings.socialMedia")} description={t("settings.socialMediaDesc")}>
             <SocialMediaSection />
           </Accordion>
         </div>

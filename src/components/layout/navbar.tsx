@@ -3,6 +3,7 @@
 import { Logo } from "./logo";
 import { NavItem } from "./nav-item";
 import { UserMenu } from "./user-menu";
+import { LanguageToggle } from "./language-toggle";
 import { NAV_ITEMS } from "@/constants/nav";
 
 export function Navbar() {
@@ -18,7 +19,10 @@ export function Navbar() {
                 <NavItem key={item.href} {...item} />
               ))}
             </nav>
-            <UserMenu />
+            <div className="flex items-center gap-3">
+              <LanguageToggle />
+              <UserMenu />
+            </div>
           </div>
         </div>
       </header>
@@ -27,7 +31,10 @@ export function Navbar() {
       <header className="sticky top-0 z-40 bg-white border-b border-gray-200 md:hidden">
         <div className="flex items-center justify-between h-14 px-4">
           <Logo />
-          <UserMenu compact />
+          <div className="flex items-center gap-2">
+            <LanguageToggle />
+            <UserMenu compact />
+          </div>
         </div>
       </header>
 

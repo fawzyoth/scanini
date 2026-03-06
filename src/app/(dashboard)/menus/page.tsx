@@ -9,10 +9,12 @@ import { MenuTable, RenameModal, AvailabilityModal, IconPickerModal } from "@/co
 import { useDashboard } from "@/lib/dashboard-context";
 import { createClient } from "@/lib/supabase/client";
 import { Menu } from "@/types";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function MenusPage() {
   const router = useRouter();
   const { menus: ctxMenus, loading, restaurant, reload } = useDashboard();
+  const { t } = useTranslation();
   const [menus, setMenus] = useState<Menu[]>([]);
   const [editingMenu, setEditingMenu] = useState<Menu | null>(null);
   const [renameOpen, setRenameOpen] = useState(false);
@@ -91,7 +93,7 @@ export default function MenusPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Are you sure you want to delete this menu? All categories and dishes in it will be removed.")) return;
+    if (!confirm(t("menus.confirmDelete"))) return;
     const supabase = createClient();
     await supabase.from("menus").delete().eq("id", id);
     setMenus((prev) => prev.filter((m) => m.id !== id));
@@ -108,6 +110,15 @@ export default function MenusPage() {
     });
   }
 
+  async function handleReorderMenus(reordered: Menu[]) {
+    setMenus(reordered);
+    const supabase = createClient();
+    const updates = reordered.map((m, i) =>
+      (supabase.from("menus") as any).update({ sort_order: i }).eq("id", m.id)
+    );
+    await Promise.all(updates);
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -118,15 +129,15 @@ export default function MenusPage() {
 
   return (
     <>
-      <PageHeader title="Menus">
+      <PageHeader title={t("menus.title")}>
         <a href="/preview" target="_blank" rel="noopener noreferrer" className="hidden sm:block">
           <Button variant="outline" size="md">
             <Eye size={16} />
-            Preview
+            {t("menus.preview")}
           </Button>
         </a>
         <Link href="/menus/new">
-          <Button size="sm" className="sm:text-sm sm:px-4 sm:py-2">New menu</Button>
+          <Button size="sm" className="sm:text-sm sm:px-4 sm:py-2">{t("menus.newMenu")}</Button>
         </Link>
       </PageHeader>
 
@@ -140,6 +151,7 @@ export default function MenusPage() {
         onMoveDown={handleMoveDown}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onReorder={handleReorderMenus}
       />
 
       <RenameModal
