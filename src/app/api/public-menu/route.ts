@@ -30,13 +30,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Restaurant not found" }, { status: 404 });
   }
 
-  // Fetch menus (exclude only explicitly hidden ones)
-  const { data: dbMenus } = await supabase
+  // Fetch all menus for this restaurant
+  const { data: allMenus } = await supabase
     .from("menus")
     .select("*")
     .eq("restaurant_id", dbRestaurant.id)
-    .neq("visible", false)
     .order("sort_order");
+
+  // Filter out explicitly hidden menus (visible=false), keep null and true
+  const dbMenus = (allMenus ?? []).filter((m: any) => m.visible !== false);
 
   const menuIds = (dbMenus ?? []).map((m: any) => m.id);
 
