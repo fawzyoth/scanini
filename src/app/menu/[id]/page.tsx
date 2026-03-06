@@ -59,7 +59,7 @@ function buildMenus(dbMenus: any[], dbCategories: any[], dbDishes: any[]): Menu[
 }
 
 export default function PublicMenuPage() {
-  const { slug } = useParams();
+  const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menus, setMenus] = useState<Menu[]>([]);
@@ -68,7 +68,7 @@ export default function PublicMenuPage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`/api/public-menu?slug=${encodeURIComponent(slug as string)}`);
+        const res = await fetch(`/api/public-menu?id=${encodeURIComponent(id as string)}`);
         if (!res.ok) {
           setLoading(false);
           return;
@@ -96,7 +96,7 @@ export default function PublicMenuPage() {
       setLoading(false);
     }
     load();
-  }, [slug]);
+  }, [id]);
 
   if (loading) {
     return (

@@ -9,52 +9,33 @@ function getServiceClient() {
 }
 
 export async function GET(request: NextRequest) {
-  const slug = request.nextUrl.searchParams.get("slug");
-  if (!slug) {
-    return NextResponse.json({ error: "Missing slug" }, { status: 400 });
+  const id = request.nextUrl.searchParams.get("id");
+  if (!id) {
+    return NextResponse.json({ error: "Missing restaurant id" }, { status: 400 });
   }
 
   const supabase = getServiceClient();
 
-  // Find restaurant by slug — if multiple match, pick the one with menus
-  const { data: restaurants } = await supabase
+  // Fetch restaurant by ID
+  const { data: dbRestaurant } = await supabase
     .from("restaurants")
-    .select("*");
+    .select("*")
+    .eq("id", id)
+    .single();
 
-  const matches = (restaurants ?? []).filter((r: any) => {
-    const rSlug = r.name?.toLowerCase().replace(/\s+/g, "-");
-    return rSlug === slug;
-  });
-
-  if (matches.length === 0) {
+  if (!dbRestaurant) {
     return NextResponse.json({ error: "Restaurant not found" }, { status: 404 });
   }
 
-  // For each match, check which has menus
-  let dbRestaurant = matches[0];
-  let dbMenus: any[] = [];
+  // Fetch all menus
+  const { data: allMenus } = await supabase
+    .from("menus")
+    .select("*")
+    .eq("restaurant_id", dbRestaurant.id)
+    .order("sort_order");
 
-  for (const candidate of matches) {
-    const { data: menus } = await supabase
-      .from("menus")
-      .select("*")
-      .eq("restaurant_id", candidate.id)
-      .order("sort_order");
-
-    const filtered = (menus ?? []).filter((m: any) => m.visible !== false);
-    if (filtered.length > 0) {
-      dbRestaurant = candidate;
-      dbMenus = filtered;
-      break;
-    }
-  }
-
-  // If no match had menus, use first match and empty menus
-  if (dbMenus.length === 0 && matches.length === 1) {
-    dbRestaurant = matches[0];
-  }
-
-  const menuIds = (dbMenus ?? []).map((m: any) => m.id);
+  const dbMenus = (allMenus ?? []).filter((m: any) => m.visible !== false);
+  const menuIds = dbMenus.map((m: any) => m.id);
 
   const { data: dbCategories } = menuIds.length > 0
     ? await supabase.from("categories").select("*").in("menu_id", menuIds).order("sort_order")
@@ -75,7 +56,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     restaurant: dbRestaurant,
-    menus: dbMenus ?? [],
+    menus: dbMenus,
     categories: dbCategories ?? [],
     dishes: dbDishes ?? [],
     reviews: dbReviews ?? [],

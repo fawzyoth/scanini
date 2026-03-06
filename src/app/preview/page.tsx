@@ -147,10 +147,9 @@ export default function PreviewPage() {
     );
   }
 
-  const slug = restaurant.name.toLowerCase().replace(/\s+/g, "-");
   const menuUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/menu/${slug}`
-    : `/menu/${slug}`;
+    ? `${window.location.origin}/menu/${restaurant.id}`
+    : `/menu/${restaurant.id}`;
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-10 px-4">

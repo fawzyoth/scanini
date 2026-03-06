@@ -48,7 +48,9 @@ export default function QRCodePage() {
     );
   }
 
-  const slug = restaurant?.name?.toLowerCase().replace(/\s+/g, "-") ?? "my-restaurant";
+  const menuUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/menu/${restaurant?.id ?? ""}`
+    : `/menu/${restaurant?.id ?? ""}`;
 
   return (
     <>
@@ -56,7 +58,7 @@ export default function QRCodePage() {
         <div className="flex items-center gap-1 text-gray-400">
           <Info size={16} />
         </div>
-        <Button variant="outline" size="md">
+        <Button variant="outline" size="md" onClick={() => { navigator.clipboard.writeText(menuUrl); }}>
           <Link2 size={16} />
           Copy link
         </Button>
@@ -66,7 +68,7 @@ export default function QRCodePage() {
         <div className="lg:col-span-2 lg:order-2">
           <div className="lg:sticky lg:top-24 space-y-4">
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6 flex flex-col items-center">
-              <QRPreview settings={settings} url={`https://scanini.io/menu/${slug}`} />
+              <QRPreview settings={settings} url={menuUrl} />
             </div>
 
             <Select
