@@ -16,29 +16,43 @@ export async function GET(request: NextRequest) {
 
   const supabase = getServiceClient();
 
-  // Find restaurant by slug
+  // Find restaurant by slug — if multiple match, pick the one with menus
   const { data: restaurants } = await supabase
     .from("restaurants")
     .select("*");
 
-  const dbRestaurant = (restaurants ?? []).find((r: any) => {
+  const matches = (restaurants ?? []).filter((r: any) => {
     const rSlug = r.name?.toLowerCase().replace(/\s+/g, "-");
     return rSlug === slug;
   });
 
-  if (!dbRestaurant) {
+  if (matches.length === 0) {
     return NextResponse.json({ error: "Restaurant not found" }, { status: 404 });
   }
 
-  // Fetch all menus for this restaurant
-  const { data: allMenus } = await supabase
-    .from("menus")
-    .select("*")
-    .eq("restaurant_id", dbRestaurant.id)
-    .order("sort_order");
+  // For each match, check which has menus
+  let dbRestaurant = matches[0];
+  let dbMenus: any[] = [];
 
-  // Filter out explicitly hidden menus (visible=false), keep null and true
-  const dbMenus = (allMenus ?? []).filter((m: any) => m.visible !== false);
+  for (const candidate of matches) {
+    const { data: menus } = await supabase
+      .from("menus")
+      .select("*")
+      .eq("restaurant_id", candidate.id)
+      .order("sort_order");
+
+    const filtered = (menus ?? []).filter((m: any) => m.visible !== false);
+    if (filtered.length > 0) {
+      dbRestaurant = candidate;
+      dbMenus = filtered;
+      break;
+    }
+  }
+
+  // If no match had menus, use first match and empty menus
+  if (dbMenus.length === 0 && matches.length === 1) {
+    dbRestaurant = matches[0];
+  }
 
   const menuIds = (dbMenus ?? []).map((m: any) => m.id);
 
