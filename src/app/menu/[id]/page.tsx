@@ -105,10 +105,14 @@ export default function PublicMenuPage() {
     load();
   }, [id]);
 
+  // DEBUG: temporary version marker — remove after confirming deployment
+  console.log("[menu-page] v2 — using preview components");
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 size={24} className="animate-spin text-gray-400" />
+        <p className="absolute bottom-4 text-xs text-gray-300">v2</p>
       </div>
     );
   }
