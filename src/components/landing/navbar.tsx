@@ -5,8 +5,8 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
-  { label: "Features", href: "#features" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Fonctionnalités", href: "#features" },
+  { label: "Tarifs", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
   { label: "Contact", href: "#contact" },
 ];
@@ -51,13 +51,13 @@ export function LandingNavbar() {
               href="/signin"
               className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
             >
-              Log in
+              Connexion
             </Link>
             <Link
               href="/signup"
               className="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors"
             >
-              Sign up free
+              Créer un compte
             </Link>
           </div>
 
@@ -91,13 +91,13 @@ export function LandingNavbar() {
               href="/signin"
               className="text-sm font-medium text-gray-700 text-center py-2.5 rounded-lg border border-gray-200"
             >
-              Log in
+              Connexion
             </Link>
             <Link
               href="/signup"
               className="text-sm font-medium text-white bg-indigo-600 text-center py-2.5 rounded-lg"
             >
-              Sign up free
+              Créer un compte
             </Link>
           </div>
         </div>

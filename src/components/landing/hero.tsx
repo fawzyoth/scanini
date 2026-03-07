@@ -13,18 +13,18 @@ export function LandingHero() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 text-xs font-medium px-3 py-1.5 rounded-full mb-6">
             <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse" />
-            Free QR stickers for your restaurant
+            Stickers QR gratuits pour votre restaurant
           </div>
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight leading-tight">
-            Create QR menus{" "}
-            <span className="text-indigo-600">for your restaurant</span>
+            Créez votre menu QR{" "}
+            <span className="text-indigo-600">en quelques minutes</span>
           </h1>
 
           {/* Subheading */}
           <p className="mt-6 text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            Scanini is the all-in-one solution to create, manage and share your restaurant&apos;s digital menu. No app download needed.
+            Scanini est la solution tout-en-un pour créer, gérer et partager le menu digital de votre restaurant. Aucune application à télécharger.
           </p>
 
           {/* CTA buttons */}
@@ -33,7 +33,7 @@ export function LandingHero() {
               href="/signup"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-200 transition-all hover:shadow-xl hover:shadow-indigo-200"
             >
-              Create a menu
+              Créer mon menu
               <ArrowRight size={16} />
             </Link>
             <a
@@ -41,7 +41,7 @@ export function LandingHero() {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl border border-gray-200 transition-colors"
             >
               <Play size={14} className="text-indigo-600" />
-              View a real menu
+              Voir un vrai menu
             </a>
           </div>
         </div>
@@ -82,9 +82,9 @@ export function LandingHero() {
 
                 {/* Category tabs */}
                 <div className="flex gap-1 px-3 py-2">
-                  <span className="text-[8px] font-semibold text-white bg-gray-900 rounded-full px-2 py-0.5">Breakfast</span>
-                  <span className="text-[8px] text-gray-500 bg-gray-100 rounded-full px-2 py-0.5">Lunch</span>
-                  <span className="text-[8px] text-gray-500 bg-gray-100 rounded-full px-2 py-0.5">Drinks</span>
+                  <span className="text-[8px] font-semibold text-white bg-gray-900 rounded-full px-2 py-0.5">Petit-déj</span>
+                  <span className="text-[8px] text-gray-500 bg-gray-100 rounded-full px-2 py-0.5">Déjeuner</span>
+                  <span className="text-[8px] text-gray-500 bg-gray-100 rounded-full px-2 py-0.5">Boissons</span>
                 </div>
 
                 {/* Menu items */}

@@ -13,20 +13,20 @@ export function LandingDemo() {
             {/* Text */}
             <div className="flex-1 text-center lg:text-left">
               <h2 className="text-2xl sm:text-3xl font-bold text-white">
-                See it in action
+                Voyez par vous-même
               </h2>
               <p className="mt-4 text-indigo-200 text-lg max-w-md">
-                Scan this QR code to preview a menu just like your customers would see it in your restaurant.
+                Scannez ce QR code pour découvrir un menu exactement comme vos clients le verront dans votre restaurant.
               </p>
 
               <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 lg:justify-start justify-center">
                 <div className="flex items-center gap-3 text-white/70 text-sm">
                   <Smartphone size={18} />
-                  <span>No app needed</span>
+                  <span>Aucune application requise</span>
                 </div>
                 <div className="flex items-center gap-3 text-white/70 text-sm">
                   <QrCode size={18} />
-                  <span>Works with any camera</span>
+                  <span>Fonctionne avec tout appareil photo</span>
                 </div>
               </div>
             </div>
@@ -36,7 +36,7 @@ export function LandingDemo() {
               <div className="w-48 h-48 sm:w-56 sm:h-56 bg-white rounded-2xl p-4 shadow-2xl">
                 <div className="w-full h-full bg-gray-100 rounded-xl flex flex-col items-center justify-center gap-3">
                   <QrCode size={64} className="text-gray-400" />
-                  <p className="text-xs text-gray-400 font-medium">Your QR here</p>
+                  <p className="text-xs text-gray-400 font-medium">Votre QR ici</p>
                 </div>
               </div>
             </div>

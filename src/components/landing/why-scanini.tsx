@@ -3,23 +3,23 @@ import { Building2, Sparkles, Headphones } from "lucide-react";
 const BENEFITS = [
   {
     icon: Building2,
-    title: "Fits every restaurant",
+    title: "Adapté à chaque restaurant",
     description:
-      "From small bistros to big chains, one solution that adapts to your needs and grows with your business.",
+      "Du petit bistrot aux grandes chaînes, une solution qui s'adapte à vos besoins et grandit avec votre activité.",
     color: "bg-blue-50 text-blue-600",
   },
   {
     icon: Sparkles,
-    title: "Ease of use",
+    title: "Simple à utiliser",
     description:
-      "Everything feels natural and straightforward from the start. Rated 9 out of 10 by our customers.",
+      "Tout est naturel et intuitif dès le départ. Aucune compétence technique requise pour créer et gérer votre menu.",
     color: "bg-amber-50 text-amber-600",
   },
   {
     icon: Headphones,
-    title: "Support quality",
+    title: "Support réactif",
     description:
-      "We reply to 96% of inquiries within 24 hours, so you're never left in the dark when you need help.",
+      "Nous répondons à 96% des demandes en moins de 24h, pour que vous ne soyez jamais bloqué quand vous avez besoin d'aide.",
     color: "bg-green-50 text-green-600",
   },
 ];
@@ -29,9 +29,9 @@ export function LandingWhyScanini() {
     <section className="py-20 sm:py-28 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-semibold text-indigo-600 mb-3">Why Scanini</p>
+          <p className="text-sm font-semibold text-indigo-600 mb-3">Pourquoi Scanini</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-            Built for restaurants like yours
+            Conçu pour des restaurants comme le vôtre
           </h2>
         </div>
 

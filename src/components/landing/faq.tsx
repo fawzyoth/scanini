@@ -5,24 +5,24 @@ import { ChevronDown } from "lucide-react";
 
 const FAQS = [
   {
-    q: "Is Scanini an app?",
-    a: "Scanini is not a native app — your customers don't need to download anything. The moment they scan your QR code, they're redirected to a web page with your restaurant menu. It works on any smartphone with a camera.",
+    q: "Scanini est-il une application ?",
+    a: "Non, Scanini n'est pas une application native. Vos clients n'ont rien à télécharger. Quand ils scannent votre QR code, ils sont redirigés vers une page web avec votre menu. Ça fonctionne sur n'importe quel smartphone avec un appareil photo.",
   },
   {
-    q: "Is it easy to create a menu with QR?",
-    a: "Absolutely. Scanini is designed to be easy to use with no programming or design knowledge. In the editor you can drag and drop dishes and categories. Once you save, the menu is instantly updated and synced with the QR code at your tables.",
+    q: "Est-ce facile de créer un menu avec QR code ?",
+    a: "Absolument. Scanini est conçu pour être simple, sans aucune compétence technique. Dans l'éditeur, vous pouvez ajouter des plats et catégories facilement. Une fois enregistré, le menu est instantanément mis à jour et synchronisé avec votre QR code.",
   },
   {
-    q: "Can I change prices or dishes?",
-    a: "Yes! You can change all menu details whenever you want. Run out of a dish? Access the control panel and hide it so customers can't order it. Changes are reflected instantly.",
+    q: "Puis-je modifier les prix ou les plats ?",
+    a: "Oui ! Vous pouvez modifier tous les détails de votre menu quand vous le souhaitez. Un plat est en rupture ? Accédez au panneau de contrôle et masquez-le pour que les clients ne le voient plus. Les changements sont reflétés instantanément.",
   },
   {
-    q: "Can I manage multiple restaurants?",
-    a: "Yes, you can associate all your restaurants to the same account. From the control panel you can quickly switch between restaurants without logging out.",
+    q: "Puis-je utiliser Scanini gratuitement ?",
+    a: "Bien sûr ! Vous pouvez utiliser Scanini gratuitement avec le plan Gratuit. Si vous souhaitez plus de plats, de menus ou de scans, vous pouvez passer à un plan payant à tout moment.",
   },
   {
-    q: "Can I use Scanini for free?",
-    a: "Of course! You can use Scanini free with the Basic plan. If you'd like more dishes, menus, or features like multi-language or reviews integration, you can upgrade to a paid plan at any time.",
+    q: "Comment fonctionne le système d'avis ?",
+    a: "Vos clients peuvent évaluer leur expérience directement depuis le menu digital. Vous consultez tous les avis depuis votre tableau de bord pour améliorer votre service en continu.",
   },
 ];
 
@@ -35,12 +35,12 @@ export function LandingFaq() {
         <div className="text-center mb-12">
           <p className="text-sm font-semibold text-indigo-600 mb-3">FAQ</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-            Frequently asked questions
+            Questions fréquentes
           </h2>
           <p className="mt-4 text-gray-500">
-            Have other questions?{" "}
+            D&apos;autres questions ?{" "}
             <a href="#contact" className="text-indigo-600 hover:underline font-medium">
-              Get in touch
+              Contactez-nous
             </a>
           </p>
         </div>

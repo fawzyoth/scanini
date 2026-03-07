@@ -6,68 +6,68 @@ import { Check, Crown } from "lucide-react";
 
 const PLANS = [
   {
-    name: "Free",
+    name: "Gratuit",
     price: 0,
     yearlyPrice: 0,
-    description: "Perfect to get started",
+    description: "Pour bien démarrer",
     features: [
       "1 menu",
-      "Up to 15 dishes",
-      "200 scans / month",
-      "Standard QR Code",
-      "Scanini branding",
+      "Jusqu'à 15 plats",
+      "200 scans / mois",
+      "QR Code standard",
+      "Branding Scanini",
     ],
-    bestFor: "Small cafes testing the product",
-    cta: "Get started",
+    bestFor: "Petits cafés qui veulent tester",
+    cta: "Commencer",
     highlighted: false,
   },
   {
     name: "Starter",
     price: 9,
     yearlyPrice: 90,
-    description: "For small restaurants",
+    description: "Pour les petits restaurants",
     features: [
       "1 menu",
-      "Up to 30 dishes",
-      "1,500 scans / month",
-      "Standard QR Code",
-      "Scanini branding",
+      "Jusqu'à 30 plats",
+      "1 500 scans / mois",
+      "QR Code standard",
+      "Branding Scanini",
     ],
-    bestFor: "Small restaurants",
-    cta: "Start free trial",
+    bestFor: "Petits restaurants",
+    cta: "Essai gratuit",
     highlighted: false,
   },
   {
     name: "Pro",
     price: 29,
     yearlyPrice: 240,
-    description: "For growing restaurants",
+    description: "Pour les restaurants en croissance",
     features: [
-      "Up to 5 menus",
-      "Up to 60 dishes per menu",
-      "6,000 scans / month",
-      "Custom QR Code",
-      "White label (no Scanini logo)",
+      "Jusqu'à 5 menus",
+      "Jusqu'à 60 plats par menu",
+      "6 000 scans / mois",
+      "QR Code personnalisé",
+      "Sans logo Scanini",
     ],
-    bestFor: "Medium restaurants",
-    cta: "Start free trial",
+    bestFor: "Restaurants moyens",
+    cta: "Essai gratuit",
     highlighted: true,
   },
   {
     name: "Business",
     price: 49,
     yearlyPrice: 490,
-    description: "For restaurant chains",
+    description: "Pour les chaînes de restaurants",
     features: [
-      "Unlimited menus",
-      "Unlimited dishes",
-      "20,000 scans / month",
-      "Custom QR Code",
-      "Full white label",
-      "Priority support",
+      "Menus illimités",
+      "Plats illimités",
+      "20 000 scans / mois",
+      "QR Code personnalisé",
+      "Sans logo Scanini",
+      "Support prioritaire",
     ],
-    bestFor: "Large restaurants and chains",
-    cta: "Contact sales",
+    bestFor: "Grands restaurants et chaînes",
+    cta: "Nous contacter",
     highlighted: false,
   },
 ];
@@ -79,12 +79,12 @@ export function LandingPricing() {
     <section id="pricing" className="py-20 sm:py-28 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <p className="text-sm font-semibold text-indigo-600 mb-3">Pricing</p>
+          <p className="text-sm font-semibold text-indigo-600 mb-3">Tarifs</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-            Simple, transparent pricing
+            Des tarifs simples et transparents
           </h2>
           <p className="mt-4 text-gray-500 text-lg">
-            No hidden fees. No credit card required. Start free and upgrade as you grow.
+            Aucun frais caché. Aucune carte bancaire requise. Commencez gratuitement et évoluez à votre rythme.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ export function LandingPricing() {
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              Monthly
+              Mensuel
             </button>
             <button
               onClick={() => setBilling("yearly")}
@@ -109,8 +109,8 @@ export function LandingPricing() {
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              Yearly
-              <span className="ml-1.5 text-xs text-green-600 font-semibold">Save 2 months</span>
+              Annuel
+              <span className="ml-1.5 text-xs text-green-600 font-semibold">-2 mois</span>
             </button>
           </div>
         </div>
@@ -118,7 +118,7 @@ export function LandingPricing() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
           {PLANS.map((plan) => {
             const price = billing === "yearly" ? plan.yearlyPrice : plan.price;
-            const period = billing === "yearly" ? "/ year" : "/ month";
+            const period = billing === "yearly" ? "/ an" : "/ mois";
 
             return (
               <div
@@ -132,7 +132,7 @@ export function LandingPricing() {
                 {plan.highlighted && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-amber-400 text-gray-900 text-xs font-semibold px-3 py-1 rounded-full">
                     <Crown size={12} />
-                    Most popular
+                    Le plus populaire
                   </div>
                 )}
 
@@ -146,7 +146,7 @@ export function LandingPricing() {
                 <div className="mt-5 mb-5">
                   {price === 0 ? (
                     <span className={`text-3xl font-bold ${plan.highlighted ? "text-white" : "text-gray-900"}`}>
-                      Free
+                      Gratuit
                     </span>
                   ) : (
                     <>
@@ -177,7 +177,7 @@ export function LandingPricing() {
                 </ul>
 
                 <p className={`text-[11px] mb-4 ${plan.highlighted ? "text-indigo-300" : "text-gray-400"}`}>
-                  Best for: {plan.bestFor}
+                  Idéal pour : {plan.bestFor}
                 </p>
 
                 <Link

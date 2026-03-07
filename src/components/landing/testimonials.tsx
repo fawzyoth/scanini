@@ -6,23 +6,23 @@ import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 const TESTIMONIALS = [
   {
     quote:
-      "Scanini is very easy to use, practical and adapts to all our needs. It allows us to add dishes daily and if I run out of something, I can hide it instantly. The customer service is attentive and fast.",
-    name: "Marta Balada",
-    role: "Owner",
+      "Scanini est très facile à utiliser, pratique et s'adapte à tous nos besoins. On peut ajouter des plats au quotidien et si un produit est en rupture, on le masque instantanément. Le service client est attentif et rapide.",
+    name: "Marta B.",
+    role: "Propriétaire",
     restaurant: "Sa Cantina, Manacor",
   },
   {
     quote:
-      "Scanini is an essential tool for managing our menu. We update our dishes whenever we want without printing new menus. And we save hundreds of dollars a year on printing costs.",
-    name: "David Ferrer",
-    role: "Manager",
+      "Scanini est un outil indispensable pour gérer notre carte. On met à jour nos plats quand on veut sans réimprimer les menus. Et on économise des centaines d'euros par an en frais d'impression.",
+    name: "David F.",
+    role: "Gérant",
     restaurant: "Damon's Grill, Miami",
   },
   {
     quote:
-      "Scanini has been a great improvement for our relationship with clients. We make our menu much more visual and intuitive, and the app offers extensive control and a wide variety of configuration options.",
-    name: "Joan Quiles",
-    role: "Owner",
+      "Scanini a été une vraie amélioration pour notre relation avec les clients. Le menu est beaucoup plus visuel et intuitif, et l'application offre un contrôle complet avec de nombreuses options de personnalisation.",
+    name: "Joan Q.",
+    role: "Propriétaire",
     restaurant: "Sorsi e Morsi, Valencia",
   },
 ];
@@ -44,9 +44,9 @@ export function LandingTestimonials() {
     <section className="py-20 sm:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <p className="text-sm font-semibold text-indigo-600 mb-3">Testimonials</p>
+          <p className="text-sm font-semibold text-indigo-600 mb-3">Témoignages</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-            Loved by restaurants worldwide
+            Adopté par des restaurants partout dans le monde
           </h2>
         </div>
 
@@ -61,7 +61,7 @@ export function LandingTestimonials() {
 
             {/* Quote */}
             <blockquote className="text-lg sm:text-xl text-gray-700 leading-relaxed">
-              &ldquo;{t.quote}&rdquo;
+              &laquo; {t.quote} &raquo;
             </blockquote>
 
             {/* Author */}

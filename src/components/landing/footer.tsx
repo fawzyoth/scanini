@@ -1,16 +1,16 @@
 import Link from "next/link";
 
 const FOOTER_LINKS = [
-  { label: "Features", href: "#features" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Fonctionnalités", href: "#features" },
+  { label: "Tarifs", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
   { label: "Contact", href: "#contact" },
 ];
 
 const LEGAL_LINKS = [
-  { label: "Terms and conditions", href: "#" },
-  { label: "Privacy policy", href: "#" },
-  { label: "Cookies policy", href: "#" },
+  { label: "Conditions générales", href: "#" },
+  { label: "Politique de confidentialité", href: "#" },
+  { label: "Politique de cookies", href: "#" },
 ];
 
 export function LandingFooter() {
@@ -33,14 +33,14 @@ export function LandingFooter() {
               <span className="text-lg font-bold">Scanini</span>
             </Link>
             <p className="mt-3 text-sm text-gray-400 max-w-xs">
-              The easiest way to create and manage digital QR menus for your restaurant.
+              La manière la plus simple de créer et gérer des menus QR digitaux pour votre restaurant.
             </p>
           </div>
 
           {/* Links */}
           <div className="flex gap-12">
             <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Product</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Produit</p>
               <ul className="space-y-2">
                 {FOOTER_LINKS.map((link) => (
                   <li key={link.href}>
@@ -52,7 +52,7 @@ export function LandingFooter() {
               </ul>
             </div>
             <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Legal</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Légal</p>
               <ul className="space-y-2">
                 {LEGAL_LINKS.map((link) => (
                   <li key={link.label}>
@@ -69,10 +69,10 @@ export function LandingFooter() {
         {/* Bottom */}
         <div className="mt-12 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-gray-500">
-            &copy; {new Date().getFullYear()} Scanini. All rights reserved.
+            &copy; {new Date().getFullYear()} Scanini. Tous droits réservés.
           </p>
           <p className="text-xs text-gray-500">
-            Made with love in Europe
+            Fait avec amour en Europe
           </p>
         </div>
       </div>

@@ -1,41 +1,40 @@
-import { RefreshCw, Languages, Star, ShieldAlert, QrCode } from "lucide-react";
+import { RefreshCw, ShieldAlert, QrCode, Star, Search } from "lucide-react";
 
 const FEATURES = [
   {
     icon: RefreshCw,
-    title: "Update menu in seconds",
+    title: "Mettez à jour en quelques secondes",
     description:
-      "Forget about printing new menus every time you edit or add new dishes. All changes are instantly synced with the QR codes on your tables.",
+      "Fini les impressions à chaque changement de menu. Modifiez vos plats, prix ou catégories et tout est instantanément synchronisé avec les QR codes sur vos tables.",
     color: "bg-blue-50 text-blue-600",
   },
   {
-    icon: Languages,
-    title: "Multiple languages",
-    description:
-      "Make it easy for foreign customers by offering your menu in additional languages. Enable auto-translate and it does the hard work for you.",
-    color: "bg-violet-50 text-violet-600",
-    badges: ["French", "Spanish", "German", "Auto-translate"],
-  },
-  {
-    icon: Star,
-    title: "Google Reviews integration",
-    description:
-      "Connect your Google Business Profile to display reviews on your menus while enabling guests to easily rate their experience.",
-    color: "bg-amber-50 text-amber-600",
-  },
-  {
     icon: ShieldAlert,
-    title: "Allergen tagging",
+    title: "Allergènes intégrés",
     description:
-      "Make dining safer for everyone. Tag allergens in your dishes so customers with dietary needs can enjoy their meal with peace of mind.",
+      "Rendez les repas plus sûrs pour tous. Indiquez les allergènes de chaque plat pour que vos clients puissent profiter de leur repas en toute sérénité.",
     color: "bg-green-50 text-green-600",
   },
   {
     icon: QrCode,
-    title: "One QR for everything",
+    title: "Un seul QR pour tout",
     description:
-      "Create as many menus as you wish. All connected to the same QR code — you decide which ones are shown and when.",
+      "Créez autant de menus que vous le souhaitez : petit-déjeuner, déjeuner, boissons... Tous reliés au même QR code. Vous choisissez lesquels afficher.",
     color: "bg-indigo-50 text-indigo-600",
+  },
+  {
+    icon: Star,
+    title: "Avis clients intégrés",
+    description:
+      "Permettez à vos clients d'évaluer leur expérience directement depuis le menu. Consultez les avis et améliorez votre service en continu.",
+    color: "bg-amber-50 text-amber-600",
+  },
+  {
+    icon: Search,
+    title: "Recherche de plats",
+    description:
+      "Vos clients peuvent rechercher un plat par nom directement dans le menu digital. Idéal pour les cartes longues ou les clients pressés.",
+    color: "bg-violet-50 text-violet-600",
   },
 ];
 
@@ -45,12 +44,12 @@ export function LandingFeatures() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-semibold text-indigo-600 mb-3">Features</p>
+          <p className="text-sm font-semibold text-indigo-600 mb-3">Fonctionnalités</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-            Everything you need to go digital
+            Tout ce qu&apos;il faut pour passer au digital
           </h2>
           <p className="mt-4 text-gray-500 text-lg">
-            From instant updates to multi-language support, Scanini gives you full control over your restaurant&apos;s digital presence.
+            De la mise à jour instantanée au QR code personnalisé, Scanini vous donne le contrôle total sur votre menu digital.
           </p>
         </div>
 
@@ -72,19 +71,6 @@ export function LandingFeatures() {
               <p className="text-sm text-gray-500 leading-relaxed">
                 {feature.description}
               </p>
-
-              {feature.badges && (
-                <div className="flex flex-wrap gap-1.5 mt-4">
-                  {feature.badges.map((badge) => (
-                    <span
-                      key={badge}
-                      className="text-[11px] font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
-                    >
-                      {badge}
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
           ))}
         </div>
