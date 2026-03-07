@@ -18,8 +18,8 @@ export function LandingHero() {
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight leading-tight">
-            Créez votre menu QR{" "}
-            <span className="text-indigo-600">en quelques minutes</span>
+            Votre menu digital{" "}
+            <span className="text-indigo-600">prêt plus vite qu&apos;un panini</span>
           </h1>
 
           {/* Subheading */}
