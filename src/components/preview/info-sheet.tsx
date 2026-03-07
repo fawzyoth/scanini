@@ -23,21 +23,31 @@ export function InfoSheet({ open, onClose, restaurant }: InfoSheetProps) {
     }
   }
 
-  const items: { icon: React.ReactNode; label: string; action?: React.ReactNode; onClick?: () => void }[] = [];
+  const items: { icon: React.ReactNode; label: string; customContent?: React.ReactNode; action?: React.ReactNode; onClick?: () => void }[] = [];
 
   if (restaurant.wifi) {
     items.push({
       icon: <Wifi size={22} className="text-gray-700" />,
-      label: restaurant.wifi.ssid,
-      action: (
+      label: "",
+      customContent: (
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-gray-900">{restaurant.wifi.ssid}</p>
+          {restaurant.wifi.password && (
+            <p className="text-xs text-gray-500 mt-0.5">
+              Mot de passe : <span className="font-mono font-medium text-gray-700">{restaurant.wifi.password}</span>
+            </p>
+          )}
+        </div>
+      ),
+      action: restaurant.wifi.password ? (
         <button onClick={handleCopyWifi} className="p-1 text-gray-400 hover:text-gray-600">
           {copied ? (
-            <span className="text-xs text-green-600 font-medium">Copie!</span>
+            <span className="text-xs text-green-600 font-medium whitespace-nowrap">Copié !</span>
           ) : (
             <Copy size={18} />
           )}
         </button>
-      ),
+      ) : undefined,
     });
   }
 
@@ -121,7 +131,7 @@ export function InfoSheet({ open, onClose, restaurant }: InfoSheetProps) {
                   onClick={item.onClick}
                 >
                   <div className="shrink-0">{item.icon}</div>
-                  <span className="flex-1 text-sm font-medium text-gray-900">{item.label}</span>
+                  {item.customContent ?? <span className="flex-1 text-sm font-medium text-gray-900">{item.label}</span>}
                   {item.action && <div className="shrink-0">{item.action}</div>}
                 </Row>
               );
