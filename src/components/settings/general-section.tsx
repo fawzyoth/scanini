@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/lib/dashboard-context";
+import { createClient } from "@/lib/supabase/client";
 import { ImageIcon, Loader2, X } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/i18n-context";
 
@@ -48,6 +49,8 @@ export function GeneralSection() {
   }
 
   async function handleSave() {
+    const oldCurrency = (restaurant as any)?.currency ?? "EUR";
+
     await updateRestaurant({
       name,
       phone: phone || null,
@@ -55,6 +58,29 @@ export function GeneralSection() {
       currency,
       cover_image: coverImage || null,
     } as any);
+
+    // Bulk-update all dishes' currency when it changes
+    if (currency !== oldCurrency && restaurant) {
+      const supabase = createClient();
+      const { data: dbMenus } = await supabase
+        .from("menus")
+        .select("id")
+        .eq("restaurant_id", restaurant.id);
+      const menuIds = (dbMenus ?? []).map((m: any) => m.id);
+      if (menuIds.length > 0) {
+        const { data: dbCats } = await supabase
+          .from("categories")
+          .select("id")
+          .in("menu_id", menuIds);
+        const catIds = (dbCats ?? []).map((c: any) => c.id);
+        if (catIds.length > 0) {
+          await (supabase.from("dishes") as any)
+            .update({ currency })
+            .in("category_id", catIds);
+        }
+      }
+    }
+
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
