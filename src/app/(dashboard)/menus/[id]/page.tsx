@@ -32,6 +32,29 @@ export default function MenuEditorPage() {
   const [categoryModal, setCategoryModal] = useState<{ open: boolean; categoryId?: string }>({
     open: false,
   });
+  const [addingDish, setAddingDish] = useState(false);
+
+  async function handleAddDishDirect() {
+    if (!menu) return;
+    setAddingDish(true);
+    try {
+      if (menu.categories.length > 0) {
+        setDishModal({ open: true, categoryId: menu.categories[0].id });
+      } else {
+        const supabase = createClient();
+        const { data } = await (supabase.from("categories") as any)
+          .insert({ menu_id: menu.id, name: "", sort_order: 0 })
+          .select("id")
+          .single();
+        if (data) {
+          await reload();
+          setDishModal({ open: true, categoryId: data.id });
+        }
+      }
+    } finally {
+      setAddingDish(false);
+    }
+  }
 
   async function handleReorderCategories(reordered: Category[]) {
     setMenu((prev) => prev ? { ...prev, categories: reordered } : prev);
@@ -361,6 +384,17 @@ export default function MenuEditorPage() {
                 <FolderPlus size={16} />
                 {t("editor.customCategoryName")}
               </Button>
+
+              <div className="flex items-center gap-3 pt-2">
+                <div className="h-px flex-1 bg-gray-200" />
+                <span className="text-xs text-gray-400">{t("common.or")}</span>
+                <div className="h-px flex-1 bg-gray-200" />
+              </div>
+
+              <Button onClick={handleAddDishDirect} disabled={addingDish}>
+                <Plus size={16} />
+                {t("editor.addDishDirectly")}
+              </Button>
             </div>
           </div>
         )}
@@ -368,6 +402,13 @@ export default function MenuEditorPage() {
         {/* -- CATEGORIES WITH DISHES -- */}
         {!isNewMenu && (
           <>
+            <div className="flex justify-end mb-4">
+              <Button onClick={handleAddDishDirect} disabled={addingDish}>
+                <Plus size={16} />
+                {t("editor.addDish")}
+              </Button>
+            </div>
+
             {filteredCategories.map((category) => (
               <div key={category.id} className="mb-2">
                 <CategorySection

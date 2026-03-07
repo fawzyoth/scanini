@@ -101,11 +101,14 @@ export function HomeScreenCard({
               const availableDishes = category.dishes.filter((d) => d.available);
               if (availableDishes.length === 0) return null;
 
+              const hideHeader = activeMenu.categories.length === 1 && !category.name;
               return (
                 <div key={category.id} className="mb-4">
+                  {!hideHeader && (
                   <h3 className="text-base font-bold text-gray-900 mb-3">
                     {category.name}
                   </h3>
+                  )}
                   <div className="space-y-3">
                     {availableDishes.map((dish) => (
                       <button

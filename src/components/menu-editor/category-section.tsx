@@ -49,7 +49,7 @@ export function CategorySection({
           </button>
         )}
         <div className="flex-1 border-t border-gray-200 hidden sm:block" />
-        <span className="text-sm font-medium text-gray-500 truncate">{category.name}</span>
+        <span className="text-sm font-medium text-gray-500 truncate">{category.name || t("editor.general")}</span>
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="px-2 sm:px-3 py-1 text-xs font-medium text-gray-600 border border-gray-300 rounded-full hover:bg-gray-50 shrink-0"

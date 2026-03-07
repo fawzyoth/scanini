@@ -28,12 +28,16 @@ export function MenuScreen({ menu, onBack, onDishClick, onReviewClick }: MenuScr
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto bg-gray-50">
-        {menu.categories.map((category) => (
+        {menu.categories.map((category) => {
+          const hideHeader = menu.categories.length === 1 && !category.name;
+          return (
           <div key={category.id} className="mb-1">
             {/* Category header */}
+            {!hideHeader && (
             <div className="px-4 py-3 bg-gray-50">
               <h3 className="text-base font-bold text-gray-900">{category.name}</h3>
             </div>
+            )}
 
             {/* Dishes */}
             <div className="bg-white">
@@ -75,7 +79,8 @@ export function MenuScreen({ menu, onBack, onDishClick, onReviewClick }: MenuScr
                 ))}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Rate button */}
