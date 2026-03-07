@@ -1,6 +1,52 @@
 "use client";
 
 /**
+ * French translations for allergen names.
+ * Keys are lowercase English names, values are French.
+ */
+const ALLERGEN_FR: Record<string, string> = {
+  celery: "Celeri",
+  crustaceans: "Crustaces",
+  eggs: "Oeufs",
+  fish: "Poisson",
+  gluten: "Gluten",
+  lupin: "Lupin",
+  milk: "Lait",
+  dairy: "Lait",
+  molluscs: "Mollusques",
+  mustard: "Moutarde",
+  nuts: "Fruits a coque",
+  peanuts: "Arachides",
+  "sesame seeds": "Graines de sesame",
+  soybeans: "Soja",
+  "sulphur dioxide and sulphites": "Sulfites",
+  barley: "Orge",
+  oats: "Avoine",
+  rye: "Seigle",
+  wheat: "Ble",
+  almonds: "Amandes",
+  "brazil nuts": "Noix du Bresil",
+  cashews: "Noix de cajou",
+  hazelnuts: "Noisettes",
+  "macadamia nuts": "Noix de macadamia",
+  "pecan nuts": "Noix de pecan",
+  "pistachio nuts": "Pistaches",
+  walnuts: "Noix",
+  spicy: "Epice",
+  vegetarian: "Vegetarien",
+  vegan: "Vegan",
+  "dairy free": "Sans lactose",
+  "without gluten": "Sans gluten",
+};
+
+function translateAllergen(name: string, locale: string): string {
+  if (locale === "fr") {
+    return ALLERGEN_FR[name.toLowerCase()] ?? name;
+  }
+  return name;
+}
+
+/**
  * EU-14 allergen icon mapping.
  * Keys are lowercase for case-insensitive lookup.
  * Sub-allergens (e.g. "wheat", "almonds") map to their parent icon.
@@ -53,9 +99,11 @@ function getAllergenInfo(name: string): { icon: string; color: string } | null {
 export function AllergenIcons({
   allergens,
   max = 3,
+  locale = "fr",
 }: {
   allergens: string[];
   max?: number;
+  locale?: string;
 }) {
   if (allergens.length === 0) return null;
 
@@ -68,7 +116,7 @@ export function AllergenIcons({
         const info = getAllergenInfo(a);
         if (!info) return null;
         return (
-          <span key={a} className="text-xs leading-none" title={a}>
+          <span key={a} className="text-xs leading-none" title={translateAllergen(a, locale)}>
             {info.icon}
           </span>
         );
@@ -83,7 +131,7 @@ export function AllergenIcons({
 /**
  * Allergen badges for the dish detail sheet — larger with labels.
  */
-export function AllergenBadges({ allergens }: { allergens: string[] }) {
+export function AllergenBadges({ allergens, locale = "fr" }: { allergens: string[]; locale?: string }) {
   if (allergens.length === 0) return null;
 
   return (
@@ -96,7 +144,7 @@ export function AllergenBadges({ allergens }: { allergens: string[] }) {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-xs font-medium text-gray-700"
           >
             {info && <span className="text-sm leading-none">{info.icon}</span>}
-            {a}
+            {translateAllergen(a, locale)}
           </span>
         );
       })}
