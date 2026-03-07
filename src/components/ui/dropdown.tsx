@@ -28,8 +28,12 @@ export function Dropdown({ trigger, items, align = "right" }: DropdownProps) {
   const updatePosition = useCallback(() => {
     if (!triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
+    const menuHeight = menuRef.current?.offsetHeight ?? 250;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const flipUp = spaceBelow < menuHeight + 8;
+
     setPosition({
-      top: rect.bottom + 4,
+      top: flipUp ? rect.top - menuHeight - 4 : rect.bottom + 4,
       left: align === "right" ? rect.right : rect.left,
     });
   }, [align]);
@@ -37,6 +41,8 @@ export function Dropdown({ trigger, items, align = "right" }: DropdownProps) {
   useEffect(() => {
     if (!open) return;
     updatePosition();
+    // Recalculate after menu renders to get actual height for flip detection
+    requestAnimationFrame(updatePosition);
 
     function handleClickOutside(e: MouseEvent) {
       if (
@@ -66,7 +72,7 @@ export function Dropdown({ trigger, items, align = "right" }: DropdownProps) {
         createPortal(
           <div
             ref={menuRef}
-            className="fixed z-[9999] min-w-[200px] bg-white rounded-lg border border-gray-200 shadow-lg py-1"
+            className="fixed z-[9999] min-w-[200px] max-h-[calc(100vh-16px)] overflow-y-auto bg-white rounded-lg border border-gray-200 shadow-lg py-1"
             style={{
               top: position.top,
               ...(align === "right"

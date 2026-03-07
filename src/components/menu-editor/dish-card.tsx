@@ -53,7 +53,7 @@ export function DishCard({ dish, onEdit, onDelete, dragProps, dragStyle }: DishC
         </span>
       )}
 
-      <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
+      <div className="flex items-center gap-1 shrink-0">
         <button onClick={onEdit} className="p-1 text-gray-400 hover:text-gray-600 rounded">
           <Edit size={14} />
         </button>
