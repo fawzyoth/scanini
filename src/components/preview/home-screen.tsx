@@ -11,9 +11,10 @@ interface HomeScreenProps {
   onMenuClick: (menu: Menu) => void;
   onReviewClick?: () => void;
   onInfoClick: () => void;
+  onSearchClick?: () => void;
 }
 
-export function HomeScreen({ restaurant, menus, reviews, onMenuClick, onReviewClick, onInfoClick }: HomeScreenProps) {
+export function HomeScreen({ restaurant, menus, reviews, onMenuClick, onReviewClick, onInfoClick, onSearchClick }: HomeScreenProps) {
   const avgRating = reviews.length > 0
     ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
     : 0;
@@ -27,7 +28,7 @@ export function HomeScreen({ restaurant, menus, reviews, onMenuClick, onReviewCl
           {restaurant.coverImage && (
             <img src={restaurant.coverImage} alt={restaurant.name} className="absolute inset-0 w-full h-full object-cover" />
           )}
-          <button className="absolute top-3 right-3 w-9 h-9 bg-white/80 backdrop-blur rounded-full flex items-center justify-center">
+          <button onClick={onSearchClick} className="absolute top-3 right-3 w-9 h-9 bg-white/80 backdrop-blur rounded-full flex items-center justify-center">
             <Search size={16} />
           </button>
         </div>

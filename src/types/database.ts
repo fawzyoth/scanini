@@ -62,6 +62,7 @@ export type Database = {
           billing_cycle: "monthly" | "yearly";
           primary_color: string;
           template: "classic" | "card";
+          currency: string;
           extra_info: string | null;
           reviews_enabled: boolean;
           created_at: string;
@@ -84,6 +85,7 @@ export type Database = {
           billing_cycle?: "monthly" | "yearly";
           primary_color?: string;
           template?: "classic" | "card";
+          currency?: string;
           extra_info?: string | null;
           reviews_enabled?: boolean;
           created_at?: string;
@@ -106,6 +108,7 @@ export type Database = {
           billing_cycle?: "monthly" | "yearly";
           primary_color?: string;
           template?: "classic" | "card";
+          currency?: string;
           extra_info?: string | null;
           reviews_enabled?: boolean;
           created_at?: string;

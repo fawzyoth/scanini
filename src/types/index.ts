@@ -7,6 +7,7 @@ export interface Restaurant {
   phone: string;
   address: string;
   template: MenuTemplate;
+  currency: string;
   wifi?: {
     ssid: string;
     password: string;

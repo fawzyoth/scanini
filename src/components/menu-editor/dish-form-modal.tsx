@@ -11,6 +11,13 @@ import { PriceVariants, DEFAULT_VARIANTS, type Variant } from "./price-variants"
 import { TAGS } from "@/constants/dish-options";
 import { generateId } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/i18n-context";
+import { useDashboard } from "@/lib/dashboard-context";
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  EUR: "\u20AC",
+  USD: "$",
+  TND: "DT",
+};
 
 interface DishFormModalProps {
   open: boolean;
@@ -20,6 +27,7 @@ interface DishFormModalProps {
 }
 
 export function DishFormModal({ open, onClose, onSave, dish }: DishFormModalProps) {
+  const { restaurant } = useDashboard();
   const { t } = useTranslation();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -61,7 +69,7 @@ export function DishFormModal({ open, onClose, onSave, dish }: DishFormModalProp
       name,
       description,
       price: useVariants ? 0 : parseFloat(price) || 0,
-      currency: "EUR",
+      currency: dish?.currency ?? (restaurant as any)?.currency ?? "EUR",
       image,
       allergens,
       available: true,
@@ -130,7 +138,7 @@ export function DishFormModal({ open, onClose, onSave, dish }: DishFormModalProp
                 className="block w-full rounded-lg border border-gray-300 px-3 py-2.5 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
               <div className="absolute inset-y-0 right-0 flex items-center px-3 border-l border-gray-300 bg-gray-50 rounded-r-lg">
-                <span className="text-sm text-gray-500 font-medium">&euro;</span>
+                <span className="text-sm text-gray-500 font-medium">{CURRENCY_SYMBOLS[(restaurant as any)?.currency ?? "EUR"] ?? "\u20AC"}</span>
               </div>
             </div>
           )}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, DishDetailSheet, ReviewSheet, InfoSheet } from "@/components/preview";
+import { HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, DishDetailSheet, ReviewSheet, InfoSheet, SearchOverlay } from "@/components/preview";
 import type { Restaurant, Menu, Category, Dish, Review } from "@/types";
 
 type Screen = { type: "home" } | { type: "menu"; menu: Menu };
@@ -16,6 +16,7 @@ function toRestaurant(db: any): Restaurant {
     phone: db.phone ?? "",
     address: db.address ?? "",
     template: db.template ?? "classic",
+    currency: db.currency ?? "EUR",
     wifi: db.wifi_ssid ? { ssid: db.wifi_ssid, password: db.wifi_password ?? "" } : undefined,
     socialMedia: {
       instagram: db.social_instagram ?? undefined,
@@ -41,7 +42,7 @@ function buildMenus(dbMenus: any[], dbCategories: any[], dbDishes: any[]): Menu[
             name: d.name,
             description: d.description ?? "",
             price: Number(d.price),
-            currency: d.currency ?? "DT",
+            currency: d.currency ?? "EUR",
             image: d.image_url ?? undefined,
             allergens: d.allergens ?? [],
             available: d.available ?? true,
@@ -73,6 +74,7 @@ export default function PublicMenuPage() {
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -145,6 +147,7 @@ export default function PublicMenuPage() {
             onDishClick={(dish) => setSelectedDish(dish)}
             onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
             onInfoClick={() => setInfoOpen(true)}
+            onSearchClick={() => setSearchOpen(true)}
           />
         ) : (
           <HomeScreen
@@ -154,6 +157,7 @@ export default function PublicMenuPage() {
             onMenuClick={(menu) => setScreen({ type: "menu", menu })}
             onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
             onInfoClick={() => setInfoOpen(true)}
+            onSearchClick={() => setSearchOpen(true)}
           />
         )
       )}
@@ -165,6 +169,7 @@ export default function PublicMenuPage() {
             onBack={() => setScreen({ type: "home" })}
             onDishClick={(dish) => setSelectedDish(dish)}
             onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
+            onSearchClick={() => setSearchOpen(true)}
           />
         ) : (
           <MenuScreen
@@ -172,6 +177,7 @@ export default function PublicMenuPage() {
             onBack={() => setScreen({ type: "home" })}
             onDishClick={(dish) => setSelectedDish(dish)}
             onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
+            onSearchClick={() => setSearchOpen(true)}
           />
         )
       )}
@@ -191,6 +197,13 @@ export default function PublicMenuPage() {
         open={infoOpen}
         onClose={() => setInfoOpen(false)}
         restaurant={restaurant}
+      />
+
+      <SearchOverlay
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        menus={menus}
+        onDishClick={(dish) => setSelectedDish(dish)}
       />
     </div>
   );

@@ -13,6 +13,7 @@ export function GeneralSection() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [currency, setCurrency] = useState("EUR");
   const [coverImage, setCoverImage] = useState("");
   const [uploading, setUploading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -22,6 +23,7 @@ export function GeneralSection() {
       setName(restaurant.name);
       setPhone(restaurant.phone ?? "");
       setAddress(restaurant.address ?? "");
+      setCurrency((restaurant as any).currency ?? "EUR");
       setCoverImage((restaurant as any).cover_image ?? "");
     }
   }, [restaurant]);
@@ -50,6 +52,7 @@ export function GeneralSection() {
       name,
       phone: phone || null,
       address: address || null,
+      currency,
       cover_image: coverImage || null,
     } as any);
     setSaved(true);
@@ -98,6 +101,31 @@ export function GeneralSection() {
       <Input label={t("general.restaurantName")} value={name} onChange={(e) => setName(e.target.value)} />
       <Input label={t("general.phoneNumber")} value={phone} onChange={(e) => setPhone(e.target.value)} />
       <Input label={t("general.address")} value={address} onChange={(e) => setAddress(e.target.value)} />
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t("general.currency")}</label>
+        <div className="flex gap-2">
+          {[
+            { code: "EUR", label: "Euro (EUR)" },
+            { code: "USD", label: "Dollar (USD)" },
+            { code: "TND", label: "Dinar (TND)" },
+          ].map((c) => (
+            <button
+              key={c.code}
+              type="button"
+              onClick={() => setCurrency(c.code)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                currency === c.code
+                  ? "bg-indigo-50 border-indigo-300 text-indigo-700"
+                  : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="pt-2 flex items-center gap-3">
         <Button size="sm" onClick={handleSave}>{t("common.saveChanges")}</Button>
         {saved && <span className="text-sm text-green-600 font-medium">{t("common.saved")}</span>}

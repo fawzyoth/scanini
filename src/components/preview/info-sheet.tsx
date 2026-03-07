@@ -46,6 +46,7 @@ export function InfoSheet({ open, onClose, restaurant }: InfoSheetProps) {
       icon: <Phone size={22} className="text-gray-700" />,
       label: restaurant.phone,
       action: <ChevronRight size={18} className="text-gray-400" />,
+      onClick: () => window.open(`tel:${restaurant.phone}`, "_self"),
     });
   }
 
@@ -54,26 +55,35 @@ export function InfoSheet({ open, onClose, restaurant }: InfoSheetProps) {
       icon: <MapPin size={22} className="text-gray-700" />,
       label: restaurant.address,
       action: <ChevronRight size={18} className="text-gray-400" />,
+      onClick: () => window.open(`https://maps.google.com/?q=${encodeURIComponent(restaurant.address)}`, "_blank"),
     });
   }
 
   if (restaurant.socialMedia?.instagram) {
+    const ig = restaurant.socialMedia.instagram;
+    const igUrl = ig.startsWith("http") ? ig : `https://instagram.com/${ig.replace(/^@/, "")}`;
     items.push({
       icon: <Instagram size={22} className="text-gray-700" />,
       label: "Instagram",
       action: <ChevronRight size={18} className="text-gray-400" />,
+      onClick: () => window.open(igUrl, "_blank"),
     });
   }
 
   if (restaurant.socialMedia?.facebook) {
+    const fb = restaurant.socialMedia.facebook;
+    const fbUrl = fb.startsWith("http") ? fb : `https://facebook.com/${fb}`;
     items.push({
       icon: <Facebook size={22} className="text-gray-700" />,
       label: "Facebook",
       action: <ChevronRight size={18} className="text-gray-400" />,
+      onClick: () => window.open(fbUrl, "_blank"),
     });
   }
 
   if (restaurant.socialMedia?.tiktok) {
+    const tt = restaurant.socialMedia.tiktok;
+    const ttUrl = tt.startsWith("http") ? tt : `https://tiktok.com/@${tt.replace(/^@/, "")}`;
     items.push({
       icon: (
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-700">
@@ -82,6 +92,7 @@ export function InfoSheet({ open, onClose, restaurant }: InfoSheetProps) {
       ),
       label: "TikTok",
       action: <ChevronRight size={18} className="text-gray-400" />,
+      onClick: () => window.open(ttUrl, "_blank"),
     });
   }
 
@@ -101,13 +112,20 @@ export function InfoSheet({ open, onClose, restaurant }: InfoSheetProps) {
           </h3>
 
           <div className="divide-y divide-gray-100">
-            {items.map((item, i) => (
-              <div key={i} className="flex items-center gap-4 py-4">
-                <div className="shrink-0">{item.icon}</div>
-                <span className="flex-1 text-sm font-medium text-gray-900">{item.label}</span>
-                {item.action && <div className="shrink-0">{item.action}</div>}
-              </div>
-            ))}
+            {items.map((item, i) => {
+              const Row = item.onClick ? "button" : "div";
+              return (
+                <Row
+                  key={i}
+                  className={`flex items-center gap-4 py-4 w-full text-left ${item.onClick ? "cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg" : ""}`}
+                  onClick={item.onClick}
+                >
+                  <div className="shrink-0">{item.icon}</div>
+                  <span className="flex-1 text-sm font-medium text-gray-900">{item.label}</span>
+                  {item.action && <div className="shrink-0">{item.action}</div>}
+                </Row>
+              );
+            })}
           </div>
         </div>
       </div>

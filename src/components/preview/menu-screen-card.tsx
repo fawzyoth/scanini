@@ -11,9 +11,10 @@ interface MenuScreenCardProps {
   onBack: () => void;
   onDishClick: (dish: Dish) => void;
   onReviewClick?: () => void;
+  onSearchClick?: () => void;
 }
 
-export function MenuScreenCard({ menu, onBack, onDishClick, onReviewClick }: MenuScreenCardProps) {
+export function MenuScreenCard({ menu, onBack, onDishClick, onReviewClick, onSearchClick }: MenuScreenCardProps) {
   const [activeCatId, setActiveCatId] = useState<string>(menu.categories[0]?.id ?? "");
   const activeCategory = menu.categories.find((c) => c.id === activeCatId);
 
@@ -25,7 +26,7 @@ export function MenuScreenCard({ menu, onBack, onDishClick, onReviewClick }: Men
           <ArrowLeft size={20} />
         </button>
         <h2 className="flex-1 text-base font-bold text-gray-900">{menu.name}</h2>
-        <button className="p-1 text-gray-500">
+        <button onClick={onSearchClick} className="p-1 text-gray-500">
           <Search size={18} />
         </button>
       </div>

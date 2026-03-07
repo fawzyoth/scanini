@@ -15,6 +15,7 @@ interface HomeScreenCardProps {
   onDishClick: (dish: Dish) => void;
   onReviewClick?: () => void;
   onInfoClick: () => void;
+  onSearchClick?: () => void;
 }
 
 export function HomeScreenCard({
@@ -25,6 +26,7 @@ export function HomeScreenCard({
   onDishClick,
   onReviewClick,
   onInfoClick,
+  onSearchClick,
 }: HomeScreenCardProps) {
   const visibleMenus = menus.filter((m) => m.visible !== false);
   const [activeMenuId, setActiveMenuId] = useState<string>(visibleMenus[0]?.id ?? "");
@@ -48,7 +50,7 @@ export function HomeScreenCard({
               className="absolute inset-0 w-full h-full object-cover"
             />
           )}
-          <button className="absolute top-3 left-3 w-9 h-9 bg-white/80 backdrop-blur rounded-full flex items-center justify-center">
+          <button onClick={onSearchClick} className="absolute top-3 left-3 w-9 h-9 bg-white/80 backdrop-blur rounded-full flex items-center justify-center">
             <Search size={16} />
           </button>
           <button

@@ -7,6 +7,7 @@ export const mockRestaurant: Restaurant = {
   phone: "+33 1 23 45 67 89",
   address: "12 Rue de la Paix, 75002 Paris",
   template: "classic",
+  currency: "EUR",
   wifi: {
     ssid: "LaBouffe-Guest",
     password: "bienvenue2024",

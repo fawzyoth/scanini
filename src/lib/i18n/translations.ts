@@ -152,6 +152,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     "general.restaurantName": "Nom du restaurant",
     "general.phoneNumber": "Numero de telephone",
     "general.address": "Adresse",
+    "general.currency": "Devise",
 
     // ── Appearance section ──
     "appearance.template": "Modele de menu",
@@ -465,6 +466,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     "general.restaurantName": "Restaurant name",
     "general.phoneNumber": "Phone number",
     "general.address": "Address",
+    "general.currency": "Currency",
 
     // ── Appearance section ──
     "appearance.template": "Menu template",

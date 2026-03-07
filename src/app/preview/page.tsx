@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Loader2, Smartphone } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { PhoneShell, HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, DishDetailSheet, ReviewSheet, InfoSheet } from "@/components/preview";
+import { PhoneShell, HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, DishDetailSheet, ReviewSheet, InfoSheet, SearchOverlay } from "@/components/preview";
 import { createClient } from "@/lib/supabase/client";
 import type { Menu, Category, Dish, Restaurant, Review } from "@/types";
 
@@ -51,6 +51,7 @@ function toFrontendRestaurant(db: any): Restaurant {
     phone: db.phone ?? "",
     address: db.address ?? "",
     template: db.template ?? "classic",
+    currency: db.currency ?? "EUR",
     wifi: db.wifi_ssid ? { ssid: db.wifi_ssid, password: db.wifi_password ?? "" } : undefined,
     socialMedia: {
       instagram: db.social_instagram ?? undefined,
@@ -65,6 +66,7 @@ export default function PreviewPage() {
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
@@ -167,6 +169,7 @@ export default function PreviewPage() {
                 onDishClick={(dish) => setSelectedDish(dish)}
                 onReviewClick={() => setReviewOpen(true)}
                 onInfoClick={() => setInfoOpen(true)}
+                onSearchClick={() => setSearchOpen(true)}
               />
             ) : (
               <HomeScreen
@@ -176,6 +179,7 @@ export default function PreviewPage() {
                 onMenuClick={(menu) => setScreen({ type: "menu", menu })}
                 onReviewClick={() => setReviewOpen(true)}
                 onInfoClick={() => setInfoOpen(true)}
+                onSearchClick={() => setSearchOpen(true)}
               />
             )
           )}
@@ -187,6 +191,7 @@ export default function PreviewPage() {
                 onBack={() => setScreen({ type: "home" })}
                 onDishClick={(dish) => setSelectedDish(dish)}
                 onReviewClick={() => setReviewOpen(true)}
+                onSearchClick={() => setSearchOpen(true)}
               />
             ) : (
               <MenuScreen
@@ -194,6 +199,7 @@ export default function PreviewPage() {
                 onBack={() => setScreen({ type: "home" })}
                 onDishClick={(dish) => setSelectedDish(dish)}
                 onReviewClick={() => setReviewOpen(true)}
+                onSearchClick={() => setSearchOpen(true)}
               />
             )
           )}
@@ -212,6 +218,13 @@ export default function PreviewPage() {
             open={infoOpen}
             onClose={() => setInfoOpen(false)}
             restaurant={restaurant}
+          />
+
+          <SearchOverlay
+            open={searchOpen}
+            onClose={() => setSearchOpen(false)}
+            menus={menus}
+            onDishClick={(dish) => setSelectedDish(dish)}
           />
         </PhoneShell>
 

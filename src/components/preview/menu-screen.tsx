@@ -10,9 +10,10 @@ interface MenuScreenProps {
   onBack: () => void;
   onDishClick: (dish: Dish) => void;
   onReviewClick?: () => void;
+  onSearchClick?: () => void;
 }
 
-export function MenuScreen({ menu, onBack, onDishClick, onReviewClick }: MenuScreenProps) {
+export function MenuScreen({ menu, onBack, onDishClick, onReviewClick, onSearchClick }: MenuScreenProps) {
   return (
     <>
       {/* Header */}
@@ -21,7 +22,7 @@ export function MenuScreen({ menu, onBack, onDishClick, onReviewClick }: MenuScr
           <ArrowLeft size={20} />
         </button>
         <h2 className="flex-1 text-base font-bold text-gray-900">{menu.name}</h2>
-        <button className="p-1 text-gray-500">
+        <button onClick={onSearchClick} className="p-1 text-gray-500">
           <Search size={18} />
         </button>
       </div>

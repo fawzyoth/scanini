@@ -47,7 +47,7 @@ function toFrontendMenu(
           name: d.name,
           description: d.description ?? "",
           price: Number(d.price),
-          currency: d.currency ?? "DT",
+          currency: d.currency ?? "EUR",
           image: d.image_url ?? undefined,
           allergens: d.allergens ?? [],
           available: d.available ?? true,
