@@ -90,11 +90,11 @@ export function MenuScreenDark({
       <div className="flex-1 flex overflow-hidden" style={{ backgroundColor: "#1a1a1a" }}>
         {/* Left sidebar — dark: back button + menu names */}
         <div
-          className="shrink-0 w-[120px] flex flex-col"
+          className="shrink-0 w-[90px] flex flex-col"
           style={{ backgroundColor: "#1a1a1a" }}
         >
           {/* Back button in sidebar — extra bottom padding for first item's inverse corner */}
-          <div className="px-3 pt-3 pb-5">
+          <div className="px-2 pt-2 pb-4">
             <button
               onClick={onBack}
               className="flex items-center gap-1 text-xs px-2 py-1.5 rounded-full border"
@@ -116,27 +116,27 @@ export function MenuScreenDark({
               <button
                 key={menu.id}
                 onClick={() => selectMenu(menu.id)}
-                className="relative py-3 px-2 text-center transition-colors"
+                className="relative py-2.5 px-1.5 text-center transition-colors"
                 style={{
                   backgroundColor: isActive ? "#fff" : "transparent",
-                  borderTopLeftRadius: isActive ? 20 : 0,
-                  borderBottomLeftRadius: isActive ? 20 : 0,
+                  borderTopLeftRadius: isActive ? 14 : 0,
+                  borderBottomLeftRadius: isActive ? 14 : 0,
                   zIndex: isActive ? 1 : 0,
                 }}
               >
                 {/* Inverse rounded corners on the right side */}
                 {isActive && (
                   <>
-                    <div style={{ position: "absolute", top: -16, right: 0, width: 16, height: 16, background: "#fff", overflow: "hidden" }}>
-                      <div style={{ width: "100%", height: "100%", background: "#1a1a1a", borderBottomRightRadius: 16 }} />
+                    <div style={{ position: "absolute", top: -10, right: 0, width: 10, height: 10, background: "#fff", overflow: "hidden" }}>
+                      <div style={{ width: "100%", height: "100%", background: "#1a1a1a", borderBottomRightRadius: 10 }} />
                     </div>
-                    <div style={{ position: "absolute", bottom: -16, right: 0, width: 16, height: 16, background: "#fff", overflow: "hidden" }}>
-                      <div style={{ width: "100%", height: "100%", background: "#1a1a1a", borderTopRightRadius: 16 }} />
+                    <div style={{ position: "absolute", bottom: -10, right: 0, width: 10, height: 10, background: "#fff", overflow: "hidden" }}>
+                      <div style={{ width: "100%", height: "100%", background: "#1a1a1a", borderTopRightRadius: 10 }} />
                     </div>
                   </>
                 )}
                 <span
-                  className="text-[11px] font-bold uppercase tracking-wider leading-tight"
+                  className="text-[9px] font-bold uppercase tracking-wider leading-tight"
                   style={{ color: isActive ? "#D4A853" : "#aaa" }}
                 >
                   {menu.name}
