@@ -108,6 +108,56 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(result);
 }
 
+// POST /api/admin/commercials — create a new commercial user
+export async function POST(request: NextRequest) {
+  if (!(await verifyAdmin(request))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  }
+
+  const body = await request.json();
+  const { first_name, last_name, email, phone, address, password } = body;
+
+  if (!first_name || !last_name || !email || !password) {
+    return NextResponse.json(
+      { error: "Nom, prenom, email et mot de passe sont requis" },
+      { status: 400 }
+    );
+  }
+
+  const service = getServiceClient();
+
+  // Create auth user
+  const { data: authData, error: authError } = await service.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: {
+      first_name,
+      last_name,
+      phone,
+      role: "commercial",
+    },
+  });
+
+  if (authError) {
+    return NextResponse.json({ error: authError.message }, { status: 400 });
+  }
+
+  // Update the auto-created profile with commercial role + extra fields
+  const userId = authData.user.id;
+  await service
+    .from("profiles")
+    .update({
+      role: "commercial",
+      phone,
+      whatsapp: phone,
+      address,
+    })
+    .eq("id", userId);
+
+  return NextResponse.json({ success: true, id: userId });
+}
+
 // PATCH /api/admin/commercials — update commission rate or assign restaurant
 export async function PATCH(request: NextRequest) {
   if (!(await verifyAdmin(request))) {
