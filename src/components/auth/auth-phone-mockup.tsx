@@ -29,10 +29,10 @@ const MENU_ITEMS = [
 
 export function AuthPhoneMockup() {
   return (
-    <div className="w-[260px] h-[540px] bg-gray-900 rounded-[2.5rem] p-2 shadow-2xl ring-1 ring-white/10">
+    <div className="w-[260px] h-[540px] bg-gray-800 rounded-[2.5rem] p-2 shadow-2xl ring-1 ring-white/10">
       {/* Notch */}
       <div className="relative z-20 flex justify-center">
-        <div className="w-20 h-5 bg-gray-900 rounded-b-xl" />
+        <div className="w-20 h-5 bg-gray-800 rounded-b-xl" />
       </div>
 
       {/* Screen */}
@@ -58,7 +58,7 @@ export function AuthPhoneMockup() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             <div className="absolute bottom-2 left-3">
-              <h2 className="text-white text-sm font-bold drop-shadow">La Bouffe</h2>
+              <h2 className="text-white text-sm font-bold drop-shadow">My Restaurant</h2>
               <div className="flex items-center gap-1 mt-0.5">
                 <MapPin size={8} className="text-white/80" />
                 <span className="text-[8px] text-white/80">Paris, France</span>

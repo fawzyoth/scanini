@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Eye } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
 export function LandingHero() {
   return (
@@ -13,11 +16,6 @@ export function LandingHero() {
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/80 text-xs font-medium px-4 py-2 rounded-full mb-8 border border-white/10">
-          <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-          Stickers QR gratuits pour votre restaurant
-        </div>
 
         {/* Headline */}
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-[1.1]">
@@ -59,67 +57,33 @@ export function LandingHero() {
           <span className="flex items-center gap-1.5"><Check size={14} className="text-green-400" /> Prêt en 5 minutes</span>
         </div>
 
-        {/* Phone mockup */}
-        <div className="mt-16 sm:mt-20 flex justify-center">
+        {/* QR Code demo */}
+        <div className="mt-16 sm:mt-20 flex flex-col items-center gap-6">
           <div className="relative">
-            {/* Glow behind phone */}
-            <div className="absolute -inset-8 bg-gradient-to-b from-indigo-500/20 via-purple-500/10 to-transparent rounded-[3rem] blur-2xl" />
+            {/* Glow behind QR */}
+            <div className="absolute -inset-8 bg-gradient-to-b from-indigo-500/20 via-purple-500/10 to-transparent rounded-3xl blur-2xl" />
 
-            <div className="relative w-[260px] sm:w-[280px] bg-gray-800 rounded-[2.5rem] p-2 shadow-2xl ring-1 ring-white/10">
-              <div className="relative z-20 flex justify-center">
-                <div className="w-20 h-5 bg-gray-800 rounded-b-xl" />
-              </div>
-              <div className="w-full bg-white rounded-[2rem] overflow-hidden -mt-5">
-                {/* Status bar */}
-                <div className="flex items-center justify-between px-5 pt-2 pb-1 text-[9px] font-semibold text-gray-900">
-                  <span>9:41</span>
-                  <div className="w-3 h-2 border border-current rounded-sm relative">
-                    <div className="absolute inset-[1px] bg-current rounded-[1px]" style={{ width: "70%" }} />
-                  </div>
-                </div>
-
-                {/* Cover */}
-                <div className="relative h-24">
-                  <img
-                    src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=200&fit=crop&q=80"
-                    alt="Restaurant"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                  <div className="absolute bottom-2 left-3">
-                    <p className="text-white text-xs font-bold">La Bouffe</p>
-                    <p className="text-[7px] text-white/80">Paris, France</p>
-                  </div>
-                </div>
-
-                {/* Tabs */}
-                <div className="flex gap-1 px-3 py-1.5">
-                  <span className="text-[7px] font-semibold text-white bg-gray-900 rounded-full px-2 py-0.5">Petit-déj</span>
-                  <span className="text-[7px] text-gray-500 bg-gray-100 rounded-full px-2 py-0.5">Déjeuner</span>
-                  <span className="text-[7px] text-gray-500 bg-gray-100 rounded-full px-2 py-0.5">Boissons</span>
-                </div>
-
-                {/* Items */}
-                {[
-                  { name: "Croissant Beurre", price: "2.50", img: "https://images.unsplash.com/photo-1555507036-ab1f4038024a?w=80&h=80&fit=crop&q=80" },
-                  { name: "Eggs Benedict", price: "12.00", img: "https://images.unsplash.com/photo-1608039829572-9b0189ea6268?w=80&h=80&fit=crop&q=80" },
-                  { name: "Avocado Toast", price: "9.50", img: "https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?w=80&h=80&fit=crop&q=80" },
-                ].map((item) => (
-                  <div key={item.name} className="flex gap-2 items-center mx-2.5 mb-1 bg-gray-50 rounded-lg p-1.5">
-                    <img src={item.img} alt={item.name} className="w-8 h-8 rounded-md object-cover" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[8px] font-semibold text-gray-900">{item.name}</p>
-                    </div>
-                    <span className="text-[8px] font-bold text-gray-900 pr-1">{item.price}&euro;</span>
-                  </div>
-                ))}
-
-                <div className="flex justify-center py-1.5">
-                  <div className="w-14 h-0.5 bg-gray-900 rounded-full" />
-                </div>
-              </div>
+            <div className="relative bg-white rounded-3xl p-6 shadow-2xl ring-1 ring-white/10">
+              <QRCodeSVG
+                value="https://scanini.business/menu/demo"
+                size={180}
+                level="M"
+                bgColor="#ffffff"
+                fgColor="#111827"
+              />
+              <p className="mt-3 text-xs text-gray-500 font-medium text-center">
+                Scannez pour voir le menu
+              </p>
             </div>
           </div>
+
+          <Link
+            href="/menu/demo"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/15 text-white text-sm font-semibold rounded-2xl border border-white/10 transition-all"
+          >
+            <Eye size={16} />
+            Voir un exemple de menu
+          </Link>
         </div>
       </div>
     </section>

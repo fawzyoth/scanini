@@ -26,7 +26,7 @@ export function LandingWhyScanini() {
               description: "Notre support est réactif. Vous ne serez jamais bloqué quand vous avez besoin d'aide.",
             },
             {
-              number: "0\u20AC",
+              number: "0 TND",
               label: "Pour commencer",
               description: "Aucune carte bancaire requise. Commencez gratuitement et évoluez à votre rythme.",
             },

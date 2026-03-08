@@ -86,10 +86,10 @@ export function AuthEditorAnimation() {
   const ITEM_HEIGHT = 44; // px per item row
 
   return (
-    <div className="w-[280px] h-[540px] bg-gray-900 rounded-[2.5rem] p-2 shadow-2xl ring-1 ring-white/10">
+    <div className="w-[280px] h-[540px] bg-gray-800 rounded-[2.5rem] p-2 shadow-2xl ring-1 ring-white/10">
       {/* Notch */}
       <div className="relative z-20 flex justify-center">
-        <div className="w-20 h-5 bg-gray-900 rounded-b-xl" />
+        <div className="w-20 h-5 bg-gray-800 rounded-b-xl" />
       </div>
 
       {/* Screen */}
