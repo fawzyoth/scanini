@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, DishDetailSheet, ReviewSheet, InfoSheet, SearchOverlay } from "@/components/preview";
+import { HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, HomeScreenProfile, MenuScreenProfile, DishDetailSheet, ReviewSheet, InfoSheet, SearchOverlay } from "@/components/preview";
 import type { Restaurant, Menu, Category, Dish, Review } from "@/types";
 
 type Screen = { type: "home" } | { type: "menu"; menu: Menu };
@@ -13,6 +13,7 @@ function toRestaurant(db: any): Restaurant {
     id: db.id,
     name: db.name,
     coverImage: db.cover_image ?? "",
+    logoImage: db.logo_image ?? undefined,
     phone: db.phone ?? "",
     address: db.address ?? "",
     template: db.template ?? "classic",
@@ -133,18 +134,28 @@ export default function PublicMenuPage() {
     );
   }
 
-  const isCard = restaurant.template === "card";
+  const tmpl = restaurant.template;
 
   return (
     <div className="h-dvh bg-white flex flex-col relative max-w-lg mx-auto overflow-hidden">
       {screen.type === "home" && (
-        isCard ? (
+        tmpl === "card" ? (
           <HomeScreenCard
             restaurant={restaurant}
             menus={menus}
             reviews={reviewsEnabled ? reviews : []}
             onMenuClick={(menu) => setScreen({ type: "menu", menu })}
             onDishClick={(dish) => setSelectedDish(dish)}
+            onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
+            onInfoClick={() => setInfoOpen(true)}
+            onSearchClick={() => setSearchOpen(true)}
+          />
+        ) : tmpl === "profile" ? (
+          <HomeScreenProfile
+            restaurant={restaurant}
+            menus={menus}
+            reviews={reviewsEnabled ? reviews : []}
+            onMenuClick={(menu) => setScreen({ type: "menu", menu })}
             onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
             onInfoClick={() => setInfoOpen(true)}
             onSearchClick={() => setSearchOpen(true)}
@@ -163,8 +174,16 @@ export default function PublicMenuPage() {
       )}
 
       {screen.type === "menu" && (
-        isCard ? (
+        tmpl === "card" ? (
           <MenuScreenCard
+            menu={screen.menu}
+            onBack={() => setScreen({ type: "home" })}
+            onDishClick={(dish) => setSelectedDish(dish)}
+            onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
+            onSearchClick={() => setSearchOpen(true)}
+          />
+        ) : tmpl === "profile" ? (
+          <MenuScreenProfile
             menu={screen.menu}
             onBack={() => setScreen({ type: "home" })}
             onDishClick={(dish) => setSelectedDish(dish)}

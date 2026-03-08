@@ -158,6 +158,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     "appearance.template": "Modele de menu",
     "appearance.templateClassic": "Classique",
     "appearance.templateCard": "Carte",
+    "appearance.templateProfile": "Profil",
     "appearance.primaryColor": "Couleur principale",
     "appearance.colorDesc": "Cette couleur est utilisee pour les boutons et les accents sur votre page de menu publique.",
 
@@ -472,6 +473,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     "appearance.template": "Menu template",
     "appearance.templateClassic": "Classic",
     "appearance.templateCard": "Card",
+    "appearance.templateProfile": "Profile",
     "appearance.primaryColor": "Primary color",
     "appearance.colorDesc": "This color is used for buttons and accents on your public menu page.",
 

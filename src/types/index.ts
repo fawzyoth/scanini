@@ -1,4 +1,4 @@
-export type MenuTemplate = "classic" | "card";
+export type MenuTemplate = "classic" | "card" | "profile";
 
 export interface Restaurant {
   id: string;
@@ -8,6 +8,7 @@ export interface Restaurant {
   address: string;
   template: MenuTemplate;
   currency: string;
+  logoImage?: string;
   wifi?: {
     ssid: string;
     password: string;

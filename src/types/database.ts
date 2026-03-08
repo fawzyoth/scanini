@@ -50,6 +50,7 @@ export type Database = {
           owner_id: string;
           name: string;
           cover_image: string | null;
+          logo_image: string | null;
           phone: string | null;
           address: string | null;
           wifi_ssid: string | null;
@@ -61,7 +62,7 @@ export type Database = {
           status: "pending" | "active" | "trial" | "suspended";
           billing_cycle: "monthly" | "yearly";
           primary_color: string;
-          template: "classic" | "card";
+          template: "classic" | "card" | "profile";
           currency: string;
           extra_info: string | null;
           reviews_enabled: boolean;
@@ -73,6 +74,7 @@ export type Database = {
           owner_id: string;
           name: string;
           cover_image?: string | null;
+          logo_image?: string | null;
           phone?: string | null;
           address?: string | null;
           wifi_ssid?: string | null;
@@ -84,7 +86,7 @@ export type Database = {
           status?: "pending" | "active" | "trial" | "suspended";
           billing_cycle?: "monthly" | "yearly";
           primary_color?: string;
-          template?: "classic" | "card";
+          template?: "classic" | "card" | "profile";
           currency?: string;
           extra_info?: string | null;
           reviews_enabled?: boolean;
@@ -96,6 +98,7 @@ export type Database = {
           owner_id?: string;
           name?: string;
           cover_image?: string | null;
+          logo_image?: string | null;
           phone?: string | null;
           address?: string | null;
           wifi_ssid?: string | null;
@@ -107,7 +110,7 @@ export type Database = {
           status?: "pending" | "active" | "trial" | "suspended";
           billing_cycle?: "monthly" | "yearly";
           primary_color?: string;
-          template?: "classic" | "card";
+          template?: "classic" | "card" | "profile";
           currency?: string;
           extra_info?: string | null;
           reviews_enabled?: boolean;

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Loader2, Smartphone } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { PhoneShell, HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, DishDetailSheet, ReviewSheet, InfoSheet, SearchOverlay } from "@/components/preview";
+import { PhoneShell, HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, HomeScreenProfile, MenuScreenProfile, DishDetailSheet, ReviewSheet, InfoSheet, SearchOverlay } from "@/components/preview";
 import { createClient } from "@/lib/supabase/client";
 import type { Menu, Category, Dish, Restaurant, Review } from "@/types";
 
@@ -48,6 +48,7 @@ function toFrontendRestaurant(db: any): Restaurant {
     id: db.id,
     name: db.name,
     coverImage: db.cover_image ?? "",
+    logoImage: db.logo_image ?? undefined,
     phone: db.phone ?? "",
     address: db.address ?? "",
     template: db.template ?? "classic",
@@ -171,6 +172,16 @@ export default function PreviewPage() {
                 onInfoClick={() => setInfoOpen(true)}
                 onSearchClick={() => setSearchOpen(true)}
               />
+            ) : restaurant.template === "profile" ? (
+              <HomeScreenProfile
+                restaurant={restaurant}
+                menus={menus}
+                reviews={reviews}
+                onMenuClick={(menu) => setScreen({ type: "menu", menu })}
+                onReviewClick={() => setReviewOpen(true)}
+                onInfoClick={() => setInfoOpen(true)}
+                onSearchClick={() => setSearchOpen(true)}
+              />
             ) : (
               <HomeScreen
                 restaurant={restaurant}
@@ -187,6 +198,14 @@ export default function PreviewPage() {
           {screen.type === "menu" && (
             restaurant.template === "card" ? (
               <MenuScreenCard
+                menu={screen.menu}
+                onBack={() => setScreen({ type: "home" })}
+                onDishClick={(dish) => setSelectedDish(dish)}
+                onReviewClick={() => setReviewOpen(true)}
+                onSearchClick={() => setSearchOpen(true)}
+              />
+            ) : restaurant.template === "profile" ? (
+              <MenuScreenProfile
                 menu={screen.menu}
                 onBack={() => setScreen({ type: "home" })}
                 onDishClick={(dish) => setSelectedDish(dish)}

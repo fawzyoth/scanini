@@ -35,7 +35,7 @@ export function AppearanceSection() {
         <label className="block text-sm font-medium text-gray-700 mb-3">
           {t("appearance.template")}
         </label>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <TemplateOption
             active={template === "classic"}
             onClick={() => setTemplate("classic")}
@@ -87,6 +87,33 @@ export function AppearanceSection() {
                     <div className="h-1 w-5 bg-gray-200 rounded" />
                   </div>
                   <div className="w-5 h-5 bg-gray-200 rounded" />
+                </div>
+              </div>
+            </div>
+          </TemplateOption>
+
+          <TemplateOption
+            active={template === "profile"}
+            onClick={() => setTemplate("profile")}
+            label={t("appearance.templateProfile")}
+          >
+            {/* Profile template preview */}
+            <div className="space-y-1">
+              <div className="h-6 bg-gradient-to-r from-amber-200 to-orange-200 rounded-t" />
+              <div className="flex justify-center -mt-2.5 relative z-10">
+                <div className="w-5 h-5 rounded-full bg-gray-800 border-2 border-white" />
+              </div>
+              <div className="flex justify-center">
+                <div className="h-1 w-8 bg-gray-300 rounded" />
+              </div>
+              <div className="px-1.5 space-y-1 pt-0.5">
+                <div className="h-5 bg-white border border-gray-200 rounded flex items-center px-1.5 gap-1">
+                  <div className="w-2 h-2 bg-gray-300 rounded-sm" />
+                  <div className="h-1 w-6 bg-gray-300 rounded" />
+                </div>
+                <div className="h-5 bg-white border border-gray-200 rounded flex items-center px-1.5 gap-1">
+                  <div className="w-2 h-2 bg-gray-300 rounded-sm" />
+                  <div className="h-1 w-8 bg-gray-300 rounded" />
                 </div>
               </div>
             </div>
