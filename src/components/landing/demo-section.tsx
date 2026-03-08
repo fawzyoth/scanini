@@ -1,42 +1,48 @@
-import { QrCode, Smartphone } from "lucide-react";
+import { QrCode, Smartphone, Zap } from "lucide-react";
 
 export function LandingDemo() {
   return (
-    <section id="demo" className="py-20 sm:py-28 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700 rounded-3xl p-8 sm:p-12 lg:p-16 overflow-hidden">
-          {/* Decorative shapes */}
-          <div className="absolute -top-20 -right-20 w-64 h-64 bg-indigo-400/20 rounded-full blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl" />
+    <section id="demo" className="py-24 sm:py-32 bg-gray-950">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative rounded-3xl overflow-hidden">
+          {/* Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
-            {/* Text */}
-            <div className="flex-1 text-center lg:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white">
-                Voyez par vous-même
-              </h2>
-              <p className="mt-4 text-indigo-200 text-lg max-w-md">
-                Scannez ce QR code pour découvrir un menu exactement comme vos clients le verront dans votre restaurant.
-              </p>
+          <div className="relative p-8 sm:p-14 lg:p-20">
+            <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+              {/* Text */}
+              <div className="flex-1 text-center lg:text-left">
+                <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+                  Voyez par vous-même
+                </h2>
+                <p className="mt-4 text-white/70 text-lg max-w-md mx-auto lg:mx-0">
+                  Scannez ce QR code pour découvrir un menu exactement comme vos clients le verront.
+                </p>
 
-              <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 lg:justify-start justify-center">
-                <div className="flex items-center gap-3 text-white/70 text-sm">
-                  <Smartphone size={18} />
-                  <span>Aucune application requise</span>
-                </div>
-                <div className="flex items-center gap-3 text-white/70 text-sm">
-                  <QrCode size={18} />
-                  <span>Fonctionne avec tout appareil photo</span>
+                <div className="mt-8 flex flex-col sm:flex-row items-center gap-5 lg:justify-start justify-center">
+                  <div className="flex items-center gap-2.5 text-white/60 text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                      <Smartphone size={16} className="text-white/80" />
+                    </div>
+                    <span>Aucune app requise</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 text-white/60 text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                      <Zap size={16} className="text-white/80" />
+                    </div>
+                    <span>Chargement instantané</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* QR code placeholder */}
-            <div className="shrink-0">
-              <div className="w-48 h-48 sm:w-56 sm:h-56 bg-white rounded-2xl p-4 shadow-2xl">
-                <div className="w-full h-full bg-gray-100 rounded-xl flex flex-col items-center justify-center gap-3">
-                  <QrCode size={64} className="text-gray-400" />
-                  <p className="text-xs text-gray-400 font-medium">Votre QR ici</p>
+              {/* QR placeholder */}
+              <div className="shrink-0">
+                <div className="w-52 h-52 sm:w-60 sm:h-60 bg-white rounded-3xl p-5 shadow-2xl shadow-black/20">
+                  <div className="w-full h-full bg-gray-100 rounded-2xl flex flex-col items-center justify-center gap-3">
+                    <QrCode size={56} className="text-gray-300" />
+                    <p className="text-xs text-gray-400 font-medium">Votre QR ici</p>
+                  </div>
                 </div>
               </div>
             </div>

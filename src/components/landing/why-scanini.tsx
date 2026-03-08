@@ -1,55 +1,42 @@
-import { Building2, Sparkles, Headphones } from "lucide-react";
-
-const BENEFITS = [
-  {
-    icon: Building2,
-    title: "Adapté à chaque restaurant",
-    description:
-      "Du petit bistrot aux grandes chaînes, une solution qui s'adapte à vos besoins et grandit avec votre activité.",
-    color: "bg-blue-50 text-blue-600",
-  },
-  {
-    icon: Sparkles,
-    title: "Simple à utiliser",
-    description:
-      "Tout est naturel et intuitif dès le départ. Aucune compétence technique requise pour créer et gérer votre menu.",
-    color: "bg-amber-50 text-amber-600",
-  },
-  {
-    icon: Headphones,
-    title: "Support réactif",
-    description:
-      "Nous répondons à 96% des demandes en moins de 24h, pour que vous ne soyez jamais bloqué quand vous avez besoin d'aide.",
-    color: "bg-green-50 text-green-600",
-  },
-];
-
 export function LandingWhyScanini() {
   return (
-    <section className="py-20 sm:py-28 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-semibold text-indigo-600 mb-3">Pourquoi Scanini</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-            Conçu pour des restaurants comme le vôtre
+    <section className="py-24 sm:py-32 bg-gray-950 text-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-white/10 text-white/70 text-xs font-medium px-3 py-1.5 rounded-full mb-4 border border-white/10">
+            Pourquoi Scanini
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
+            Conçu pour des restaurants
+            <br />
+            comme le vôtre
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {BENEFITS.map((b) => (
-            <div
-              key={b.title}
-              className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 text-center"
-            >
-              <div className={`w-12 h-12 rounded-xl ${b.color} flex items-center justify-center mx-auto mb-5`}>
-                <b.icon size={22} />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {b.title}
-              </h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                {b.description}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              number: "5 min",
+              label: "Pour créer votre menu",
+              description: "Du petit bistrot aux grandes chaînes, créez votre premier menu digital en quelques minutes seulement.",
+            },
+            {
+              number: "96%",
+              label: "De réponses en 24h",
+              description: "Notre support est réactif. Vous ne serez jamais bloqué quand vous avez besoin d'aide.",
+            },
+            {
+              number: "0\u20AC",
+              label: "Pour commencer",
+              description: "Aucune carte bancaire requise. Commencez gratuitement et évoluez à votre rythme.",
+            },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center">
+              <p className="text-5xl sm:text-6xl font-bold bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">
+                {stat.number}
               </p>
+              <p className="text-sm font-semibold text-white/80 mt-3 mb-2">{stat.label}</p>
+              <p className="text-sm text-white/40 leading-relaxed max-w-xs mx-auto">{stat.description}</p>
             </div>
           ))}
         </div>

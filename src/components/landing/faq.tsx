@@ -1,28 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 
 const FAQS = [
   {
     q: "Scanini est-il une application ?",
-    a: "Non, Scanini n'est pas une application native. Vos clients n'ont rien à télécharger. Quand ils scannent votre QR code, ils sont redirigés vers une page web avec votre menu. Ça fonctionne sur n'importe quel smartphone avec un appareil photo.",
+    a: "Non. Vos clients n'ont rien à télécharger. Quand ils scannent votre QR code, ils voient votre menu directement dans leur navigateur. Ça fonctionne sur n'importe quel smartphone.",
   },
   {
-    q: "Est-ce facile de créer un menu avec QR code ?",
-    a: "Absolument. Scanini est conçu pour être simple, sans aucune compétence technique. Dans l'éditeur, vous pouvez ajouter des plats et catégories facilement. Une fois enregistré, le menu est instantanément mis à jour et synchronisé avec votre QR code.",
+    q: "Est-ce facile de créer un menu ?",
+    a: "Absolument. Aucune compétence technique requise. Ajoutez vos plats et catégories facilement. Une fois enregistré, le menu est instantanément synchronisé avec votre QR code.",
   },
   {
     q: "Puis-je modifier les prix ou les plats ?",
-    a: "Oui ! Vous pouvez modifier tous les détails de votre menu quand vous le souhaitez. Un plat est en rupture ? Accédez au panneau de contrôle et masquez-le pour que les clients ne le voient plus. Les changements sont reflétés instantanément.",
+    a: "Oui ! Modifiez tout quand vous le souhaitez. Un plat en rupture ? Masquez-le en un clic. Les changements sont reflétés instantanément.",
   },
   {
     q: "Puis-je utiliser Scanini gratuitement ?",
-    a: "Bien sûr ! Vous pouvez utiliser Scanini gratuitement avec le plan Gratuit. Si vous souhaitez plus de plats, de menus ou de scans, vous pouvez passer à un plan payant à tout moment.",
+    a: "Bien sûr ! Le plan gratuit inclut 1 menu, 15 plats et 200 scans par mois. Vous pouvez passer à un plan payant à tout moment.",
   },
   {
     q: "Comment fonctionne le système d'avis ?",
-    a: "Vos clients peuvent évaluer leur expérience directement depuis le menu digital. Vous consultez tous les avis depuis votre tableau de bord pour améliorer votre service en continu.",
+    a: "Vos clients évaluent leur expérience directement depuis le menu digital. Vous consultez tous les avis depuis votre tableau de bord.",
   },
 ];
 
@@ -30,48 +30,41 @@ export function LandingFaq() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="py-20 sm:py-28 bg-white">
+    <section id="faq" className="py-24 sm:py-32 bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <p className="text-sm font-semibold text-indigo-600 mb-3">FAQ</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 bg-white text-gray-600 text-xs font-medium px-3 py-1.5 rounded-full mb-4 border border-gray-200">
+            FAQ
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
             Questions fréquentes
           </h2>
-          <p className="mt-4 text-gray-500">
-            D&apos;autres questions ?{" "}
-            <a href="#contact" className="text-indigo-600 hover:underline font-medium">
-              Contactez-nous
-            </a>
-          </p>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           {FAQS.map((faq, i) => {
             const isOpen = openIndex === i;
             return (
               <div
                 key={i}
-                className="border border-gray-100 rounded-xl overflow-hidden"
+                className={`rounded-2xl transition-all duration-200 ${
+                  isOpen ? "bg-white shadow-lg shadow-gray-100/50 border border-gray-200" : "bg-white border border-gray-100 hover:border-gray-200"
+                }`}
               >
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : i)}
-                  className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center justify-between px-6 py-5 text-left"
                 >
-                  <span className="text-sm font-medium text-gray-900">
-                    {faq.q}
-                  </span>
-                  <ChevronDown
-                    size={16}
-                    className={`text-gray-400 shrink-0 ml-4 transition-transform ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                  />
+                  <span className="text-sm font-semibold text-gray-900 pr-4">{faq.q}</span>
+                  <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                    isOpen ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500"
+                  }`}>
+                    {isOpen ? <Minus size={14} /> : <Plus size={14} />}
+                  </div>
                 </button>
                 {isOpen && (
-                  <div className="px-5 pb-4">
-                    <p className="text-sm text-gray-500 leading-relaxed">
-                      {faq.a}
-                    </p>
+                  <div className="px-6 pb-5 -mt-1">
+                    <p className="text-sm text-gray-500 leading-relaxed">{faq.a}</p>
                   </div>
                 )}
               </div>
