@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
 
   const service = getServiceClient();
 
-  // Create auth user
+  // Create auth user — the updated trigger will set role/whatsapp/address from metadata
   const { data: authData, error: authError } = await service.auth.admin.createUser({
     email,
     password,
@@ -134,8 +134,10 @@ export async function POST(request: NextRequest) {
     user_metadata: {
       first_name,
       last_name,
-      phone,
+      phone: phone || "",
       role: "commercial",
+      whatsapp: phone || "",
+      address: address || "",
     },
   });
 
@@ -143,44 +145,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: authError.message }, { status: 400 });
   }
 
-  // Update the auto-created profile
-  // Use direct PostgREST fetch to bypass Supabase JS client schema cache
   const userId = authData.user.id;
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-  // Wait for the handle_new_user trigger to create the profile row
-  await new Promise((r) => setTimeout(r, 300));
+  // Wait for the trigger to create the profile
+  await new Promise((r) => setTimeout(r, 500));
 
-  // PATCH the profile directly via PostgREST REST API
-  const patchRes = await fetch(
-    `${supabaseUrl}/rest/v1/profiles?id=eq.${userId}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
-        Prefer: "return=minimal",
-      },
-      body: JSON.stringify({
-        first_name,
-        last_name,
-        email,
-        role: "commercial",
-        phone: phone || null,
-        whatsapp: phone || null,
-        address: address || null,
-      }),
-    }
-  );
+  // Update profile via the SQL function (bypasses PostgREST schema cache entirely)
+  const { error: rpcError } = await service.rpc("update_commercial_profile" as any, {
+    p_user_id: userId,
+    p_first_name: first_name,
+    p_last_name: last_name,
+    p_email: email,
+    p_phone: phone || null,
+    p_whatsapp: phone || null,
+    p_address: address || null,
+  });
 
-  if (!patchRes.ok) {
-    const errText = await patchRes.text();
-    return NextResponse.json(
-      { error: `Profile update failed: ${errText}` },
-      { status: 500 }
-    );
+  if (rpcError) {
+    // The trigger should have already set the correct data from user_metadata
+    console.error("RPC update failed (trigger fallback used):", rpcError.message);
   }
 
   return NextResponse.json({ success: true, id: userId });
