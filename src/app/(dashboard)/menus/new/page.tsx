@@ -51,14 +51,15 @@ export default function NewMenuPage() {
         <MenuCreationOption
           icon={<Sparkles size={48} strokeWidth={1.5} />}
           title={t("newMenu.digitize")}
-          badge={t("newMenu.new")}
           description={t("newMenu.digitizeDesc")}
-          onClick={() => router.push("/menus/digitize")}
+          comingSoon
+          onClick={() => {}}
         />
         <MenuCreationOption
           icon={<Paperclip size={48} strokeWidth={1.5} />}
           title={t("newMenu.static")}
           description={t("newMenu.staticDesc")}
+          comingSoon
           onClick={() => {}}
         />
       </div>

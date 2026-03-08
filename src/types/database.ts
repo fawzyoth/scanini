@@ -17,7 +17,10 @@ export type Database = {
           email: string;
           phone: string | null;
           avatar_url: string | null;
-          role: "owner" | "admin";
+          role: "owner" | "admin" | "commercial";
+          whatsapp: string | null;
+          address: string | null;
+          commission_rate: number;
           created_at: string;
           updated_at: string;
         };
@@ -28,7 +31,10 @@ export type Database = {
           email: string;
           phone?: string | null;
           avatar_url?: string | null;
-          role?: "owner" | "admin";
+          role?: "owner" | "admin" | "commercial";
+          whatsapp?: string | null;
+          address?: string | null;
+          commission_rate?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -39,7 +45,10 @@ export type Database = {
           email?: string;
           phone?: string | null;
           avatar_url?: string | null;
-          role?: "owner" | "admin";
+          role?: "owner" | "admin" | "commercial";
+          whatsapp?: string | null;
+          address?: string | null;
+          commission_rate?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -48,6 +57,7 @@ export type Database = {
         Row: {
           id: string;
           owner_id: string;
+          commercial_id: string | null;
           name: string;
           cover_image: string | null;
           logo_image: string | null;
@@ -73,6 +83,7 @@ export type Database = {
         Insert: {
           id?: string;
           owner_id: string;
+          commercial_id?: string | null;
           name: string;
           cover_image?: string | null;
           logo_image?: string | null;
@@ -98,6 +109,7 @@ export type Database = {
         Update: {
           id?: string;
           owner_id?: string;
+          commercial_id?: string | null;
           name?: string;
           cover_image?: string | null;
           logo_image?: string | null;
@@ -331,6 +343,47 @@ export type Database = {
           created_at?: string;
         };
       };
+      payments: {
+        Row: {
+          id: string;
+          restaurant_id: string;
+          amount: number;
+          period_month: number;
+          period_year: number;
+          plan: "free" | "starter" | "pro" | "business";
+          status: string;
+          paid_at: string | null;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          restaurant_id: string;
+          amount?: number;
+          period_month: number;
+          period_year: number;
+          plan?: "free" | "starter" | "pro" | "business";
+          status?: string;
+          paid_at?: string | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          restaurant_id?: string;
+          amount?: number;
+          period_month?: number;
+          period_year?: number;
+          plan?: "free" | "starter" | "pro" | "business";
+          status?: string;
+          paid_at?: string | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
       menu_languages: {
         Row: {
           id: string;
@@ -369,7 +422,7 @@ export type Database = {
       };
     };
     Enums: {
-      user_role: "owner" | "admin";
+      user_role: "owner" | "admin" | "commercial";
       plan_type: "free" | "starter" | "pro" | "business";
       account_status: "pending" | "active" | "trial" | "suspended";
     };
