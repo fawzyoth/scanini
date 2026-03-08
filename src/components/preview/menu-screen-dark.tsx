@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Menu, Dish } from "@/types";
 import { ArrowLeft, Search } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
@@ -43,12 +43,13 @@ export function MenuScreenDark({
     );
   }, [activeMenu]);
 
-  // Reset key forces re-render of dishes for animation replay
+  const contentRef = useRef<HTMLDivElement>(null);
   const [animKey, setAnimKey] = useState(0);
 
   function selectMenu(id: string) {
     setActiveMenuId(id);
     setAnimKey((k) => k + 1);
+    contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
@@ -148,11 +149,12 @@ export function MenuScreenDark({
 
         {/* Right content area — full height white, hidden scrollbar */}
         <div
+          ref={contentRef}
           className="flex-1 overflow-y-auto bg-white relative"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {/* Top: logo + name + search */}
-          <div className="flex items-center px-3 pt-3 pb-2 gap-2">
+          {/* Sticky header: logo + name + search */}
+          <div className="sticky top-0 z-10 bg-white flex items-center px-3 pt-3 pb-2 gap-2">
             {restaurant?.logoImage && (
               <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200 bg-white shrink-0">
                 <img
