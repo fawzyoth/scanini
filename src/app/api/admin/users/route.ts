@@ -151,7 +151,7 @@ export async function PATCH(request: NextRequest) {
   return NextResponse.json({ success: true });
 }
 
-// DELETE /api/admin/users — delete a restaurant (and optionally the user)
+// DELETE /api/admin/users — delete a user entirely (restaurant + profile + auth)
 export async function DELETE(request: NextRequest) {
   if (!(await verifyAdmin(request))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
@@ -162,13 +162,21 @@ export async function DELETE(request: NextRequest) {
   const profileId = searchParams.get("profile_id");
 
   const service = getServiceClient();
+  const userId = profileId ?? id;
 
   // Delete restaurant if it exists
   if (id && id !== profileId) {
     await service.from("restaurants").delete().eq("id", id);
-  } else if (profileId) {
-    // Delete restaurant by owner_id
-    await service.from("restaurants").delete().eq("owner_id", profileId);
+  }
+  // Also delete any restaurant by owner_id
+  if (userId) {
+    await service.from("restaurants").delete().eq("owner_id", userId);
+  }
+
+  // Delete the profile and auth user so they don't reappear
+  if (userId) {
+    await service.from("profiles").delete().eq("id", userId);
+    await service.auth.admin.deleteUser(userId);
   }
 
   return NextResponse.json({ success: true });
