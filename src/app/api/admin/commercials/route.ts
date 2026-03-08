@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { first_name, last_name, email, phone, address, password } = body;
+  const { first_name, last_name, email, password } = body;
 
   if (!first_name || !last_name || !email || !password) {
     return NextResponse.json(
@@ -126,40 +126,33 @@ export async function POST(request: NextRequest) {
 
   const service = getServiceClient();
 
-  // Step 1: Create auth user with ONLY the fields the original trigger knows
-  // (id, email, first_name, last_name, phone — no role/whatsapp/address)
+  // Step 1: Create auth user — trigger creates profile with role='owner'
   const { data: authData, error: authError } = await service.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
-    user_metadata: { first_name, last_name, phone: phone || "" },
+    user_metadata: { first_name, last_name },
   });
 
   if (authError) {
-    return NextResponse.json({ error: authError.message }, { status: 400 });
+    return NextResponse.json(
+      { error: authError.message, code: (authError as any).code, status: (authError as any).status, details: JSON.stringify(authError) },
+      { status: 400 }
+    );
   }
 
   const userId = authData.user.id;
 
-  // Step 2: Wait for the trigger to create the profile row (as role='owner')
+  // Step 2: Wait for trigger, then update role to commercial
   await new Promise((r) => setTimeout(r, 800));
-
-  // Step 3: Update the profile to commercial role
-  // Try updating all fields; if schema cache blocks some columns, fallback to role-only
-  const updateFields: Record<string, unknown> = { role: "commercial" };
-  if (phone) updateFields.phone = phone;
 
   const { error: updateError } = await service
     .from("profiles")
-    .update(updateFields as any)
+    .update({ role: "commercial" } as any)
     .eq("id", userId);
 
   if (updateError) {
-    console.error("Profile update error:", updateError.message);
-    // If even role update fails, try via auth metadata
-    await service.auth.admin.updateUserById(userId, {
-      user_metadata: { role: "commercial" },
-    });
+    console.error("Profile role update error:", updateError.message);
   }
 
   return NextResponse.json({ success: true, id: userId });

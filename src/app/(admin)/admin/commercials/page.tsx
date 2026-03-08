@@ -8,7 +8,6 @@ import {
   DollarSign,
   Users,
   TrendingUp,
-  Phone,
   Plus,
   X,
   Eye,
@@ -158,12 +157,6 @@ export default function AdminCommercialsPage() {
                       {c.first_name} {c.last_name}
                     </h3>
                     <p className="text-xs text-gray-500 mt-0.5">{c.email}</p>
-                    {(c.phone || c.whatsapp) && (
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <Phone size={12} className="text-green-500" />
-                        <span className="text-xs text-gray-500">{c.whatsapp || c.phone}</span>
-                      </div>
-                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700">
@@ -249,8 +242,6 @@ function CreateCommercialModal({
     first_name: "",
     last_name: "",
     email: "",
-    phone: "",
-    address: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -283,7 +274,7 @@ function CreateCommercialModal({
       });
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Erreur lors de la creation");
+        setError(`${data.error} | code: ${data.code} | details: ${data.details}`);
         return;
       }
       onCreated();
@@ -337,29 +328,6 @@ function CreateCommercialModal({
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               placeholder="ahmed@example.com"
             />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Telephone</label>
-              <input
-                type="tel"
-                value={form.phone}
-                onChange={(e) => update("phone", e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="+216 XX XXX XXX"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Adresse</label>
-              <input
-                type="text"
-                value={form.address}
-                onChange={(e) => update("address", e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="Tunis, Tunisie"
-              />
-            </div>
           </div>
 
           <div>
