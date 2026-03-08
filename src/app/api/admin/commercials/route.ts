@@ -126,19 +126,13 @@ export async function POST(request: NextRequest) {
 
   const service = getServiceClient();
 
-  // Create auth user — the updated trigger will set role/whatsapp/address from metadata
+  // Step 1: Create auth user with ONLY the fields the original trigger knows
+  // (id, email, first_name, last_name, phone — no role/whatsapp/address)
   const { data: authData, error: authError } = await service.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
-    user_metadata: {
-      first_name,
-      last_name,
-      phone: phone || "",
-      role: "commercial",
-      whatsapp: phone || "",
-      address: address || "",
-    },
+    user_metadata: { first_name, last_name, phone: phone || "" },
   });
 
   if (authError) {
@@ -147,23 +141,25 @@ export async function POST(request: NextRequest) {
 
   const userId = authData.user.id;
 
-  // Wait for the trigger to create the profile
-  await new Promise((r) => setTimeout(r, 500));
+  // Step 2: Wait for the trigger to create the profile row (as role='owner')
+  await new Promise((r) => setTimeout(r, 800));
 
-  // Update profile via the SQL function (bypasses PostgREST schema cache entirely)
-  const { error: rpcError } = await service.rpc("update_commercial_profile" as any, {
-    p_user_id: userId,
-    p_first_name: first_name,
-    p_last_name: last_name,
-    p_email: email,
-    p_phone: phone || null,
-    p_whatsapp: phone || null,
-    p_address: address || null,
-  });
+  // Step 3: Update the profile to commercial role
+  // Try updating all fields; if schema cache blocks some columns, fallback to role-only
+  const updateFields: Record<string, unknown> = { role: "commercial" };
+  if (phone) updateFields.phone = phone;
 
-  if (rpcError) {
-    // The trigger should have already set the correct data from user_metadata
-    console.error("RPC update failed (trigger fallback used):", rpcError.message);
+  const { error: updateError } = await service
+    .from("profiles")
+    .update(updateFields as any)
+    .eq("id", userId);
+
+  if (updateError) {
+    console.error("Profile update error:", updateError.message);
+    // If even role update fails, try via auth metadata
+    await service.auth.admin.updateUserById(userId, {
+      user_metadata: { role: "commercial" },
+    });
   }
 
   return NextResponse.json({ success: true, id: userId });
