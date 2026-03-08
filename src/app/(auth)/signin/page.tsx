@@ -57,6 +57,15 @@ export default function SignInPage() {
         return;
       }
 
+      // Check if commercial
+      const isCommercial =
+        (profile && (profile as any).role === "commercial") ||
+        user.user_metadata?.role === "commercial";
+      if (isCommercial) {
+        router.push("/commercial");
+        return;
+      }
+
       // Check restaurant status — ONLY allow access if explicitly active/trial
       const { data: restaurant } = await supabase
         .from("restaurants")
