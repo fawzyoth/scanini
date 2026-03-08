@@ -87,29 +87,31 @@ export function MenuScreenDark({
       {/* Top bar */}
       <div
         className="shrink-0 flex items-center justify-between px-3 py-2"
-        style={{ backgroundColor: "#f5f5f0" }}
+        style={{ backgroundColor: "#1a1a1a" }}
       >
         <button
           onClick={onBack}
-          className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900 px-2 py-1 rounded-full border border-gray-300"
+          className="flex items-center gap-1 text-xs px-2 py-1 rounded-full border"
+          style={{ color: "#D4A853", borderColor: "rgba(212,168,83,0.3)" }}
         >
           <ArrowLeft size={14} />
           <span>Back</span>
         </button>
         <button
           onClick={onSearchClick}
-          className="p-1.5 text-gray-500 hover:text-gray-700"
+          className="p-1.5"
+          style={{ color: "#D4A853" }}
         >
           <Search size={16} />
         </button>
       </div>
 
       {/* Main content: sidebar + dishes */}
-      <div className="flex-1 flex overflow-hidden" style={{ backgroundColor: "#f5f5f0" }}>
+      <div className="flex-1 flex overflow-hidden" style={{ backgroundColor: "#1a1a1a" }}>
         {/* Left category sidebar */}
         <div
-          className="shrink-0 w-[72px] overflow-y-auto py-2 flex flex-col items-center gap-1"
-          style={{ backgroundColor: "#f5f5f0" }}
+          className="shrink-0 w-[100px] overflow-y-auto py-2 flex flex-col items-center gap-1"
+          style={{ backgroundColor: "#1a1a1a" }}
         >
           {allCategories.map((cat) => {
             const isActive = cat.id === activeCatId;
@@ -128,14 +130,14 @@ export function MenuScreenDark({
                   <MenuIcon
                     name={cat.menuIcon}
                     size={16}
-                    className={isActive ? "text-amber-600" : "text-gray-400"}
+                    className={isActive ? "text-amber-600" : "text-gray-500"}
                   />
                 </div>
                 <span
-                  className="text-[9px] font-bold uppercase tracking-wider text-center leading-tight max-w-[64px]"
-                  style={{ color: isActive ? "#D4A853" : "#9ca3af" }}
+                  className="text-[10px] font-bold uppercase tracking-wider text-center leading-tight max-w-[90px] line-clamp-2"
+                  style={{ color: isActive ? "#D4A853" : "#aaa" }}
                 >
-                  {cat.name.length > 12 ? cat.name.slice(0, 12) : cat.name}
+                  {cat.name}
                 </span>
               </button>
             );
@@ -143,7 +145,7 @@ export function MenuScreenDark({
         </div>
 
         {/* Right content area with curved left edge */}
-        <div className="flex-1 overflow-y-auto rounded-tl-[32px] bg-white relative">
+        <div className="flex-1 overflow-y-auto rounded-tl-[40px] bg-white relative">
           {/* Logo at top */}
           {restaurant?.logoImage && (
             <div className="flex justify-center pt-4 pb-2">

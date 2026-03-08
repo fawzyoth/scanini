@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Restaurant, Menu, Review } from "@/types";
-import { Instagram, Phone, User, ChevronRight } from "lucide-react";
+import { Instagram, Phone, Wifi, ChevronRight } from "lucide-react";
 
 interface HomeScreenDarkProps {
   restaurant: Restaurant;
@@ -25,34 +25,40 @@ export function HomeScreenDark({
   onSearchClick,
   onSwipeToMenu,
 }: HomeScreenDarkProps) {
-  const touchStartX = useRef(0);
-  const [swiping, setSwiping] = useState(false);
-  const [swipeOffset, setSwipeOffset] = useState(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [sliderX, setSliderX] = useState(0);
+  const [dragging, setDragging] = useState(false);
 
-  function handleTouchStart(e: React.TouchEvent) {
-    touchStartX.current = e.touches[0].clientX;
-    setSwiping(true);
-  }
-
-  function handleTouchMove(e: React.TouchEvent) {
-    if (!swiping) return;
-    const diff = touchStartX.current - e.touches[0].clientX;
-    if (diff > 0) {
-      setSwipeOffset(Math.min(diff, 120));
+  function triggerMenu() {
+    const visibleMenus = menus.filter((m) => m.visible !== false);
+    if (onSwipeToMenu) {
+      onSwipeToMenu();
+    } else if (visibleMenus[0]) {
+      onMenuClick(visibleMenus[0]);
     }
   }
 
-  function handleTouchEnd() {
-    if (swipeOffset > 60) {
-      const visibleMenus = menus.filter((m) => m.visible !== false);
-      if (onSwipeToMenu) {
-        onSwipeToMenu();
-      } else if (visibleMenus[0]) {
-        onMenuClick(visibleMenus[0]);
-      }
+  function handleSliderStart(clientX: number) {
+    setDragging(true);
+  }
+
+  function handleSliderMove(clientX: number) {
+    if (!dragging || !sliderRef.current) return;
+    const rect = sliderRef.current.getBoundingClientRect();
+    const maxX = rect.width - 48; // handle width
+    const x = Math.max(0, Math.min(clientX - rect.left - 24, maxX));
+    setSliderX(x);
+  }
+
+  function handleSliderEnd() {
+    if (!sliderRef.current) { setDragging(false); setSliderX(0); return; }
+    const rect = sliderRef.current.getBoundingClientRect();
+    const maxX = rect.width - 48;
+    if (sliderX > maxX * 0.65) {
+      triggerMenu();
     }
-    setSwiping(false);
-    setSwipeOffset(0);
+    setDragging(false);
+    setSliderX(0);
   }
 
   const darkBg = "#1a1a1a";
@@ -63,16 +69,19 @@ export function HomeScreenDark({
 
   return (
     <>
+      <style>{`
+        @keyframes sliderShimmer {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(212,168,83,0.3); }
+          50% { box-shadow: 0 0 16px 4px rgba(212,168,83,0.5); }
+        }
+        @keyframes sliderArrowBounce {
+          0%, 100% { transform: translateX(0); }
+          50% { transform: translateX(4px); }
+        }
+      `}</style>
       <div
         className="flex-1 overflow-y-auto flex flex-col"
-        style={{
-          ...textureStyle,
-          transform: `translateX(-${swipeOffset}px)`,
-          transition: swiping ? "none" : "transform 0.3s ease-out",
-        }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        style={textureStyle}
       >
         {/* Cover image with rounded corners */}
         <div className="px-3 pt-3">
@@ -100,28 +109,60 @@ export function HomeScreenDark({
           )}
         </div>
 
-        {/* Swipe CTA button */}
+        {/* Swipe-to-unlock slider */}
         <div className="px-6 pb-5">
-          <button
-            onClick={() => {
-              const visibleMenus = menus.filter((m) => m.visible !== false);
-              if (onSwipeToMenu) {
-                onSwipeToMenu();
-              } else if (visibleMenus[0]) {
-                onMenuClick(visibleMenus[0]);
+          <div
+            ref={sliderRef}
+            className="relative h-14 rounded-full overflow-hidden select-none"
+            style={{ backgroundColor: "rgba(212,168,83,0.2)", border: "1px solid rgba(212,168,83,0.3)" }}
+            onTouchStart={(e) => {
+              const touch = e.touches[0];
+              if (!sliderRef.current) return;
+              const rect = sliderRef.current.getBoundingClientRect();
+              const handleEnd = sliderX + 48;
+              if (touch.clientX - rect.left <= handleEnd + 10) {
+                handleSliderStart(touch.clientX);
               }
             }}
-            className="w-full flex items-center justify-center gap-3 py-3.5 rounded-full text-sm font-semibold transition-all group"
-            style={{ backgroundColor: "#D4A853", color: "#1a1a1a" }}
+            onTouchMove={(e) => handleSliderMove(e.touches[0].clientX)}
+            onTouchEnd={handleSliderEnd}
+            onMouseDown={(e) => {
+              if (!sliderRef.current) return;
+              const rect = sliderRef.current.getBoundingClientRect();
+              const handleEnd = sliderX + 48;
+              if (e.clientX - rect.left <= handleEnd + 10) {
+                handleSliderStart(e.clientX);
+              }
+            }}
+            onMouseMove={(e) => { if (dragging) handleSliderMove(e.clientX); }}
+            onMouseUp={handleSliderEnd}
+            onMouseLeave={() => { if (dragging) handleSliderEnd(); }}
           >
-            <span
-              className="w-7 h-7 rounded-full flex items-center justify-center transition-transform group-hover:translate-x-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.15)" }}
+            {/* Track text */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <span
+                className="text-sm font-semibold tracking-wide"
+                style={{ color: "rgba(212,168,83,0.6)", opacity: sliderX > 40 ? 0 : 1, transition: "opacity 0.2s" }}
+              >
+                Slide to see menu
+              </span>
+            </div>
+            {/* Draggable handle */}
+            <div
+              className="absolute top-1 left-1 w-12 h-12 rounded-full flex items-center justify-center"
+              style={{
+                backgroundColor: "#D4A853",
+                transform: `translateX(${sliderX}px)`,
+                transition: dragging ? "none" : "transform 0.4s cubic-bezier(0.32, 1.2, 0.5, 1)",
+                animation: !dragging && sliderX === 0 ? "sliderShimmer 2.5s ease-in-out infinite" : "none",
+                cursor: "grab",
+              }}
             >
-              <ChevronRight size={16} />
-            </span>
-            Slide to see menu
-          </button>
+              <div style={{ animation: !dragging && sliderX === 0 ? "sliderArrowBounce 1.5s ease-in-out infinite" : "none" }}>
+                <ChevronRight size={20} color="#1a1a1a" />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Contact us section */}
@@ -146,7 +187,7 @@ export function HomeScreenDark({
               className="w-11 h-11 rounded-full flex items-center justify-center transition-colors"
               style={{ backgroundColor: "rgba(239,68,68,0.15)", color: "#ef4444" }}
             >
-              <User size={18} />
+              <Wifi size={18} />
             </button>
             {restaurant.phone && (
               <a
