@@ -151,27 +151,27 @@ export function MenuScreenDark({
           className="flex-1 overflow-y-auto bg-white relative"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {/* Search button */}
-          <div className="flex justify-end px-3 pt-2">
-            <button
-              onClick={onSearchClick}
-              className="p-1.5 text-gray-500 hover:text-gray-700"
-            >
-              <Search size={16} />
-            </button>
-          </div>
-          {/* Logo at top */}
-          {restaurant?.logoImage && (
-            <div className="flex justify-center pt-4 pb-2">
-              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 bg-white">
+          {/* Top: logo + name + search */}
+          <div className="flex items-center px-3 pt-3 pb-2 gap-2">
+            {restaurant?.logoImage && (
+              <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200 bg-white shrink-0">
                 <img
                   src={restaurant.logoImage}
                   alt={restaurant.name ?? ""}
                   className="w-full h-full object-contain"
                 />
               </div>
-            </div>
-          )}
+            )}
+            <h3 className="flex-1 text-sm font-bold text-gray-900 truncate">
+              {restaurant?.name ?? ""}
+            </h3>
+            <button
+              onClick={onSearchClick}
+              className="p-1.5 text-gray-500 hover:text-gray-700 shrink-0"
+            >
+              <Search size={16} />
+            </button>
+          </div>
 
           {/* Dishes as circular image cards */}
           {activeDishes.length > 0 && (
