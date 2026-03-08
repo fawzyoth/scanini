@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import { HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, HomeScreenProfile, MenuScreenProfile, HomeScreenDark, MenuScreenDark, DishDetailSheet, ReviewSheet, InfoSheet, SearchOverlay } from "@/components/preview";
 import type { Restaurant, Menu, Category, Dish, Review } from "@/types";
 
-type Screen = { type: "home" } | { type: "menu"; menu: Menu };
+type Screen = { type: "home" } | { type: "menu"; menu: Menu } | { type: "dark-menu" };
 
 function toRestaurant(db: any): Restaurant {
   return {
@@ -18,6 +18,7 @@ function toRestaurant(db: any): Restaurant {
     address: db.address ?? "",
     template: db.template ?? "classic",
     currency: db.currency ?? "EUR",
+    animationsEnabled: db.animations_enabled ?? true,
     wifi: db.wifi_ssid ? { ssid: db.wifi_ssid, password: db.wifi_password ?? "" } : undefined,
     socialMedia: {
       instagram: db.social_instagram ?? undefined,
@@ -166,6 +167,7 @@ export default function PublicMenuPage() {
             menus={menus}
             reviews={reviewsEnabled ? reviews : []}
             onMenuClick={(menu) => setScreen({ type: "menu", menu })}
+            onSwipeToMenu={() => setScreen({ type: "dark-menu" })}
             onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
             onInfoClick={() => setInfoOpen(true)}
             onSearchClick={() => setSearchOpen(true)}
@@ -200,15 +202,6 @@ export default function PublicMenuPage() {
             onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
             onSearchClick={() => setSearchOpen(true)}
           />
-        ) : tmpl === "dark" ? (
-          <MenuScreenDark
-            menu={screen.menu}
-            restaurant={restaurant}
-            onBack={() => setScreen({ type: "home" })}
-            onDishClick={(dish) => setSelectedDish(dish)}
-            onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
-            onSearchClick={() => setSearchOpen(true)}
-          />
         ) : (
           <MenuScreen
             menu={screen.menu}
@@ -218,6 +211,18 @@ export default function PublicMenuPage() {
             onSearchClick={() => setSearchOpen(true)}
           />
         )
+      )}
+
+      {screen.type === "dark-menu" && (
+        <MenuScreenDark
+          menus={menus}
+          restaurant={restaurant}
+          animationsEnabled={restaurant.animationsEnabled}
+          onBack={() => setScreen({ type: "home" })}
+          onDishClick={(dish) => setSelectedDish(dish)}
+          onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
+          onSearchClick={() => setSearchOpen(true)}
+        />
       )}
 
       <DishDetailSheet

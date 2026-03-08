@@ -1,8 +1,8 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { Restaurant, Menu, Review } from "@/types";
 import { Instagram, Phone, User, ChevronRight } from "lucide-react";
-import { MenuIcon } from "@/components/menus/menu-icon";
 
 interface HomeScreenDarkProps {
   restaurant: Restaurant;
@@ -12,6 +12,7 @@ interface HomeScreenDarkProps {
   onReviewClick?: () => void;
   onInfoClick: () => void;
   onSearchClick?: () => void;
+  onSwipeToMenu?: () => void;
 }
 
 export function HomeScreenDark({
@@ -22,21 +23,60 @@ export function HomeScreenDark({
   onReviewClick,
   onInfoClick,
   onSearchClick,
+  onSwipeToMenu,
 }: HomeScreenDarkProps) {
-  const visibleMenus = menus.filter((m) => m.visible !== false);
+  const touchStartX = useRef(0);
+  const [swiping, setSwiping] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+    setSwiping(true);
+  }
+
+  function handleTouchMove(e: React.TouchEvent) {
+    if (!swiping) return;
+    const diff = touchStartX.current - e.touches[0].clientX;
+    if (diff > 0) {
+      setSwipeOffset(Math.min(diff, 120));
+    }
+  }
+
+  function handleTouchEnd() {
+    if (swipeOffset > 60) {
+      const visibleMenus = menus.filter((m) => m.visible !== false);
+      if (onSwipeToMenu) {
+        onSwipeToMenu();
+      } else if (visibleMenus[0]) {
+        onMenuClick(visibleMenus[0]);
+      }
+    }
+    setSwiping(false);
+    setSwipeOffset(0);
+  }
+
+  const darkBg = "#1a1a1a";
+  const textureStyle = {
+    backgroundColor: darkBg,
+    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23333333' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+  };
 
   return (
     <>
       <div
         className="flex-1 overflow-y-auto flex flex-col"
         style={{
-          backgroundColor: "#1a1a1a",
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23333333' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          ...textureStyle,
+          transform: `translateX(-${swipeOffset}px)`,
+          transition: swiping ? "none" : "transform 0.3s ease-out",
         }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Cover image with rounded corners */}
         <div className="px-3 pt-3">
-          <div className="relative h-48 rounded-2xl overflow-hidden bg-gray-800">
+          <div className="relative h-52 rounded-2xl overflow-hidden bg-gray-800">
             {restaurant.coverImage && (
               <img
                 src={restaurant.coverImage}
@@ -48,51 +88,45 @@ export function HomeScreenDark({
         </div>
 
         {/* Restaurant name + subtitle */}
-        <div className="px-4 pt-6 pb-2 text-center">
-          <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">
+        <div className="px-4 pt-8 pb-3 text-center flex-1 flex flex-col justify-center">
+          <p className="text-xs text-gray-400 uppercase tracking-[0.2em] mb-2">
             welcome to
           </p>
           <h2 className="text-2xl font-bold text-white uppercase tracking-wide">
             {restaurant.name}
           </h2>
           {restaurant.address && (
-            <p className="text-sm text-gray-400 mt-1">{restaurant.address}</p>
+            <p className="text-sm text-gray-400 mt-2">{restaurant.address}</p>
           )}
         </div>
 
-        {/* Menu list */}
-        <div className="px-4 pt-4 pb-2 flex-1">
-          {visibleMenus.map((menu) => (
-            <button
-              key={menu.id}
-              onClick={() => onMenuClick(menu)}
-              className="w-full flex items-center gap-3 px-4 py-3.5 mb-2 rounded-xl border border-gray-700/50 hover:border-amber-500/50 transition-all text-left"
-              style={{ backgroundColor: "rgba(255,255,255,0.05)" }}
-            >
-              <MenuIcon name={menu.icon} size={18} className="text-amber-400 shrink-0" />
-              <span className="flex-1 text-sm font-medium text-white">{menu.name}</span>
-              <ChevronRight size={16} className="text-gray-500" />
-            </button>
-          ))}
-        </div>
-
-        {/* Gold CTA button */}
-        <div className="px-6 pb-4">
+        {/* Swipe CTA button */}
+        <div className="px-6 pb-5">
           <button
-            onClick={() => visibleMenus[0] && onMenuClick(visibleMenus[0])}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-full text-sm font-semibold transition-colors"
+            onClick={() => {
+              const visibleMenus = menus.filter((m) => m.visible !== false);
+              if (onSwipeToMenu) {
+                onSwipeToMenu();
+              } else if (visibleMenus[0]) {
+                onMenuClick(visibleMenus[0]);
+              }
+            }}
+            className="w-full flex items-center justify-center gap-3 py-3.5 rounded-full text-sm font-semibold transition-all group"
             style={{ backgroundColor: "#D4A853", color: "#1a1a1a" }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-            Voir le menu
+            <span
+              className="w-7 h-7 rounded-full flex items-center justify-center transition-transform group-hover:translate-x-1"
+              style={{ backgroundColor: "rgba(0,0,0,0.15)" }}
+            >
+              <ChevronRight size={16} />
+            </span>
+            Slide to see menu
           </button>
         </div>
 
         {/* Contact us section */}
-        <div className="px-4 pb-4 text-center">
-          <p className="text-xs text-gray-500 uppercase tracking-widest mb-3">
+        <div className="px-4 pb-5 text-center">
+          <p className="text-xs text-gray-500 uppercase tracking-[0.2em] mb-3">
             Contact us
           </p>
           <div className="flex items-center justify-center gap-4">
@@ -101,7 +135,7 @@ export function HomeScreenDark({
                 href={`https://instagram.com/${restaurant.socialMedia.instagram}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                className="w-11 h-11 rounded-full flex items-center justify-center transition-colors"
                 style={{ backgroundColor: "rgba(239,68,68,0.15)", color: "#ef4444" }}
               >
                 <Instagram size={18} />
@@ -109,7 +143,7 @@ export function HomeScreenDark({
             )}
             <button
               onClick={onInfoClick}
-              className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+              className="w-11 h-11 rounded-full flex items-center justify-center transition-colors"
               style={{ backgroundColor: "rgba(239,68,68,0.15)", color: "#ef4444" }}
             >
               <User size={18} />
@@ -117,7 +151,7 @@ export function HomeScreenDark({
             {restaurant.phone && (
               <a
                 href={`tel:${restaurant.phone}`}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                className="w-11 h-11 rounded-full flex items-center justify-center transition-colors"
                 style={{ backgroundColor: "rgba(239,68,68,0.15)", color: "#ef4444" }}
               >
                 <Phone size={18} />
@@ -127,10 +161,10 @@ export function HomeScreenDark({
         </div>
       </div>
 
-      {/* WhatsApp CTA */}
+      {/* Bottom bar */}
       <div
         className="shrink-0 px-4 pb-3 pt-2 border-t space-y-2"
-        style={{ backgroundColor: "#1a1a1a", borderColor: "#333" }}
+        style={{ backgroundColor: darkBg, borderColor: "#333" }}
       >
         {onReviewClick && (
           <button

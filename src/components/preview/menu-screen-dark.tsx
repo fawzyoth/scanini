@@ -1,15 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Menu, Dish } from "@/types";
 import { ArrowLeft, Search } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { MenuIcon } from "@/components/menus/menu-icon";
 import { AllergenIcons } from "./allergen-icons";
 
+interface CatEntry {
+  id: string;
+  name: string;
+  menuIcon: string;
+  dishes: Dish[];
+}
+
 interface MenuScreenDarkProps {
-  menu: Menu;
+  menus: Menu[];
   restaurant?: { logoImage?: string; name?: string };
+  animationsEnabled?: boolean;
   onBack: () => void;
   onDishClick: (dish: Dish) => void;
   onReviewClick?: () => void;
@@ -17,20 +25,65 @@ interface MenuScreenDarkProps {
 }
 
 export function MenuScreenDark({
-  menu,
+  menus,
   restaurant,
+  animationsEnabled = true,
   onBack,
   onDishClick,
   onReviewClick,
   onSearchClick,
 }: MenuScreenDarkProps) {
+  // Build flat list of all categories from all visible menus
+  const allCategories = useMemo<CatEntry[]>(() => {
+    const result: CatEntry[] = [];
+    for (const menu of menus.filter((m) => m.visible !== false)) {
+      for (const cat of menu.categories) {
+        result.push({
+          id: cat.id,
+          name: cat.name,
+          menuIcon: menu.icon,
+          dishes: cat.dishes.filter((d) => d.available),
+        });
+      }
+    }
+    return result;
+  }, [menus]);
+
   const [activeCatId, setActiveCatId] = useState<string>(
-    menu.categories[0]?.id ?? ""
+    allCategories[0]?.id ?? ""
   );
-  const activeCategory = menu.categories.find((c) => c.id === activeCatId);
+  const activeCategory = allCategories.find((c) => c.id === activeCatId);
+
+  // Reset key forces re-render of dishes for animation replay
+  const [animKey, setAnimKey] = useState(0);
+
+  function selectCategory(id: string) {
+    setActiveCatId(id);
+    setAnimKey((k) => k + 1);
+  }
 
   return (
     <div className="flex flex-col h-full">
+      {/* Inline animation styles */}
+      {animationsEnabled && (
+        <style>{`
+          @keyframes darkFadeSlideUp {
+            from { opacity: 0; transform: translateY(24px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+          }
+          @keyframes darkPulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(212,168,83,0); }
+            50% { box-shadow: 0 0 12px 2px rgba(212,168,83,0.25); }
+          }
+          .dark-dish-enter {
+            animation: darkFadeSlideUp 0.45s cubic-bezier(0.22,1,0.36,1) both;
+          }
+          .dark-dish-enter:hover {
+            animation: darkPulseGlow 2s ease-in-out infinite;
+          }
+        `}</style>
+      )}
+
       {/* Top bar */}
       <div
         className="shrink-0 flex items-center justify-between px-3 py-2"
@@ -58,31 +111,31 @@ export function MenuScreenDark({
           className="shrink-0 w-[72px] overflow-y-auto py-2 flex flex-col items-center gap-1"
           style={{ backgroundColor: "#f5f5f0" }}
         >
-          {menu.categories.map((cat) => {
+          {allCategories.map((cat) => {
             const isActive = cat.id === activeCatId;
             return (
               <button
                 key={cat.id}
-                onClick={() => setActiveCatId(cat.id)}
+                onClick={() => selectCategory(cat.id)}
                 className="flex flex-col items-center gap-1 py-2 px-1 w-full transition-colors"
               >
                 <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
                   style={{
                     backgroundColor: isActive ? "rgba(212,168,83,0.15)" : "transparent",
                   }}
                 >
                   <MenuIcon
-                    name={menu.icon}
+                    name={cat.menuIcon}
                     size={16}
                     className={isActive ? "text-amber-600" : "text-gray-400"}
                   />
                 </div>
                 <span
-                  className="text-[9px] font-bold uppercase tracking-wider text-center leading-tight"
+                  className="text-[9px] font-bold uppercase tracking-wider text-center leading-tight max-w-[64px]"
                   style={{ color: isActive ? "#D4A853" : "#9ca3af" }}
                 >
-                  {cat.name.length > 10 ? cat.name.slice(0, 10) : cat.name}
+                  {cat.name.length > 12 ? cat.name.slice(0, 12) : cat.name}
                 </span>
               </button>
             );
@@ -106,51 +159,56 @@ export function MenuScreenDark({
 
           {/* Dishes as circular image cards */}
           {activeCategory && (
-            <div className="px-4 py-3 space-y-4">
-              {activeCategory.dishes
-                .filter((d) => d.available)
-                .map((dish) => (
-                  <button
-                    key={dish.id}
-                    onClick={() => onDishClick(dish)}
-                    className="w-full flex flex-col items-center text-center group"
-                  >
-                    {dish.image ? (
-                      <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-gray-100 shadow-sm group-hover:shadow-md transition-shadow bg-gray-100">
-                        <img
-                          src={dish.image}
-                          alt={dish.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-28 h-28 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                        <span className="text-2xl text-gray-300">
-                          {dish.name.charAt(0)}
-                        </span>
-                      </div>
-                    )}
-                    <h4 className="text-sm font-bold text-gray-900 mt-2">
-                      {dish.name}
-                    </h4>
-                    {dish.variants && dish.variants.length > 0 ? (
-                      <span
-                        className="text-sm font-semibold mt-0.5"
-                        style={{ color: "#D4A853" }}
-                      >
-                        {formatCurrency(dish.variants[0].price, dish.currency)}
+            <div key={animKey} className="px-4 py-3 space-y-5">
+              {activeCategory.dishes.map((dish, i) => (
+                <button
+                  key={dish.id}
+                  onClick={() => onDishClick(dish)}
+                  className={`w-full flex flex-col items-center text-center group ${
+                    animationsEnabled ? "dark-dish-enter" : ""
+                  }`}
+                  style={
+                    animationsEnabled
+                      ? { animationDelay: `${i * 80}ms` }
+                      : undefined
+                  }
+                >
+                  {dish.image ? (
+                    <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-gray-100 shadow-sm group-hover:shadow-md transition-shadow bg-gray-100">
+                      <img
+                        src={dish.image}
+                        alt={dish.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-28 h-28 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                      <span className="text-2xl text-gray-300">
+                        {dish.name.charAt(0)}
                       </span>
-                    ) : (
-                      <span
-                        className="text-sm font-semibold mt-0.5"
-                        style={{ color: "#D4A853" }}
-                      >
-                        {formatCurrency(dish.price, dish.currency)}
-                      </span>
-                    )}
-                    <AllergenIcons allergens={dish.allergens} />
-                  </button>
-                ))}
+                    </div>
+                  )}
+                  <h4 className="text-sm font-bold text-gray-900 mt-2">
+                    {dish.name}
+                  </h4>
+                  {dish.variants && dish.variants.length > 0 ? (
+                    <span
+                      className="text-sm font-semibold mt-0.5"
+                      style={{ color: "#D4A853" }}
+                    >
+                      {formatCurrency(dish.variants[0].price, dish.currency)}
+                    </span>
+                  ) : (
+                    <span
+                      className="text-sm font-semibold mt-0.5"
+                      style={{ color: "#D4A853" }}
+                    >
+                      {formatCurrency(dish.price, dish.currency)}
+                    </span>
+                  )}
+                  <AllergenIcons allergens={dish.allergens} />
+                </button>
+              ))}
             </div>
           )}
         </div>

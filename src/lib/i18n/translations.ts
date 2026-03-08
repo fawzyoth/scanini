@@ -165,6 +165,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     "appearance.templateDark": "Sombre",
     "appearance.primaryColor": "Couleur principale",
     "appearance.colorDesc": "Cette couleur est utilisee pour les boutons et les accents sur votre page de menu publique.",
+    "appearance.animations": "Animations du menu",
+    "appearance.animationsDesc": "Activer les animations sur les plats dans le template sombre.",
 
     // ── Languages section ──
     "languages.french": "Francais",
@@ -484,6 +486,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     "appearance.templateDark": "Dark",
     "appearance.primaryColor": "Primary color",
     "appearance.colorDesc": "This color is used for buttons and accents on your public menu page.",
+    "appearance.animations": "Menu animations",
+    "appearance.animationsDesc": "Enable dish animations in the dark template.",
 
     // ── Languages section ──
     "languages.french": "French",

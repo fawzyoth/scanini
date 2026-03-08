@@ -9,6 +9,7 @@ export interface Restaurant {
   template: MenuTemplate;
   currency: string;
   logoImage?: string;
+  animationsEnabled?: boolean;
   wifi?: {
     ssid: string;
     password: string;

@@ -7,7 +7,7 @@ import { PhoneShell, HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, Hom
 import { createClient } from "@/lib/supabase/client";
 import type { Menu, Category, Dish, Restaurant, Review } from "@/types";
 
-type Screen = { type: "home" } | { type: "menu"; menu: Menu };
+type Screen = { type: "home" } | { type: "menu"; menu: Menu } | { type: "dark-menu" };
 
 function toFrontendMenu(dbMenu: any, categories: any[], dishes: any[]): Menu {
   const menuCats = categories
@@ -54,6 +54,7 @@ function toFrontendRestaurant(db: any): Restaurant {
     template: db.template ?? "classic",
     currency: db.currency ?? "EUR",
     wifi: db.wifi_ssid ? { ssid: db.wifi_ssid, password: db.wifi_password ?? "" } : undefined,
+    animationsEnabled: db.animations_enabled ?? true,
     socialMedia: {
       instagram: db.social_instagram ?? undefined,
       facebook: db.social_facebook ?? undefined,
@@ -188,6 +189,7 @@ export default function PreviewPage() {
                 menus={menus}
                 reviews={reviews}
                 onMenuClick={(menu) => setScreen({ type: "menu", menu })}
+                onSwipeToMenu={() => setScreen({ type: "dark-menu" })}
                 onReviewClick={() => setReviewOpen(true)}
                 onInfoClick={() => setInfoOpen(true)}
                 onSearchClick={() => setSearchOpen(true)}
@@ -222,15 +224,6 @@ export default function PreviewPage() {
                 onReviewClick={() => setReviewOpen(true)}
                 onSearchClick={() => setSearchOpen(true)}
               />
-            ) : restaurant.template === "dark" ? (
-              <MenuScreenDark
-                menu={screen.menu}
-                restaurant={restaurant}
-                onBack={() => setScreen({ type: "home" })}
-                onDishClick={(dish) => setSelectedDish(dish)}
-                onReviewClick={() => setReviewOpen(true)}
-                onSearchClick={() => setSearchOpen(true)}
-              />
             ) : (
               <MenuScreen
                 menu={screen.menu}
@@ -240,6 +233,18 @@ export default function PreviewPage() {
                 onSearchClick={() => setSearchOpen(true)}
               />
             )
+          )}
+
+          {screen.type === "dark-menu" && (
+            <MenuScreenDark
+              menus={menus}
+              restaurant={restaurant}
+              animationsEnabled={restaurant.animationsEnabled}
+              onBack={() => setScreen({ type: "home" })}
+              onDishClick={(dish) => setSelectedDish(dish)}
+              onReviewClick={() => setReviewOpen(true)}
+              onSearchClick={() => setSearchOpen(true)}
+            />
           )}
 
           <DishDetailSheet

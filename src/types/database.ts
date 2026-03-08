@@ -66,6 +66,7 @@ export type Database = {
           currency: string;
           extra_info: string | null;
           reviews_enabled: boolean;
+          animations_enabled: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -90,6 +91,7 @@ export type Database = {
           currency?: string;
           extra_info?: string | null;
           reviews_enabled?: boolean;
+          animations_enabled?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -114,6 +116,7 @@ export type Database = {
           currency?: string;
           extra_info?: string | null;
           reviews_enabled?: boolean;
+          animations_enabled?: boolean;
           created_at?: string;
           updated_at?: string;
         };
