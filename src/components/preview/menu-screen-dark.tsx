@@ -4,15 +4,7 @@ import { useState, useMemo } from "react";
 import { Menu, Dish } from "@/types";
 import { ArrowLeft, Search } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { MenuIcon } from "@/components/menus/menu-icon";
 import { AllergenIcons } from "./allergen-icons";
-
-interface CatEntry {
-  id: string;
-  name: string;
-  menuIcon: string;
-  dishes: Dish[];
-}
 
 interface MenuScreenDarkProps {
   menus: Menu[];
@@ -33,32 +25,29 @@ export function MenuScreenDark({
   onReviewClick,
   onSearchClick,
 }: MenuScreenDarkProps) {
-  // Build flat list of all categories from all visible menus
-  const allCategories = useMemo<CatEntry[]>(() => {
-    const result: CatEntry[] = [];
-    for (const menu of menus.filter((m) => m.visible !== false)) {
-      for (const cat of menu.categories) {
-        result.push({
-          id: cat.id,
-          name: cat.name,
-          menuIcon: menu.icon,
-          dishes: cat.dishes.filter((d) => d.available),
-        });
-      }
-    }
-    return result;
-  }, [menus]);
-
-  const [activeCatId, setActiveCatId] = useState<string>(
-    allCategories[0]?.id ?? ""
+  const visibleMenus = useMemo(
+    () => menus.filter((m) => m.visible !== false),
+    [menus]
   );
-  const activeCategory = allCategories.find((c) => c.id === activeCatId);
+
+  const [activeMenuId, setActiveMenuId] = useState<string>(
+    visibleMenus[0]?.id ?? ""
+  );
+  const activeMenu = visibleMenus.find((m) => m.id === activeMenuId);
+
+  // All available dishes from all categories in the active menu
+  const activeDishes = useMemo(() => {
+    if (!activeMenu) return [];
+    return activeMenu.categories.flatMap((cat) =>
+      cat.dishes.filter((d) => d.available)
+    );
+  }, [activeMenu]);
 
   // Reset key forces re-render of dishes for animation replay
   const [animKey, setAnimKey] = useState(0);
 
-  function selectCategory(id: string) {
-    setActiveCatId(id);
+  function selectMenu(id: string) {
+    setActiveMenuId(id);
     setAnimKey((k) => k + 1);
   }
 
@@ -108,36 +97,29 @@ export function MenuScreenDark({
 
       {/* Main content: sidebar + dishes */}
       <div className="flex-1 flex overflow-hidden" style={{ backgroundColor: "#1a1a1a" }}>
-        {/* Left category sidebar */}
+        {/* Left menu sidebar — names only, no icons */}
         <div
-          className="shrink-0 w-[100px] overflow-y-auto py-2 flex flex-col items-center gap-1"
+          className="shrink-0 w-[100px] overflow-y-auto py-1 flex flex-col"
           style={{ backgroundColor: "#1a1a1a" }}
         >
-          {allCategories.map((cat) => {
-            const isActive = cat.id === activeCatId;
+          {visibleMenus.map((menu) => {
+            const isActive = menu.id === activeMenuId;
             return (
               <button
-                key={cat.id}
-                onClick={() => selectCategory(cat.id)}
-                className="flex flex-col items-center gap-1 py-2 px-1 w-full transition-colors"
+                key={menu.id}
+                onClick={() => selectMenu(menu.id)}
+                className="py-3 px-2 text-center transition-colors"
+                style={{
+                  backgroundColor: isActive ? "#fff" : "transparent",
+                  borderTopLeftRadius: isActive ? 20 : 0,
+                  borderBottomLeftRadius: isActive ? 20 : 0,
+                }}
               >
-                <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
-                  style={{
-                    backgroundColor: isActive ? "rgba(212,168,83,0.15)" : "transparent",
-                  }}
-                >
-                  <MenuIcon
-                    name={cat.menuIcon}
-                    size={16}
-                    className={isActive ? "text-amber-600" : "text-gray-500"}
-                  />
-                </div>
                 <span
-                  className="text-[10px] font-bold uppercase tracking-wider text-center leading-tight max-w-[90px] line-clamp-2"
+                  className="text-[11px] font-bold uppercase tracking-wider leading-tight"
                   style={{ color: isActive ? "#D4A853" : "#aaa" }}
                 >
-                  {cat.name}
+                  {menu.name}
                 </span>
               </button>
             );
@@ -160,9 +142,9 @@ export function MenuScreenDark({
           )}
 
           {/* Dishes as circular image cards */}
-          {activeCategory && (
+          {activeDishes.length > 0 && (
             <div key={animKey} className="px-4 py-3 space-y-5">
-              {activeCategory.dishes.map((dish, i) => (
+              {activeDishes.map((dish, i) => (
                 <button
                   key={dish.id}
                   onClick={() => onDishClick(dish)}
