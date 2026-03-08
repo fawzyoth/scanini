@@ -6,7 +6,7 @@ import { Check, X, Zap, Crown, Loader2 } from "lucide-react";
 import { useDashboard } from "@/lib/dashboard-context";
 import { PLAN_LIMITS } from "@/data/admin-mock";
 import { useTranslation } from "@/lib/i18n/i18n-context";
-import { COMPARISON_FEATURES, type PlanId } from "@/lib/plan-config";
+import { COMPARISON_FEATURES, PLAN_ORDER, type PlanId } from "@/lib/plan-config";
 import { usePlanConfigs } from "@/lib/use-plan-configs";
 
 export default function BillingPage() {
@@ -116,6 +116,10 @@ export default function BillingPage() {
                 const isCurrent = plan.id === currentPlanId;
                 const price = billing === "yearly" ? plan.yearlyPrice : plan.monthlyPrice;
                 const period = billing === "yearly" ? "/ year" : "/ month";
+                const currentIdx = PLAN_ORDER.indexOf(currentPlanId);
+                const planIdx = PLAN_ORDER.indexOf(plan.id);
+                const isUpgrade = planIdx > currentIdx;
+                const isDowngrade = planIdx < currentIdx;
 
                 return (
                   <div
@@ -203,17 +207,21 @@ export default function BillingPage() {
                     ) : (
                       <a
                         href={`https://wa.me/32465987804?text=${encodeURIComponent(
-                          `Hi, I'd like to upgrade my Scanini plan to ${plan.name} (${billing}). Restaurant: ${restaurant?.name ?? "N/A"}`
+                          isUpgrade
+                            ? `Bonjour, je souhaite passer au plan ${plan.name} (${billing}). Restaurant: ${restaurant?.name ?? "N/A"}`
+                            : `Bonjour, je souhaite passer au plan ${plan.name} (${billing}). Restaurant: ${restaurant?.name ?? "N/A"}`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`w-full block text-center text-sm font-medium py-2 rounded-lg transition-colors ${
-                          plan.popular
-                            ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                            : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                          isUpgrade
+                            ? plan.popular
+                              ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                              : "bg-indigo-600 text-white hover:bg-indigo-700"
+                            : "border border-gray-300 text-gray-500 hover:bg-gray-50"
                         }`}
                       >
-                        {t("common.upgrade")}
+                        {isUpgrade ? t("common.upgrade") : t("common.downgrade")}
                       </a>
                     )}
                   </div>
