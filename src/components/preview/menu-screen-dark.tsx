@@ -56,40 +56,44 @@ export function MenuScreenDark({
       {/* Inline animation styles */}
       {animationsEnabled && (
         <style>{`
-          @keyframes darkFadeSlideUp {
-            from { opacity: 0; transform: translateY(24px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+          @keyframes darkLiquidIn {
+            0% { opacity: 0; transform: translateY(30px) scale(0.85); filter: blur(6px); }
+            50% { opacity: 0.7; transform: translateY(-4px) scale(1.02); filter: blur(0px); }
+            70% { transform: translateY(2px) scale(0.99); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
           }
           @keyframes darkPulseGlow {
             0%, 100% { box-shadow: 0 0 0 0 rgba(212,168,83,0); }
             50% { box-shadow: 0 0 12px 2px rgba(212,168,83,0.25); }
           }
+          @keyframes darkContentFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
           .dark-dish-enter {
-            animation: darkFadeSlideUp 0.45s cubic-bezier(0.22,1,0.36,1) both;
+            animation: darkLiquidIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
           }
           .dark-dish-enter:hover {
             animation: darkPulseGlow 2s ease-in-out infinite;
           }
+          .dark-content-transition {
+            animation: darkContentFade 0.35s ease-out both;
+          }
         `}</style>
       )}
 
-      {/* Top bar */}
-      <div
-        className="shrink-0 flex items-center justify-between px-3 py-2"
-        style={{ backgroundColor: "#1a1a1a" }}
-      >
+      {/* Top bar — white */}
+      <div className="shrink-0 flex items-center justify-between px-3 py-2 bg-white">
         <button
           onClick={onBack}
-          className="flex items-center gap-1 text-xs px-2 py-1 rounded-full border"
-          style={{ color: "#D4A853", borderColor: "rgba(212,168,83,0.3)" }}
+          className="flex items-center gap-1 text-xs px-2 py-1 rounded-full border border-gray-300 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft size={14} />
           <span>Back</span>
         </button>
         <button
           onClick={onSearchClick}
-          className="p-1.5"
-          style={{ color: "#D4A853" }}
+          className="p-1.5 text-gray-500 hover:text-gray-700"
         >
           <Search size={16} />
         </button>
@@ -155,7 +159,7 @@ export function MenuScreenDark({
 
           {/* Dishes as circular image cards */}
           {activeDishes.length > 0 && (
-            <div key={animKey} className="px-4 py-3 space-y-5">
+            <div key={animKey} className={`px-4 py-3 space-y-5 ${animationsEnabled ? "dark-content-transition" : ""}`}>
               {activeDishes.map((dish, i) => (
                 <button
                   key={dish.id}
@@ -165,7 +169,7 @@ export function MenuScreenDark({
                   }`}
                   style={
                     animationsEnabled
-                      ? { animationDelay: `${i * 80}ms` }
+                      ? { animationDelay: `${i * 120}ms` }
                       : undefined
                   }
                 >
