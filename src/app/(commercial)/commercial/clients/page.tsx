@@ -210,6 +210,7 @@ function CreateClientModal({
     email: "",
     phone: "",
     password: "",
+    plan: "starter" as string,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -295,6 +296,35 @@ function CreateClientModal({
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               placeholder="La Bouffe"
             />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Plan *</label>
+            <div className="grid grid-cols-4 gap-2">
+              {(["free", "starter", "pro", "business"] as const).map((planId) => {
+                const plan = PLANS[planId];
+                const selected = form.plan === planId;
+                return (
+                  <button
+                    key={planId}
+                    type="button"
+                    onClick={() => update("plan", planId)}
+                    className={`relative flex flex-col items-center gap-0.5 px-2 py-2.5 rounded-lg border-2 transition-all text-center ${
+                      selected
+                        ? "border-green-500 bg-green-50"
+                        : "border-gray-200 bg-white hover:border-gray-300"
+                    }`}
+                  >
+                    <span className={`text-xs font-semibold ${selected ? "text-green-700" : "text-gray-900"}`}>
+                      {plan.name}
+                    </span>
+                    <span className={`text-[10px] ${selected ? "text-green-600" : "text-gray-500"}`}>
+                      {plan.monthlyPrice === 0 ? "Gratuit" : `${plan.monthlyPrice} DT/mois`}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

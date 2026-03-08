@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { first_name, last_name, restaurant_name, email, phone, password } = body;
+  const { first_name, last_name, restaurant_name, email, phone, password, plan } = body;
 
   if (!first_name || !restaurant_name || !email || !phone || !password) {
     return NextResponse.json(
@@ -153,6 +153,7 @@ export async function POST(request: NextRequest) {
   const { error: restError } = await service.from("restaurants").insert({
     owner_id: userId,
     name: restaurant_name,
+    plan: plan || "starter",
     status: "active",
     commercial_id: auth.user.id,
   } as any);
