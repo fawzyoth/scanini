@@ -90,7 +90,7 @@ export function MenuScreenDark({
       <div className="flex-1 flex overflow-hidden" style={{ backgroundColor: "#1a1a1a" }}>
         {/* Left sidebar — dark: back button + menu names */}
         <div
-          className="shrink-0 w-[90px] flex flex-col"
+          className="shrink-0 w-[140px] flex flex-col"
           style={{ backgroundColor: "#1a1a1a" }}
         >
           {/* Back button in sidebar — extra bottom padding for first item's inverse corner */}
