@@ -143,17 +143,21 @@ export async function POST(request: NextRequest) {
 
   const userId = authData.user.id;
 
-  // Step 2: Wait for trigger, then update role to commercial
+  // Always store role in auth metadata (this always works, no PostgREST needed)
+  await service.auth.admin.updateUserById(userId, {
+    user_metadata: { first_name, last_name, role: "commercial" },
+  });
+
+  // Step 2: Wait for trigger, then try to update profile role too
   await new Promise((r) => setTimeout(r, 800));
 
-  const { error: updateError } = await service
+  await service
     .from("profiles")
     .update({ role: "commercial" } as any)
-    .eq("id", userId);
-
-  if (updateError) {
-    console.error("Profile role update error:", updateError.message);
-  }
+    .eq("id", userId)
+    .then(({ error }) => {
+      if (error) console.error("Profile role update error:", error.message);
+    });
 
   return NextResponse.json({ success: true, id: userId });
 }

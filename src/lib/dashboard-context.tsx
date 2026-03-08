@@ -102,7 +102,11 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       .single();
 
     // Commercial users go to their own dashboard
-    if ((prof as any)?.role === "commercial") {
+    // Check both profile role and auth metadata (in case PostgREST update failed)
+    const isCommercial =
+      (prof as any)?.role === "commercial" ||
+      user.user_metadata?.role === "commercial";
+    if (isCommercial) {
       setLoading(false);
       router.replace("/commercial");
       return;
