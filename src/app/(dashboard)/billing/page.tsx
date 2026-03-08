@@ -2,18 +2,21 @@
 
 import { useState } from "react";
 import { PageHeader } from "@/components/ui";
-import { Check, X, Zap, Crown, Loader2 } from "lucide-react";
+import { Check, X, Zap, Crown, Loader2, AlertTriangle, MessageCircle } from "lucide-react";
 import { useDashboard } from "@/lib/dashboard-context";
 import { PLAN_LIMITS } from "@/data/admin-mock";
 import { useTranslation } from "@/lib/i18n/i18n-context";
 import { COMPARISON_FEATURES, PLAN_ORDER, type PlanId } from "@/lib/plan-config";
 import { usePlanConfigs } from "@/lib/use-plan-configs";
 
+const WHATSAPP_NUMBER = "32465987804";
+
 export default function BillingPage() {
   const { restaurant, usage, loading } = useDashboard();
   const { t } = useTranslation();
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
   const { plans: plansMap, orderedPlans } = usePlanConfigs();
+  const [downgradeWarning, setDowngradeWarning] = useState<{ planId: PlanId; issues: string[] } | null>(null);
 
   if (loading) {
     return (
@@ -28,11 +31,88 @@ export default function BillingPage() {
   const limits = PLAN_LIMITS[currentPlanId] ?? PLAN_LIMITS.free;
   const plans = orderedPlans;
 
+  // Check if current usage allows downgrade to a target plan
+  function checkDowngrade(targetPlanId: PlanId): string[] {
+    const targetLimits = PLAN_LIMITS[targetPlanId] ?? PLAN_LIMITS.free;
+    const issues: string[] = [];
+
+    if (usage.menus > targetLimits.menus) {
+      const excess = usage.menus - targetLimits.menus;
+      issues.push(`Supprimez ${excess} menu${excess > 1 ? "s" : ""} (vous en avez ${usage.menus}, limite: ${targetLimits.menus})`);
+    }
+    if (usage.dishes > targetLimits.dishes) {
+      const excess = usage.dishes - targetLimits.dishes;
+      issues.push(`Supprimez ${excess} plat${excess > 1 ? "s" : ""} (vous en avez ${usage.dishes}, limite: ${targetLimits.dishes})`);
+    }
+
+    return issues;
+  }
+
+  function handleDowngradeClick(planId: PlanId, planName: string) {
+    const issues = checkDowngrade(planId);
+    if (issues.length > 0) {
+      setDowngradeWarning({ planId, issues });
+    } else {
+      // Can downgrade — open WhatsApp
+      const msg = encodeURIComponent(
+        `Bonjour, je souhaite passer au plan ${planName} (${billing}). Restaurant: ${restaurant?.name ?? "N/A"}`
+      );
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
+    }
+  }
+
+  // Usage warning thresholds
+  const menuPct = limits.menus >= 999 ? 0 : (usage.menus / limits.menus) * 100;
+  const dishPct = limits.dishes >= 999 ? 0 : (usage.dishes / limits.dishes) * 100;
+  const scanPct = limits.scans >= 999999 ? 0 : (usage.scansThisMonth / limits.scans) * 100;
+  const showUsageWarning = menuPct >= 80 || dishPct >= 80 || scanPct >= 80;
+  const isOverLimit = menuPct > 100 || dishPct > 100 || scanPct > 100;
+
   return (
     <>
       <PageHeader title={t("billing.title")} />
 
       <div className="max-w-5xl space-y-6">
+        {/* Usage warning banner */}
+        {showUsageWarning && (
+          <div className={`rounded-xl border p-5 flex flex-col sm:flex-row sm:items-center gap-4 ${
+            isOverLimit
+              ? "bg-red-50 border-red-200"
+              : "bg-amber-50 border-amber-200"
+          }`}>
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+              isOverLimit ? "bg-red-100" : "bg-amber-100"
+            }`}>
+              <AlertTriangle size={20} className={isOverLimit ? "text-red-600" : "text-amber-600"} />
+            </div>
+            <div className="flex-1">
+              <p className={`text-sm font-semibold ${isOverLimit ? "text-red-900" : "text-amber-900"}`}>
+                {isOverLimit
+                  ? "Vous avez depasse les limites de votre plan"
+                  : "Vous approchez des limites de votre plan"
+                }
+              </p>
+              <p className={`text-xs mt-0.5 ${isOverLimit ? "text-red-700" : "text-amber-700"}`}>
+                {isOverLimit
+                  ? "Certaines fonctionnalites peuvent etre limitees. Passez a un plan superieur pour continuer."
+                  : "Pensez a passer a un plan superieur pour eviter les interruptions."
+                }
+              </p>
+            </div>
+            <a
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+                `Bonjour, je souhaite mettre a niveau mon plan. Restaurant: ${restaurant?.name ?? "N/A"}. Plan actuel: ${currentPlan.name}`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors shrink-0"
+            >
+              <MessageCircle size={16} />
+              Nous contacter
+            </a>
+          </div>
+        )}
+
         {/* Current plan overview */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
           <div className="px-6 py-4 border-b border-gray-100">
@@ -74,6 +154,52 @@ export default function BillingPage() {
             <UsageMeter label={t("billing.scansThisMonth")} current={usage.scansThisMonth} max={limits.scans} />
           </div>
         </div>
+
+        {/* Downgrade warning modal */}
+        {downgradeWarning && (
+          <div className="bg-white rounded-xl border-2 border-amber-300 shadow-sm p-6">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
+                <AlertTriangle size={20} className="text-amber-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">
+                  Impossible de changer de plan pour le moment
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Votre utilisation actuelle depasse les limites du plan {plansMap[downgradeWarning.planId]?.name}. Veuillez d&apos;abord effectuer les modifications suivantes :
+                </p>
+              </div>
+            </div>
+            <ul className="space-y-2 mb-5">
+              {downgradeWarning.issues.map((issue, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-amber-800 bg-amber-50 rounded-lg px-4 py-2.5">
+                  <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+                  {issue}
+                </li>
+              ))}
+            </ul>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setDowngradeWarning(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Compris
+              </button>
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+                  `Bonjour, j'ai besoin d'aide pour changer mon plan. Restaurant: ${restaurant?.name ?? "N/A"}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <MessageCircle size={14} />
+                Besoin d&apos;aide ?
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* Plans */}
         <div id="plans" className="bg-white rounded-xl border border-gray-200 shadow-sm">
@@ -204,25 +330,24 @@ export default function BillingPage() {
                       >
                         {t("billing.currentPlanBtn")}
                       </button>
-                    ) : (
+                    ) : isUpgrade ? (
                       <a
-                        href={`https://wa.me/32465987804?text=${encodeURIComponent(
-                          isUpgrade
-                            ? `Bonjour, je souhaite passer au plan ${plan.name} (${billing}). Restaurant: ${restaurant?.name ?? "N/A"}`
-                            : `Bonjour, je souhaite passer au plan ${plan.name} (${billing}). Restaurant: ${restaurant?.name ?? "N/A"}`
+                        href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+                          `Bonjour, je souhaite passer au plan ${plan.name} (${billing}). Restaurant: ${restaurant?.name ?? "N/A"}`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`w-full block text-center text-sm font-medium py-2 rounded-lg transition-colors ${
-                          isUpgrade
-                            ? plan.popular
-                              ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                              : "bg-indigo-600 text-white hover:bg-indigo-700"
-                            : "border border-gray-300 text-gray-500 hover:bg-gray-50"
-                        }`}
+                        className="w-full block text-center text-sm font-medium py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
                       >
-                        {isUpgrade ? t("common.upgrade") : t("common.downgrade")}
+                        {t("common.upgrade")}
                       </a>
+                    ) : (
+                      <button
+                        onClick={() => handleDowngradeClick(plan.id, plan.name)}
+                        className="w-full text-center text-sm font-medium py-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-50 transition-colors"
+                      >
+                        {t("common.downgrade")}
+                      </button>
                     )}
                   </div>
                 );
@@ -284,12 +409,13 @@ function UsageMeter({ label, current, max }: { label: string; current: number; m
   const displayMax = max >= 999 ? t("billing.unlimited") : max.toString();
   const pct = max >= 999 ? Math.min((current / 100) * 10, 100) : Math.min((current / max) * 100, 100);
   const overLimit = max < 999 && current > max;
+  const nearLimit = max < 999 && !overLimit && pct >= 80;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-sm font-medium text-gray-700">{label}</span>
-        <span className={`text-sm font-semibold ${overLimit ? "text-red-600" : "text-gray-900"}`}>
+        <span className={`text-sm font-semibold ${overLimit ? "text-red-600" : nearLimit ? "text-amber-600" : "text-gray-900"}`}>
           {current} / {displayMax}
         </span>
       </div>
@@ -303,6 +429,9 @@ function UsageMeter({ label, current, max }: { label: string; current: number; m
       </div>
       {overLimit && (
         <p className="text-xs text-red-500 mt-1">{t("billing.overLimit")}</p>
+      )}
+      {nearLimit && (
+        <p className="text-xs text-amber-500 mt-1">Presque atteint</p>
       )}
     </div>
   );

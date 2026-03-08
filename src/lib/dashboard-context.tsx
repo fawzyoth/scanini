@@ -102,9 +102,13 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       .single();
 
     if (!rest || (rest as any).status === "pending") {
-      // No restaurant or pending — force redirect to /pending
       setLoading(false);
       router.replace("/pending");
+      return;
+    }
+    if ((rest as any).status === "suspended") {
+      setLoading(false);
+      router.replace("/suspended");
       return;
     }
     const r = rest as Restaurant;

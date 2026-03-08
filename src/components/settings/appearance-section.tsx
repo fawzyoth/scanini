@@ -218,27 +218,29 @@ function TemplateOption({
       onClick={onClick}
       className={`relative rounded-xl border-2 p-2 transition-all text-left ${
         locked
-          ? "border-gray-200 bg-gray-50 opacity-70 cursor-not-allowed"
+          ? "border-gray-100 bg-gray-50/50 cursor-not-allowed"
           : active
           ? "border-indigo-500 bg-indigo-50/50"
           : "border-gray-200 bg-white hover:border-gray-300"
       }`}
     >
       {active && !locked && (
-        <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center">
+        <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center z-10 shadow-sm">
           <Check size={12} className="text-white" />
         </div>
       )}
-      {locked && (
-        <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
-          <Lock size={10} className="text-white" />
-        </div>
-      )}
-      <div className={`rounded-lg overflow-hidden bg-gray-50 border border-gray-100 ${locked ? "grayscale" : ""}`}>
+      <div className="relative rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
+        {locked && (
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-10 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-gray-900/80 flex items-center justify-center">
+              <Lock size={14} className="text-white" />
+            </div>
+          </div>
+        )}
         {children}
       </div>
       <div className="mt-2 text-center">
-        <p className="text-xs font-medium text-gray-700">{label}</p>
+        <p className={`text-xs font-medium ${locked ? "text-gray-400" : "text-gray-700"}`}>{label}</p>
         {locked && (
           <div className="mt-1">
             <UpgradeBadge requiredPlan={requiredPlan} size="sm" />

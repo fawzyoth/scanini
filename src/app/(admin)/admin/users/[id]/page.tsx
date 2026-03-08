@@ -18,6 +18,7 @@ export default function AdminUserDetailPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [usage, setUsage] = useState({ menus: 0, dishes: 0, scansThisMonth: 0 });
   const [payments, setPayments] = useState<any[]>([]);
+  const [commercials, setCommercials] = useState<{ id: string; name: string }[]>([]);
 
   const [name, setName] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -25,6 +26,7 @@ export default function AdminUserDetailPage() {
   const [email, setEmail] = useState("");
   const [plan, setPlan] = useState<"free" | "starter" | "pro" | "business">("free");
   const [status, setStatus] = useState<string>("active");
+  const [commercialId, setCommercialId] = useState<string>("");
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -47,6 +49,7 @@ export default function AdminUserDetailPage() {
       setName(r.name);
       setPlan(r.plan);
       setStatus(r.status);
+      setCommercialId((r as any).commercial_id ?? "");
 
       const { data: prof } = await supabase
         .from("profiles")
@@ -76,12 +79,18 @@ export default function AdminUserDetailPage() {
         });
       }
 
-      // Load payment history
+      // Load payment history and commercials list
       try {
-        const payRes = await fetch(`/api/admin/payments?restaurant_id=${id}`);
+        const [payRes, comRes] = await Promise.all([
+          fetch(`/api/admin/payments?restaurant_id=${id}`),
+          fetch("/api/admin/commercials"),
+        ]);
         if (payRes.ok) {
-          const payData = await payRes.json();
-          setPayments(payData);
+          setPayments(await payRes.json());
+        }
+        if (comRes.ok) {
+          const comData = await comRes.json();
+          setCommercials(comData.map((c: any) => ({ id: c.id, name: `${c.first_name} ${c.last_name}` })));
         }
       } catch {}
 
@@ -117,7 +126,7 @@ export default function AdminUserDetailPage() {
     const supabase = createClient();
 
     await (supabase.from("restaurants") as any)
-      .update({ name, plan, status })
+      .update({ name, plan, status, commercial_id: commercialId || null })
       .eq("id", id);
 
     if (profile) {
@@ -234,6 +243,22 @@ export default function AdminUserDetailPage() {
                 disabled
                 className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-500 cursor-not-allowed"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Commercial</label>
+              <select
+                value={commercialId}
+                onChange={(e) => setCommercialId(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">Aucun commercial</option>
+                {commercials.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
