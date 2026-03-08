@@ -144,16 +144,24 @@ export async function POST(request: NextRequest) {
   }
 
   // Update the auto-created profile with commercial role + extra fields
+  // The handle_new_user trigger may not have fired yet, so upsert to be safe
   const userId = authData.user.id;
-  await service
+  const { error: profileError } = await service
     .from("profiles")
-    .update({
+    .upsert({
+      id: userId,
+      first_name,
+      last_name,
+      email,
       role: "commercial",
-      phone,
-      whatsapp: phone,
-      address,
-    })
-    .eq("id", userId);
+      phone: phone || null,
+      whatsapp: phone || null,
+      address: address || null,
+    }, { onConflict: "id" });
+
+  if (profileError) {
+    return NextResponse.json({ error: profileError.message }, { status: 500 });
+  }
 
   return NextResponse.json({ success: true, id: userId });
 }

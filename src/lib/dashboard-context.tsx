@@ -101,6 +101,13 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       .eq("owner_id", user.id)
       .single();
 
+    // Commercial users go to their own dashboard
+    if ((prof as any)?.role === "commercial") {
+      setLoading(false);
+      router.replace("/commercial");
+      return;
+    }
+
     if (!rest || (rest as any).status === "pending") {
       setLoading(false);
       router.replace("/pending");

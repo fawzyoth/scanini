@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, Receipt, LogOut } from "lucide-react";
 
 const COMMERCIAL_NAV = [
-  { label: "Tableau de bord", href: "/commercial", icon: LayoutDashboard },
+  { label: "Dashboard", href: "/commercial", icon: LayoutDashboard },
   { label: "Mes clients", href: "/commercial/clients", icon: Users },
+  { label: "Paiements", href: "/commercial/billing", icon: Receipt },
 ];
 
 export default function CommercialLayout({

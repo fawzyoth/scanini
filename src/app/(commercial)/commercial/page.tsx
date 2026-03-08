@@ -9,8 +9,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
-  CheckCircle2,
   AlertTriangle,
+  ArrowRight,
+  QrCode,
 } from "lucide-react";
 import { PLAN_PRICES } from "@/data/admin-mock";
 import { PLANS } from "@/lib/plan-config";
@@ -28,7 +29,7 @@ type Client = {
   created_at: string;
   owner: { first_name: string; last_name: string; email: string; phone?: string } | null;
   payment: { status: string; amount: number; paid_at: string | null } | null;
-  usage: { scans_this_month: number } | null;
+  usage: { scans_this_month: number; menu_count: number; dish_count: number } | null;
 };
 
 export default function CommercialDashboardPage() {
@@ -72,6 +73,7 @@ export default function CommercialDashboardPage() {
   const totalRevenue = paidClients.reduce((sum, c) => sum + (PLAN_PRICES[c.plan]?.monthly ?? 0), 0);
   const myCommission = Math.round(totalRevenue * (commissionRate / 100) * 100) / 100;
   const platformShare = totalRevenue - myCommission;
+  const totalScans = clients.reduce((sum, c) => sum + (c.usage?.scans_this_month ?? 0), 0);
 
   if (loading) {
     return (
@@ -101,13 +103,34 @@ export default function CommercialDashboardPage() {
         </div>
       </div>
 
+      {/* Unpaid alert */}
+      {unpaidClients.length > 0 && (
+        <Link
+          href="/commercial/billing"
+          className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl hover:bg-amber-100 transition-colors"
+        >
+          <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+            <AlertTriangle size={20} className="text-amber-600" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-amber-900">
+              {unpaidClients.length} client{unpaidClients.length > 1 ? "s" : ""} impaye{unpaidClients.length > 1 ? "s" : ""}
+            </p>
+            <p className="text-xs text-amber-700">
+              {unpaidClients.map((c) => c.name).join(", ")}
+            </p>
+          </div>
+          <ArrowRight size={16} className="text-amber-600" />
+        </Link>
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           icon={<Users size={20} />}
           label="Mes clients"
           value={clients.length.toString()}
-          sub={`${paidClients.length} actifs`}
+          sub={`${paidClients.length} ont paye`}
           color="bg-blue-50 text-blue-600"
         />
         <StatCard
@@ -125,11 +148,11 @@ export default function CommercialDashboardPage() {
           color="bg-emerald-50 text-emerald-600"
         />
         <StatCard
-          icon={<DollarSign size={20} />}
-          label="Part Scanini"
-          value={`${platformShare} DT`}
-          sub={`${100 - commissionRate}% du revenu`}
-          color="bg-gray-50 text-gray-600"
+          icon={<QrCode size={20} />}
+          label="Scans total"
+          value={totalScans.toLocaleString()}
+          sub="Ce mois"
+          color="bg-purple-50 text-purple-600"
         />
       </div>
 
@@ -156,34 +179,22 @@ export default function CommercialDashboardPage() {
         <div className="flex items-center gap-6 mt-2">
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-full bg-emerald-500" />
-            <span className="text-xs text-gray-500">Ma commission ({commissionRate}%)</span>
+            <span className="text-xs text-gray-500">Ma commission ({commissionRate}%) — {myCommission} DT</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-full bg-gray-400" />
-            <span className="text-xs text-gray-500">Scanini ({100 - commissionRate}%)</span>
+            <span className="text-xs text-gray-500">Scanini ({100 - commissionRate}%) — {platformShare} DT</span>
           </div>
         </div>
       </div>
 
-      {/* Unpaid alert */}
-      {unpaidClients.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 flex items-start gap-3">
-          <AlertTriangle size={20} className="text-amber-600 shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-semibold text-amber-900">
-              {unpaidClients.length} client{unpaidClients.length > 1 ? "s" : ""} impaye{unpaidClients.length > 1 ? "s" : ""}
-            </p>
-            <p className="text-xs text-amber-700 mt-0.5">
-              {unpaidClients.map((c) => c.name).join(", ")}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Clients table */}
+      {/* Recent clients */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-900">Mes clients — {MONTH_NAMES[month - 1]} {year}</h2>
+          <Link href="/commercial/clients" className="text-xs text-green-600 hover:text-green-700 flex items-center gap-1">
+            Voir tout <ArrowRight size={12} />
+          </Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -192,13 +203,13 @@ export default function CommercialDashboardPage() {
                 <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Restaurant</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Proprietaire</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Plan</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Montant</th>
+                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Statut</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Paiement</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-5 py-3">Ma part</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {clients.map((client) => {
+              {clients.slice(0, 10).map((client) => {
                 const price = PLAN_PRICES[client.plan]?.monthly ?? 0;
                 const isPaid = client.payment?.status === "paid";
                 const myPart = isPaid ? Math.round(price * (commissionRate / 100) * 100) / 100 : 0;
@@ -207,37 +218,25 @@ export default function CommercialDashboardPage() {
                     <td className="px-5 py-3.5">
                       <p className="text-sm text-gray-900 font-medium">{client.name}</p>
                     </td>
-                    <td className="px-5 py-3.5">
-                      <p className="text-sm text-gray-700">
-                        {client.owner ? `${client.owner.first_name} ${client.owner.last_name}` : "—"}
-                      </p>
-                      {client.owner?.phone && (
-                        <a
-                          href={`https://wa.me/${client.owner.phone.replace(/\s+/g, "").replace("+", "")}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-green-600 hover:text-green-700"
-                        >
-                          {client.owner.phone}
-                        </a>
-                      )}
+                    <td className="px-5 py-3.5 text-sm text-gray-700">
+                      {client.owner ? `${client.owner.first_name} ${client.owner.last_name}` : "—"}
                     </td>
                     <td className="px-5 py-3.5">
                       <PlanBadge plan={client.plan} />
                     </td>
-                    <td className="px-5 py-3.5 text-sm font-medium text-gray-900">
-                      {price > 0 ? `${price} DT` : "Gratuit"}
+                    <td className="px-5 py-3.5">
+                      <StatusBadge status={client.status} />
                     </td>
                     <td className="px-5 py-3.5">
                       {price === 0 ? (
                         <span className="text-[11px] text-gray-400">—</span>
                       ) : isPaid ? (
                         <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700">
-                          <CheckCircle2 size={12} /> Paye
+                          Paye
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
-                          <DollarSign size={12} /> Impaye
+                          Impaye
                         </span>
                       )}
                     </td>
@@ -288,6 +287,20 @@ function PlanBadge({ plan }: { plan: string }) {
   return (
     <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${styles[plan] || styles.free}`}>
       {displayName}
+    </span>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const styles: Record<string, string> = {
+    pending: "bg-amber-50 text-amber-700",
+    active: "bg-green-50 text-green-700",
+    trial: "bg-purple-50 text-purple-700",
+    suspended: "bg-red-50 text-red-700",
+  };
+  return (
+    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full capitalize ${styles[status] || styles.active}`}>
+      {status}
     </span>
   );
 }

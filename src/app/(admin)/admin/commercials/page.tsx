@@ -111,13 +111,6 @@ export default function AdminCommercialsPage() {
         </div>
       </div>
 
-      {showCreate && (
-        <CreateCommercialForm
-          onClose={() => setShowCreate(false)}
-          onCreated={() => { setShowCreate(false); loadData(); }}
-        />
-      )}
-
       {/* Summary stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
@@ -151,7 +144,7 @@ export default function AdminCommercialsPage() {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center">
           <p className="text-sm text-gray-400">Aucun commercial enregistre</p>
           <p className="text-xs text-gray-400 mt-1">
-            Creez un compte avec le role &quot;commercial&quot; pour commencer
+            Cliquez sur &quot;Nouveau commercial&quot; pour en creer un
           </p>
         </div>
       ) : (
@@ -219,6 +212,14 @@ export default function AdminCommercialsPage() {
           ))}
         </div>
       )}
+
+      {/* Create modal */}
+      {showCreate && (
+        <CreateCommercialModal
+          onClose={() => setShowCreate(false)}
+          onCreated={() => { setShowCreate(false); loadData(); }}
+        />
+      )}
     </div>
   );
 }
@@ -237,7 +238,7 @@ function StatCard({
   );
 }
 
-function CreateCommercialForm({
+function CreateCommercialModal({
   onClose,
   onCreated,
 }: {
@@ -294,113 +295,116 @@ function CreateCommercialForm({
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-        <h2 className="text-sm font-semibold text-gray-900">Nouveau commercial</h2>
-        <button onClick={onClose} className="p-1 rounded hover:bg-gray-100">
-          <X size={16} className="text-gray-400" />
-        </button>
-      </div>
-      <form onSubmit={handleSubmit} className="p-5 space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Prenom *</label>
-            <input
-              type="text"
-              value={form.first_name}
-              onChange={(e) => update("first_name", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="Ahmed"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Nom *</label>
-            <input
-              type="text"
-              value={form.last_name}
-              onChange={(e) => update("last_name", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="Ben Ali"
-            />
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h2 className="text-base font-semibold text-gray-900">Nouveau commercial</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100">
+            <X size={18} className="text-gray-400" />
+          </button>
         </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Prenom *</label>
+              <input
+                type="text"
+                value={form.first_name}
+                onChange={(e) => update("first_name", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ahmed"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Nom *</label>
+              <input
+                type="text"
+                value={form.last_name}
+                onChange={(e) => update("last_name", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ben Ali"
+              />
+            </div>
+          </div>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Email *</label>
-          <input
-            type="email"
-            value={form.email}
-            onChange={(e) => update("email", e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            placeholder="ahmed@example.com"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Telephone</label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Email *</label>
             <input
-              type="tel"
-              value={form.phone}
-              onChange={(e) => update("phone", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="+216 XX XXX XXX"
+              type="email"
+              value={form.email}
+              onChange={(e) => update("email", e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="ahmed@example.com"
             />
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Adresse</label>
-            <input
-              type="text"
-              value={form.address}
-              onChange={(e) => update("address", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="Tunis, Tunisie"
-            />
-          </div>
-        </div>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Mot de passe *</label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              value={form.password}
-              onChange={(e) => update("password", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="Min. 6 caracteres"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Telephone</label>
+              <input
+                type="tel"
+                value={form.phone}
+                onChange={(e) => update("phone", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="+216 XX XXX XXX"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Adresse</label>
+              <input
+                type="text"
+                value={form.address}
+                onChange={(e) => update("address", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Tunis, Tunisie"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Mot de passe *</label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={(e) => update("password", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 pr-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Min. 6 caracteres"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+          )}
+
+          <div className="flex items-center justify-end gap-3 pt-2">
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              onClick={onClose}
+              className="text-sm text-gray-600 hover:text-gray-900 px-4 py-2"
             >
-              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              Annuler
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex items-center gap-2 bg-green-600 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+            >
+              {saving && <Loader2 size={14} className="animate-spin" />}
+              Creer le commercial
             </button>
           </div>
-        </div>
-
-        {error && (
-          <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
-        )}
-
-        <div className="flex items-center justify-end gap-3 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-sm text-gray-600 hover:text-gray-900 px-4 py-2"
-          >
-            Annuler
-          </button>
-          <button
-            type="submit"
-            disabled={saving}
-            className="inline-flex items-center gap-2 bg-green-600 text-white text-sm font-medium px-5 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
-          >
-            {saving && <Loader2 size={14} className="animate-spin" />}
-            Creer le commercial
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

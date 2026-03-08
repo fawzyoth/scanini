@@ -74,9 +74,9 @@ export async function GET(request: NextRequest) {
     (paymentRows ?? []).map((p: any) => [p.restaurant_id, p])
   );
 
-  // Build user list from profiles (skip admin profiles)
+  // Build user list from profiles (skip admin and commercial profiles)
   const users = (profiles ?? [])
-    .filter((p: any) => p.role !== "admin")
+    .filter((p: any) => p.role !== "admin" && p.role !== "commercial")
     .map((p: any) => {
       const restaurant = restMap.get(p.id) ?? null;
       const usage = restaurant ? usageMap.get(restaurant.id) : null;
