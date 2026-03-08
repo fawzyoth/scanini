@@ -67,6 +67,14 @@ export async function GET(request: NextRequest) {
     ? await service.from("profiles").select("*").in("id", ownerIds)
     : { data: [] };
 
+  // Get auth users to read phone from metadata (PostgREST may not return phone)
+  const authPhoneMap = new Map<string, string>();
+  for (const ownerId of ownerIds) {
+    const { data: authUser } = await service.auth.admin.getUserById(ownerId);
+    const phone = authUser?.user?.user_metadata?.phone;
+    if (phone) authPhoneMap.set(ownerId, phone);
+  }
+
   // Get payments for the specified month
   const { data: payments } = restaurantIds.length > 0
     ? await service
@@ -86,16 +94,23 @@ export async function GET(request: NextRequest) {
   const paymentMap = new Map((payments ?? []).map((p: any) => [p.restaurant_id, p]));
   const usageMap = new Map((usageRows ?? []).map((u: any) => [u.restaurant_id, u]));
 
-  const clients = (restaurants ?? []).map((r: any) => ({
-    id: r.id,
-    name: r.name,
-    plan: r.plan,
-    status: r.status,
-    created_at: r.created_at,
-    owner: profileMap.get(r.owner_id) ?? null,
-    payment: paymentMap.get(r.id) ?? null,
-    usage: usageMap.get(r.id) ?? null,
-  }));
+  const clients = (restaurants ?? []).map((r: any) => {
+    const owner = profileMap.get(r.owner_id);
+    // Use auth metadata phone as fallback if profile phone is missing
+    if (owner && !owner.phone && authPhoneMap.has(r.owner_id)) {
+      owner.phone = authPhoneMap.get(r.owner_id);
+    }
+    return {
+      id: r.id,
+      name: r.name,
+      plan: r.plan,
+      status: r.status,
+      created_at: r.created_at,
+      owner: owner ?? null,
+      payment: paymentMap.get(r.id) ?? null,
+      usage: usageMap.get(r.id) ?? null,
+    };
+  });
 
   const commissionRate = (auth.profile as any).commission_rate ?? 65;
 
