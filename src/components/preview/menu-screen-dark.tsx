@@ -99,7 +99,7 @@ export function MenuScreenDark({
       <div className="flex-1 flex overflow-hidden" style={{ backgroundColor: "#1a1a1a" }}>
         {/* Left menu sidebar — names only, no icons */}
         <div
-          className="shrink-0 w-[100px] overflow-y-auto py-1 flex flex-col"
+          className="shrink-0 w-[100px] overflow-y-auto overflow-x-visible py-1 flex flex-col"
           style={{ backgroundColor: "#1a1a1a" }}
         >
           {visibleMenus.map((menu) => {
@@ -108,13 +108,25 @@ export function MenuScreenDark({
               <button
                 key={menu.id}
                 onClick={() => selectMenu(menu.id)}
-                className="py-3 px-2 text-center transition-colors"
+                className="relative py-3 px-2 text-center transition-colors"
                 style={{
                   backgroundColor: isActive ? "#fff" : "transparent",
                   borderTopLeftRadius: isActive ? 20 : 0,
                   borderBottomLeftRadius: isActive ? 20 : 0,
+                  zIndex: isActive ? 1 : 0,
                 }}
               >
+                {/* Inverse rounded corners on the right side */}
+                {isActive && (
+                  <>
+                    <div style={{ position: "absolute", top: -16, right: 0, width: 16, height: 16, background: "#fff", overflow: "hidden" }}>
+                      <div style={{ width: "100%", height: "100%", background: "#1a1a1a", borderBottomRightRadius: 16 }} />
+                    </div>
+                    <div style={{ position: "absolute", bottom: -16, right: 0, width: 16, height: 16, background: "#fff", overflow: "hidden" }}>
+                      <div style={{ width: "100%", height: "100%", background: "#1a1a1a", borderTopRightRadius: 16 }} />
+                    </div>
+                  </>
+                )}
                 <span
                   className="text-[11px] font-bold uppercase tracking-wider leading-tight"
                   style={{ color: isActive ? "#D4A853" : "#aaa" }}
@@ -126,8 +138,8 @@ export function MenuScreenDark({
           })}
         </div>
 
-        {/* Right content area with curved left edge */}
-        <div className="flex-1 overflow-y-auto rounded-tl-[40px] bg-white relative">
+        {/* Right content area — full height white */}
+        <div className="flex-1 overflow-y-auto bg-white relative">
           {/* Logo at top */}
           {restaurant?.logoImage && (
             <div className="flex justify-center pt-4 pb-2">
