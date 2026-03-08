@@ -1,4 +1,4 @@
-export type MenuTemplate = "classic" | "card" | "profile";
+export type MenuTemplate = "classic" | "card" | "profile" | "dark";
 
 export interface Restaurant {
   id: string;

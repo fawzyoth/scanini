@@ -5,6 +5,8 @@ export { HomeScreenCard } from "./home-screen-card";
 export { MenuScreenCard } from "./menu-screen-card";
 export { HomeScreenProfile } from "./home-screen-profile";
 export { MenuScreenProfile } from "./menu-screen-profile";
+export { HomeScreenDark } from "./home-screen-dark";
+export { MenuScreenDark } from "./menu-screen-dark";
 export { DishDetailSheet } from "./dish-detail-sheet";
 export { ReviewSheet } from "./review-sheet";
 export { InfoSheet } from "./info-sheet";

@@ -62,7 +62,7 @@ export type Database = {
           status: "pending" | "active" | "trial" | "suspended";
           billing_cycle: "monthly" | "yearly";
           primary_color: string;
-          template: "classic" | "card" | "profile";
+          template: "classic" | "card" | "profile" | "dark";
           currency: string;
           extra_info: string | null;
           reviews_enabled: boolean;
@@ -86,7 +86,7 @@ export type Database = {
           status?: "pending" | "active" | "trial" | "suspended";
           billing_cycle?: "monthly" | "yearly";
           primary_color?: string;
-          template?: "classic" | "card" | "profile";
+          template?: "classic" | "card" | "profile" | "dark";
           currency?: string;
           extra_info?: string | null;
           reviews_enabled?: boolean;
@@ -110,7 +110,7 @@ export type Database = {
           status?: "pending" | "active" | "trial" | "suspended";
           billing_cycle?: "monthly" | "yearly";
           primary_color?: string;
-          template?: "classic" | "card" | "profile";
+          template?: "classic" | "card" | "profile" | "dark";
           currency?: string;
           extra_info?: string | null;
           reviews_enabled?: boolean;

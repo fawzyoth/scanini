@@ -35,7 +35,7 @@ export function AppearanceSection() {
         <label className="block text-sm font-medium text-gray-700 mb-3">
           {t("appearance.template")}
         </label>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-3">
           <TemplateOption
             active={template === "classic"}
             onClick={() => setTemplate("classic")}
@@ -114,6 +114,33 @@ export function AppearanceSection() {
                 <div className="h-5 bg-white border border-gray-200 rounded flex items-center px-1.5 gap-1">
                   <div className="w-2 h-2 bg-gray-300 rounded-sm" />
                   <div className="h-1 w-8 bg-gray-300 rounded" />
+                </div>
+              </div>
+            </div>
+          </TemplateOption>
+
+          <TemplateOption
+            active={template === "dark"}
+            onClick={() => setTemplate("dark")}
+            label={t("appearance.templateDark")}
+          >
+            {/* Dark template preview */}
+            <div className="space-y-1.5" style={{ backgroundColor: "#1a1a1a" }}>
+              <div className="mx-1.5 mt-1.5 h-7 bg-gray-700 rounded" />
+              <div className="flex justify-center">
+                <div className="h-1 w-10 bg-gray-500 rounded" />
+              </div>
+              <div className="flex justify-center">
+                <div className="h-1 w-6 bg-gray-600 rounded" />
+              </div>
+              <div className="px-1.5 pb-1.5 space-y-1">
+                <div className="h-5 rounded flex items-center px-1.5 gap-1" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+                  <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: "#D4A853" }} />
+                  <div className="h-1 w-6 bg-gray-500 rounded" />
+                </div>
+                <div className="h-5 rounded flex items-center px-1.5 gap-1" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+                  <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: "#D4A853" }} />
+                  <div className="h-1 w-8 bg-gray-500 rounded" />
                 </div>
               </div>
             </div>

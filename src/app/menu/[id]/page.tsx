@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, HomeScreenProfile, MenuScreenProfile, DishDetailSheet, ReviewSheet, InfoSheet, SearchOverlay } from "@/components/preview";
+import { HomeScreen, MenuScreen, HomeScreenCard, MenuScreenCard, HomeScreenProfile, MenuScreenProfile, HomeScreenDark, MenuScreenDark, DishDetailSheet, ReviewSheet, InfoSheet, SearchOverlay } from "@/components/preview";
 import type { Restaurant, Menu, Category, Dish, Review } from "@/types";
 
 type Screen = { type: "home" } | { type: "menu"; menu: Menu };
@@ -160,6 +160,16 @@ export default function PublicMenuPage() {
             onInfoClick={() => setInfoOpen(true)}
             onSearchClick={() => setSearchOpen(true)}
           />
+        ) : tmpl === "dark" ? (
+          <HomeScreenDark
+            restaurant={restaurant}
+            menus={menus}
+            reviews={reviewsEnabled ? reviews : []}
+            onMenuClick={(menu) => setScreen({ type: "menu", menu })}
+            onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
+            onInfoClick={() => setInfoOpen(true)}
+            onSearchClick={() => setSearchOpen(true)}
+          />
         ) : (
           <HomeScreen
             restaurant={restaurant}
@@ -185,6 +195,15 @@ export default function PublicMenuPage() {
         ) : tmpl === "profile" ? (
           <MenuScreenProfile
             menu={screen.menu}
+            onBack={() => setScreen({ type: "home" })}
+            onDishClick={(dish) => setSelectedDish(dish)}
+            onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
+            onSearchClick={() => setSearchOpen(true)}
+          />
+        ) : tmpl === "dark" ? (
+          <MenuScreenDark
+            menu={screen.menu}
+            restaurant={restaurant}
             onBack={() => setScreen({ type: "home" })}
             onDishClick={(dish) => setSelectedDish(dish)}
             onReviewClick={reviewsEnabled ? () => setReviewOpen(true) : undefined}
