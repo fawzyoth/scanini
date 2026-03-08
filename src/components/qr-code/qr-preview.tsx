@@ -30,8 +30,16 @@ export function QRPreview({ settings, url }: QRPreviewProps) {
           size={200}
           bgColor="#FFFFFF"
           fgColor={settings.dotColor}
-          level="M"
+          level={settings.logo ? "H" : "M"}
           style={{ borderRadius: 8 }}
+          {...(settings.logo ? {
+            imageSettings: {
+              src: settings.logo,
+              height: 40,
+              width: 40,
+              excavate: true,
+            }
+          } : {})}
         />
       </div>
 

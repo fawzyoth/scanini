@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { QRSettings } from "@/types";
 import { Accordion } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
@@ -7,7 +8,7 @@ import { Select } from "@/components/ui/select";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { Slider } from "@/components/ui/slider";
 import { FrameTypeSelector } from "./frame-type-selector";
-import { CropIcon, Palette, ImageIcon } from "lucide-react";
+import { CropIcon, Palette, ImageIcon, Loader2, X } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/i18n-context";
 
 interface QRSettingsPanelProps {
@@ -25,9 +26,29 @@ const FONT_OPTIONS = [
 
 export function QRSettingsPanel({ settings, onChange }: QRSettingsPanelProps) {
   const { t } = useTranslation();
+  const [uploading, setUploading] = useState(false);
 
   function update(partial: Partial<QRSettings>) {
     onChange({ ...settings, ...partial });
+  }
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      update({ logo: data.url });
+    } catch (err) {
+      console.error("Logo upload failed:", err);
+    } finally {
+      setUploading(false);
+    }
   }
 
   return (
@@ -65,9 +86,37 @@ export function QRSettingsPanel({ settings, onChange }: QRSettingsPanelProps) {
       <Accordion icon={<ImageIcon size={20} />} title={t("qr.logo")}>
         <div className="text-sm text-gray-500">
           <p>{t("qr.logoDesc")}</p>
-          <button className="mt-3 px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
-            {t("qr.uploadLogo")}
-          </button>
+
+          {settings.logo ? (
+            <div className="mt-3 flex items-center gap-3">
+              <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                <img src={settings.logo} alt="QR Logo" className="w-full h-full object-contain" />
+                {uploading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/60">
+                    <Loader2 size={16} className="animate-spin text-indigo-500" />
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => update({ logo: undefined })}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+              >
+                <X size={12} />
+                Supprimer
+              </button>
+            </div>
+          ) : (
+            <label className="mt-3 inline-flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+              {uploading ? (
+                <Loader2 size={16} className="animate-spin text-indigo-500" />
+              ) : (
+                <ImageIcon size={16} className="text-gray-400" />
+              )}
+              {t("qr.uploadLogo")}
+              <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+            </label>
+          )}
         </div>
       </Accordion>
     </div>

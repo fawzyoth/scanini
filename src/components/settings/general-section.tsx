@@ -16,7 +16,9 @@ export function GeneralSection() {
   const [address, setAddress] = useState("");
   const [currency, setCurrency] = useState("EUR");
   const [coverImage, setCoverImage] = useState("");
+  const [logoImage, setLogoImage] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -26,6 +28,7 @@ export function GeneralSection() {
       setAddress(restaurant.address ?? "");
       setCurrency((restaurant as any).currency ?? "EUR");
       setCoverImage((restaurant as any).cover_image ?? "");
+      setLogoImage((restaurant as any).logo_image ?? "");
     }
   }, [restaurant]);
 
@@ -48,6 +51,25 @@ export function GeneralSection() {
     }
   }
 
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingLogo(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setLogoImage(data.url);
+    } catch (err) {
+      console.error("Logo upload failed:", err);
+    } finally {
+      setUploadingLogo(false);
+    }
+  }
+
   async function handleSave() {
     const oldCurrency = (restaurant as any)?.currency ?? "EUR";
 
@@ -57,6 +79,7 @@ export function GeneralSection() {
       address: address || null,
       currency,
       cover_image: coverImage || null,
+      logo_image: logoImage || null,
     } as any);
 
     // Bulk-update all dishes' currency when it changes
@@ -122,6 +145,43 @@ export function GeneralSection() {
           )}
           <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
         </label>
+      </div>
+
+      {/* Logo image */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t("general.logoImage")}</label>
+        <label className="block cursor-pointer">
+          {logoImage ? (
+            <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200">
+              <img src={logoImage} alt="Logo" className="w-full h-full object-cover" />
+              {uploadingLogo && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/60">
+                  <Loader2 size={20} className="animate-spin text-indigo-500" />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={(e) => { e.preventDefault(); setLogoImage(""); }}
+                className="absolute top-0 right-0 p-1 bg-white/80 hover:bg-white rounded-full shadow"
+              >
+                <X size={12} className="text-gray-600" />
+              </button>
+            </div>
+          ) : (
+            <div className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 hover:border-indigo-400 hover:bg-indigo-50/30 transition-colors">
+              {uploadingLogo ? (
+                <Loader2 size={20} className="animate-spin text-indigo-500" />
+              ) : (
+                <>
+                  <ImageIcon size={20} className="text-gray-300" />
+                  <span className="text-[10px] text-indigo-600 font-medium">{t("general.uploadLogo")}</span>
+                </>
+              )}
+            </div>
+          )}
+          <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+        </label>
+        <p className="text-xs text-gray-400 mt-1">{t("general.logoRecommended")}</p>
       </div>
 
       <Input label={t("general.restaurantName")} value={name} onChange={(e) => setName(e.target.value)} />
