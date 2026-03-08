@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Check, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, Save, Loader2, CheckCircle2, DollarSign, XCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { PLAN_LIMITS, PLAN_PRICES } from "@/data/admin-mock";
 import type { Restaurant, Profile } from "@/types/database";
@@ -17,6 +17,7 @@ export default function AdminUserDetailPage() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [usage, setUsage] = useState({ menus: 0, dishes: 0, scansThisMonth: 0 });
+  const [payments, setPayments] = useState<any[]>([]);
 
   const [name, setName] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -74,6 +75,15 @@ export default function AdminUserDetailPage() {
           scansThisMonth: (usageRow as any).scans_this_month ?? 0,
         });
       }
+
+      // Load payment history
+      try {
+        const payRes = await fetch(`/api/admin/payments?restaurant_id=${id}`);
+        if (payRes.ok) {
+          const payData = await payRes.json();
+          setPayments(payData);
+        }
+      } catch {}
 
       setLoading(false);
     }
@@ -240,6 +250,129 @@ export default function AdminUserDetailPage() {
         </div>
       </form>
 
+      {/* Payment history */}
+      {plan !== "free" && (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-gray-900">Historique des paiements</h2>
+              <p className="text-xs text-gray-500 mt-0.5">Suivi mensuel des abonnements</p>
+            </div>
+            <button
+              type="button"
+              onClick={async () => {
+                const now = new Date();
+                const month = now.getMonth() + 1;
+                const year = now.getFullYear();
+                const existing = payments.find((p) => p.period_month === month && p.period_year === year);
+                const newStatus = existing?.status === "paid" ? "pending" : "paid";
+                const res = await fetch("/api/admin/payments", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    restaurant_id: id,
+                    period_month: month,
+                    period_year: year,
+                    amount: PLAN_PRICES[plan]?.monthly ?? 0,
+                    plan,
+                    status: newStatus,
+                  }),
+                });
+                if (res.ok) {
+                  const updated = await res.json();
+                  setPayments((prev) => {
+                    const idx = prev.findIndex((p) => p.period_month === month && p.period_year === year);
+                    if (idx >= 0) {
+                      const next = [...prev];
+                      next[idx] = updated;
+                      return next;
+                    }
+                    return [updated, ...prev];
+                  });
+                }
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <CheckCircle2 size={14} />
+              {payments.find((p) => p.period_month === new Date().getMonth() + 1 && p.period_year === new Date().getFullYear())?.status === "paid"
+                ? "Marquer impaye"
+                : "Marquer paye"}
+            </button>
+          </div>
+
+          <div className="p-5">
+            {payments.length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-4">Aucun paiement enregistre</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left text-xs font-medium text-gray-500 pb-3">Periode</th>
+                      <th className="text-left text-xs font-medium text-gray-500 pb-3">Plan</th>
+                      <th className="text-left text-xs font-medium text-gray-500 pb-3">Montant</th>
+                      <th className="text-left text-xs font-medium text-gray-500 pb-3">Statut</th>
+                      <th className="text-left text-xs font-medium text-gray-500 pb-3">Date de paiement</th>
+                      <th className="text-right text-xs font-medium text-gray-500 pb-3">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {payments.map((p) => {
+                      const monthNames = ["Jan", "Fev", "Mar", "Avr", "Mai", "Jun", "Jul", "Aou", "Sep", "Oct", "Nov", "Dec"];
+                      return (
+                        <tr key={p.id}>
+                          <td className="py-3 text-sm text-gray-900">
+                            {monthNames[p.period_month - 1]} {p.period_year}
+                          </td>
+                          <td className="py-3">
+                            <PlanBadge plan={p.plan} />
+                          </td>
+                          <td className="py-3 text-sm text-gray-700">
+                            {p.amount > 0 ? `${p.amount} DT` : "—"}
+                          </td>
+                          <td className="py-3">
+                            <PaymentStatusBadge status={p.status} />
+                          </td>
+                          <td className="py-3 text-sm text-gray-500">
+                            {p.paid_at
+                              ? new Date(p.paid_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })
+                              : "—"}
+                          </td>
+                          <td className="py-3 text-right">
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                const newSt = p.status === "paid" ? "pending" : "paid";
+                                const res = await fetch("/api/admin/payments", {
+                                  method: "PATCH",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ id: p.id, status: newSt }),
+                                });
+                                if (res.ok) {
+                                  const updated = await res.json();
+                                  setPayments((prev) => prev.map((x) => (x.id === p.id ? updated : x)));
+                                }
+                              }}
+                              className={`text-xs font-medium px-2 py-1 rounded-lg transition-colors ${
+                                p.status === "paid"
+                                  ? "text-amber-700 hover:bg-amber-50"
+                                  : "text-green-700 hover:bg-green-50"
+                              }`}
+                            >
+                              {p.status === "paid" ? "Annuler" : "Paye"}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Plan management */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
         <div className="px-5 py-4 border-b border-gray-100">
@@ -340,6 +473,28 @@ function StatusBadge({ status }: { status: string }) {
   return (
     <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full capitalize ${styles[status] || styles.active}`}>
       {status}
+    </span>
+  );
+}
+
+function PaymentStatusBadge({ status }: { status: string }) {
+  if (status === "paid") {
+    return (
+      <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+        <CheckCircle2 size={12} /> Paye
+      </span>
+    );
+  }
+  if (status === "overdue") {
+    return (
+      <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-red-50 text-red-700">
+        <XCircle size={12} /> En retard
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+      <DollarSign size={12} /> Impaye
     </span>
   );
 }

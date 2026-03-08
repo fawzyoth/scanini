@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Users, DollarSign, QrCode, TrendingUp, ArrowRight, Clock, Loader2 } from "lucide-react";
+import { Users, DollarSign, QrCode, TrendingUp, ArrowRight, Clock, Loader2, AlertTriangle } from "lucide-react";
 import { PLAN_PRICES } from "@/data/admin-mock";
 import { PLANS } from "@/lib/plan-config";
 
@@ -41,6 +41,10 @@ export default function AdminDashboardPage() {
       </div>
     );
   }
+
+  const unpaidCount = restaurants.filter(
+    (r) => r.plan !== "free" && r.payment_status !== "paid"
+  ).length;
 
   const totalUsers = restaurants.length;
   const activeUsers = restaurants.filter((r) => r.status === "active").length;
@@ -83,6 +87,25 @@ export default function AdminDashboardPage() {
             <p className="text-xs text-amber-700">Review and approve new sign-ups</p>
           </div>
           <ArrowRight size={16} className="text-amber-600" />
+        </Link>
+      )}
+
+      {/* Unpaid alert */}
+      {unpaidCount > 0 && (
+        <Link
+          href="/admin/billing"
+          className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors"
+        >
+          <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+            <AlertTriangle size={20} className="text-red-600" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-red-900">
+              {unpaidCount} abonnement{unpaidCount > 1 ? "s" : ""} impaye{unpaidCount > 1 ? "s" : ""}
+            </p>
+            <p className="text-xs text-red-700">Verifier les paiements du mois en cours</p>
+          </div>
+          <ArrowRight size={16} className="text-red-600" />
         </Link>
       )}
 

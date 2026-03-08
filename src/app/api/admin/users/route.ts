@@ -51,11 +51,16 @@ export async function GET(request: NextRequest) {
 
   const service = getServiceClient();
 
-  const [{ data: profiles }, { data: restaurants }, { data: usageRows }] =
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1;
+  const currentYear = now.getFullYear();
+
+  const [{ data: profiles }, { data: restaurants }, { data: usageRows }, { data: paymentRows }] =
     await Promise.all([
       service.from("profiles").select("*").order("created_at", { ascending: false }),
       service.from("restaurants").select("*"),
       service.from("restaurant_usage").select("*"),
+      service.from("payments").select("*").eq("period_month", currentMonth).eq("period_year", currentYear),
     ]);
 
   // Map restaurants by owner_id
@@ -65,6 +70,9 @@ export async function GET(request: NextRequest) {
   const usageMap = new Map(
     (usageRows ?? []).map((u: any) => [u.restaurant_id, u])
   );
+  const paymentMap = new Map(
+    (paymentRows ?? []).map((p: any) => [p.restaurant_id, p])
+  );
 
   // Build user list from profiles (skip admin profiles)
   const users = (profiles ?? [])
@@ -72,6 +80,7 @@ export async function GET(request: NextRequest) {
     .map((p: any) => {
       const restaurant = restMap.get(p.id) ?? null;
       const usage = restaurant ? usageMap.get(restaurant.id) : null;
+      const payment = restaurant ? paymentMap.get(restaurant.id) : null;
       return {
         // Use restaurant id if exists, otherwise profile id
         id: restaurant?.id ?? p.id,
@@ -85,6 +94,7 @@ export async function GET(request: NextRequest) {
         restaurant,
         scans_this_month: usage?.scans_this_month ?? 0,
         has_restaurant: !!restaurant,
+        payment_status: payment?.status ?? null,
       };
     });
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, MoreVertical, ArrowUpDown, Phone, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { Search, MoreVertical, ArrowUpDown, Phone, CheckCircle2, XCircle, Loader2, DollarSign } from "lucide-react";
 import type { Profile } from "@/types/database";
 import { PLANS } from "@/lib/plan-config";
 
@@ -18,6 +18,7 @@ type UserRow = {
   restaurant: any;
   scans_this_month: number;
   has_restaurant: boolean;
+  payment_status: "paid" | "pending" | "overdue" | null;
 };
 
 export default function AdminUsersPage() {
@@ -26,6 +27,7 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [filterPlan, setFilterPlan] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [filterPayment, setFilterPayment] = useState("all");
   const [sortBy, setSortBy] = useState<"name" | "created" | "scans">("created");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
@@ -67,6 +69,10 @@ export default function AdminUsersPage() {
       if (q && !u.name.toLowerCase().includes(q) && !email.toLowerCase().includes(q) && !fullName.toLowerCase().includes(q)) return false;
       if (filterPlan !== "all" && u.plan !== filterPlan) return false;
       if (filterStatus !== "all" && u.status !== filterStatus) return false;
+      if (filterPayment === "paid" && u.payment_status !== "paid") return false;
+      if (filterPayment === "unpaid" && u.payment_status === "paid") return false;
+      if (filterPayment === "pending" && u.payment_status !== "pending") return false;
+      if (filterPayment === "overdue" && u.payment_status !== "overdue") return false;
       return true;
     })
     .sort((a, b) => {
@@ -111,6 +117,29 @@ export default function AdminUsersPage() {
   async function handleDelete(user: UserRow) {
     await fetch(`/api/admin/users?id=${user.id}&profile_id=${user.profile_id}`, { method: "DELETE" });
     setUsers((prev) => prev.filter((u) => u.profile_id !== user.profile_id));
+  }
+
+  async function handleTogglePayment(user: UserRow) {
+    if (!user.has_restaurant || user.plan === "free") return;
+    const now = new Date();
+    const newStatus = user.payment_status === "paid" ? "pending" : "paid";
+    await fetch("/api/admin/payments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        restaurant_id: user.id,
+        period_month: now.getMonth() + 1,
+        period_year: now.getFullYear(),
+        amount: 0,
+        plan: user.plan,
+        status: newStatus,
+      }),
+    });
+    setUsers((prev) =>
+      prev.map((u) =>
+        u.id === user.id ? { ...u, payment_status: newStatus } : u
+      )
+    );
   }
 
   if (loading) {
@@ -223,6 +252,17 @@ export default function AdminUsersPage() {
           <option value="trial">Trial</option>
           <option value="suspended">Suspended</option>
         </select>
+        <select
+          value={filterPayment}
+          onChange={(e) => setFilterPayment(e.target.value)}
+          className="bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="all">All payments</option>
+          <option value="paid">Paid</option>
+          <option value="unpaid">Unpaid</option>
+          <option value="pending">Pending</option>
+          <option value="overdue">Overdue</option>
+        </select>
       </div>
 
       {/* Table */}
@@ -240,6 +280,7 @@ export default function AdminUsersPage() {
                 <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Phone</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Plan</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Status</th>
+                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Paiement</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">
                   <button onClick={() => toggleSort("scans")} className="flex items-center gap-1 hover:text-gray-700">
                     Scans <ArrowUpDown size={12} />
@@ -294,6 +335,18 @@ export default function AdminUsersPage() {
                   <td className="px-5 py-3.5">
                     <StatusBadge status={user.status} />
                   </td>
+                  <td className="px-5 py-3.5">
+                    {user.plan === "free" ? (
+                      <span className="text-[11px] text-gray-400">Gratuit</span>
+                    ) : (
+                      <button
+                        onClick={() => handleTogglePayment(user)}
+                        title={user.payment_status === "paid" ? "Marquer comme impaye" : "Marquer comme paye"}
+                      >
+                        <PaymentBadge status={user.payment_status} />
+                      </button>
+                    )}
+                  </td>
                   <td className="px-5 py-3.5 text-sm text-gray-700">
                     {user.scans_this_month.toLocaleString()}
                   </td>
@@ -312,7 +365,7 @@ export default function AdminUsersPage() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-5 py-8 text-center text-sm text-gray-400">
+                  <td colSpan={9} className="px-5 py-8 text-center text-sm text-gray-400">
                     No users found
                   </td>
                 </tr>
@@ -412,6 +465,28 @@ function StatusBadge({ status }: { status: string }) {
   return (
     <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full capitalize ${styles[status] || styles.active}`}>
       {status}
+    </span>
+  );
+}
+
+function PaymentBadge({ status }: { status: string | null }) {
+  if (status === "paid") {
+    return (
+      <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+        <CheckCircle2 size={12} /> Paye
+      </span>
+    );
+  }
+  if (status === "overdue") {
+    return (
+      <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-red-50 text-red-700">
+        <XCircle size={12} /> En retard
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+      <DollarSign size={12} /> Impaye
     </span>
   );
 }
