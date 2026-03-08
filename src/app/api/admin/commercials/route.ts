@@ -143,24 +143,44 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: authError.message }, { status: 400 });
   }
 
-  // Update the auto-created profile with commercial role + extra fields
-  // The handle_new_user trigger may not have fired yet, so upsert to be safe
+  // Update the auto-created profile
+  // Use direct PostgREST fetch to bypass Supabase JS client schema cache
   const userId = authData.user.id;
-  const { error: profileError } = await service
-    .from("profiles")
-    .upsert({
-      id: userId,
-      first_name,
-      last_name,
-      email,
-      role: "commercial",
-      phone: phone || null,
-      whatsapp: phone || null,
-      address: address || null,
-    }, { onConflict: "id" });
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-  if (profileError) {
-    return NextResponse.json({ error: profileError.message }, { status: 500 });
+  // Wait for the handle_new_user trigger to create the profile row
+  await new Promise((r) => setTimeout(r, 300));
+
+  // PATCH the profile directly via PostgREST REST API
+  const patchRes = await fetch(
+    `${supabaseUrl}/rest/v1/profiles?id=eq.${userId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({
+        first_name,
+        last_name,
+        email,
+        role: "commercial",
+        phone: phone || null,
+        whatsapp: phone || null,
+        address: address || null,
+      }),
+    }
+  );
+
+  if (!patchRes.ok) {
+    const errText = await patchRes.text();
+    return NextResponse.json(
+      { error: `Profile update failed: ${errText}` },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ success: true, id: userId });
