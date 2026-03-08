@@ -105,3 +105,62 @@ export async function GET(request: NextRequest) {
     clients,
   });
 }
+
+// POST /api/commercial — create a new client (user + restaurant, auto-approved)
+export async function POST(request: NextRequest) {
+  const auth = await verifyCommercial(request);
+  if (!auth) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  }
+
+  const body = await request.json();
+  const { first_name, last_name, restaurant_name, email, phone, password } = body;
+
+  if (!first_name || !restaurant_name || !email || !phone || !password) {
+    return NextResponse.json(
+      { error: "Tous les champs obligatoires doivent etre remplis" },
+      { status: 400 }
+    );
+  }
+
+  if (password.length < 6) {
+    return NextResponse.json(
+      { error: "Le mot de passe doit contenir au moins 6 caracteres" },
+      { status: 400 }
+    );
+  }
+
+  const service = getServiceClient();
+
+  // 1. Create auth user
+  const { data: authData, error: authError } = await service.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { first_name, last_name: last_name || "", phone },
+  });
+
+  if (authError) {
+    return NextResponse.json({ error: authError.message }, { status: 400 });
+  }
+
+  const userId = authData.user.id;
+
+  // 2. Wait for trigger to create profile
+  await new Promise((r) => setTimeout(r, 800));
+
+  // 3. Create restaurant — auto-approved (active), assigned to this commercial
+  const { error: restError } = await service.from("restaurants").insert({
+    owner_id: userId,
+    name: restaurant_name,
+    status: "active",
+    commercial_id: auth.user.id,
+  } as any);
+
+  if (restError) {
+    console.error("Restaurant creation error:", restError.message);
+    return NextResponse.json({ error: restError.message }, { status: 400 });
+  }
+
+  return NextResponse.json({ success: true, id: userId });
+}

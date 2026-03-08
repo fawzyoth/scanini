@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, Loader2, Phone, ArrowUpDown } from "lucide-react";
-import { PLAN_PRICES } from "@/data/admin-mock";
+import { Search, Loader2, Phone, ArrowUpDown, Plus, X, Eye, EyeOff } from "lucide-react";
 import { PLANS } from "@/lib/plan-config";
 
 type Client = {
@@ -22,19 +21,22 @@ export default function CommercialClientsPage() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "created" | "scans">("created");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [showCreate, setShowCreate] = useState(false);
+
+  async function loadClients() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/commercial");
+      if (res.ok) {
+        const data = await res.json();
+        setClients(data.clients);
+      }
+    } catch {}
+    setLoading(false);
+  }
 
   useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/commercial");
-        if (res.ok) {
-          const data = await res.json();
-          setClients(data.clients);
-        }
-      } catch {}
-      setLoading(false);
-    }
-    load();
+    loadClients();
   }, []);
 
   function toggleSort(field: "name" | "created" | "scans") {
@@ -70,9 +72,18 @@ export default function CommercialClientsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Mes clients</h1>
-        <p className="text-sm text-gray-500 mt-1">{clients.length} restaurant{clients.length > 1 ? "s" : ""} gere{clients.length > 1 ? "s" : ""}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Mes clients</h1>
+          <p className="text-sm text-gray-500 mt-1">{clients.length} restaurant{clients.length > 1 ? "s" : ""} gere{clients.length > 1 ? "s" : ""}</p>
+        </div>
+        <button
+          onClick={() => setShowCreate(true)}
+          className="inline-flex items-center gap-2 bg-green-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+        >
+          <Plus size={16} />
+          Ajouter un client
+        </button>
       </div>
 
       <div className="relative max-w-md">
@@ -123,7 +134,7 @@ export default function CommercialClientsPage() {
                   <td className="px-5 py-3.5">
                     <div>
                       <p className="text-sm text-gray-700">
-                        {client.owner ? `${client.owner.first_name} ${client.owner.last_name}` : "—"}
+                        {client.owner ? `${client.owner.first_name} ${client.owner.last_name}` : "\u2014"}
                       </p>
                       <p className="text-xs text-gray-400">{client.owner?.email ?? ""}</p>
                     </div>
@@ -140,7 +151,7 @@ export default function CommercialClientsPage() {
                         {client.owner.phone}
                       </a>
                     ) : (
-                      <span className="text-xs text-gray-400">—</span>
+                      <span className="text-xs text-gray-400">\u2014</span>
                     )}
                   </td>
                   <td className="px-5 py-3.5">
@@ -173,6 +184,188 @@ export default function CommercialClientsPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {showCreate && (
+        <CreateClientModal
+          onClose={() => setShowCreate(false)}
+          onCreated={() => { setShowCreate(false); loadClients(); }}
+        />
+      )}
+    </div>
+  );
+}
+
+function CreateClientModal({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void;
+  onCreated: () => void;
+}) {
+  const [form, setForm] = useState({
+    first_name: "",
+    last_name: "",
+    restaurant_name: "",
+    email: "",
+    phone: "",
+    password: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  function update(field: string, value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    if (!form.first_name || !form.restaurant_name || !form.email || !form.phone || !form.password) {
+      setError("Tous les champs obligatoires doivent etre remplis");
+      return;
+    }
+    if (form.password.length < 6) {
+      setError("Le mot de passe doit contenir au moins 6 caracteres");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const res = await fetch("/api/commercial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Erreur lors de la creation");
+        return;
+      }
+      onCreated();
+    } catch {
+      setError("Erreur reseau");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h2 className="text-base font-semibold text-gray-900">Nouveau client</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100">
+            <X size={18} className="text-gray-400" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Prenom *</label>
+              <input
+                type="text"
+                value={form.first_name}
+                onChange={(e) => update("first_name", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ahmed"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Nom</label>
+              <input
+                type="text"
+                value={form.last_name}
+                onChange={(e) => update("last_name", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ben Ali"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Nom du restaurant *</label>
+            <input
+              type="text"
+              value={form.restaurant_name}
+              onChange={(e) => update("restaurant_name", e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="La Bouffe"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Email *</label>
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => update("email", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="ahmed@restaurant.com"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Telephone *</label>
+              <input
+                type="tel"
+                value={form.phone}
+                onChange={(e) => update("phone", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="+216 XX XXX XXX"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Mot de passe *</label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={(e) => update("password", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 pr-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Min. 6 caracteres"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+            <p className="text-xs text-green-700">Le compte sera active automatiquement — aucune approbation necessaire.</p>
+          </div>
+
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+          )}
+
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-sm text-gray-600 hover:text-gray-900 px-4 py-2"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex items-center gap-2 bg-green-600 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+            >
+              {saving && <Loader2 size={14} className="animate-spin" />}
+              Creer le client
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
