@@ -52,7 +52,7 @@ export function MenuScreenDark({
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full dark-menu-screen overflow-hidden">
       {/* Inline animation styles */}
       {animationsEnabled && (
         <style>{`
@@ -79,33 +79,36 @@ export function MenuScreenDark({
           .dark-content-transition {
             animation: darkContentFade 0.35s ease-out both;
           }
+          .dark-menu-screen ::-webkit-scrollbar {
+            display: none;
+          }
         `}</style>
       )}
 
-      {/* Top bar — white */}
-      <div className="shrink-0 flex items-center justify-between px-3 py-2 bg-white">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-1 text-xs px-2 py-1 rounded-full border border-gray-300 text-gray-600 hover:text-gray-900"
-        >
-          <ArrowLeft size={14} />
-          <span>Back</span>
-        </button>
-        <button
-          onClick={onSearchClick}
-          className="p-1.5 text-gray-500 hover:text-gray-700"
-        >
-          <Search size={16} />
-        </button>
-      </div>
-
       {/* Main content: sidebar + dishes */}
       <div className="flex-1 flex overflow-hidden" style={{ backgroundColor: "#1a1a1a" }}>
-        {/* Left menu sidebar — names only, no icons */}
+        {/* Left sidebar — dark: back button + menu names */}
         <div
-          className="shrink-0 w-[100px] overflow-y-auto overflow-x-visible py-1 flex flex-col"
+          className="shrink-0 w-[100px] flex flex-col"
           style={{ backgroundColor: "#1a1a1a" }}
         >
+          {/* Back button in sidebar */}
+          <div className="px-2 py-2">
+            <button
+              onClick={onBack}
+              className="flex items-center gap-1 text-xs px-2 py-1.5 rounded-full border"
+              style={{ color: "#D4A853", borderColor: "rgba(212,168,83,0.3)" }}
+            >
+              <ArrowLeft size={12} />
+              <span>Back</span>
+            </button>
+          </div>
+
+          {/* Menu list — hidden scrollbar */}
+          <div
+            className="flex-1 overflow-y-auto py-1 flex flex-col"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
           {visibleMenus.map((menu) => {
             const isActive = menu.id === activeMenuId;
             return (
@@ -140,10 +143,23 @@ export function MenuScreenDark({
               </button>
             );
           })}
+          </div>
         </div>
 
-        {/* Right content area — full height white */}
-        <div className="flex-1 overflow-y-auto bg-white relative">
+        {/* Right content area — full height white, hidden scrollbar */}
+        <div
+          className="flex-1 overflow-y-auto bg-white relative"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {/* Search button */}
+          <div className="flex justify-end px-3 pt-2">
+            <button
+              onClick={onSearchClick}
+              className="p-1.5 text-gray-500 hover:text-gray-700"
+            >
+              <Search size={16} />
+            </button>
+          </div>
           {/* Logo at top */}
           {restaurant?.logoImage && (
             <div className="flex justify-center pt-4 pb-2">
