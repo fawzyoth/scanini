@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, MoreVertical, ArrowUpDown, Phone, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import type { Profile } from "@/types/database";
+import { PLANS } from "@/lib/plan-config";
 
 type UserRow = {
   id: string;
@@ -393,9 +394,10 @@ function PlanBadge({ plan }: { plan: string }) {
     pro: "bg-indigo-50 text-indigo-700",
     business: "bg-amber-50 text-amber-700",
   };
+  const displayName = PLANS[plan as keyof typeof PLANS]?.name ?? plan;
   return (
-    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full capitalize ${styles[plan] || styles.free}`}>
-      {plan}
+    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${styles[plan] || styles.free}`}>
+      {displayName}
     </span>
   );
 }

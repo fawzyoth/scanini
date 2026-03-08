@@ -7,6 +7,7 @@ import { ArrowLeft, Check, Save, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { PLAN_LIMITS, PLAN_PRICES } from "@/data/admin-mock";
 import type { Restaurant, Profile } from "@/types/database";
+import { PLANS as PLAN_INFO } from "@/lib/plan-config";
 
 const PLANS = ["free", "starter", "pro", "business"] as const;
 
@@ -244,7 +245,7 @@ export default function AdminUserDetailPage() {
         <div className="px-5 py-4 border-b border-gray-100">
           <h2 className="text-sm font-semibold text-gray-900">Plan management</h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Current plan: <span className="capitalize text-gray-700 font-medium">{plan}</span> ({price.monthly === 0 ? "Free" : `${price.monthly} DT/mo`})
+            Current plan: <span className="text-gray-700 font-medium">{PLAN_INFO[plan]?.name ?? plan}</span> ({price.monthly === 0 ? "Free" : `${price.monthly} DT/mo`})
           </p>
         </div>
 
@@ -266,7 +267,7 @@ export default function AdminUserDetailPage() {
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-gray-900 capitalize">{p}</span>
+                    <span className="text-sm font-semibold text-gray-900">{PLAN_INFO[p]?.name ?? p}</span>
                     {isCurrent && <Check size={14} className="text-indigo-600" />}
                   </div>
                   <p className="text-lg font-bold text-gray-900">
@@ -321,9 +322,10 @@ function PlanBadge({ plan }: { plan: string }) {
     pro: "bg-indigo-50 text-indigo-700",
     business: "bg-amber-50 text-amber-700",
   };
+  const displayName = PLAN_INFO[plan as keyof typeof PLAN_INFO]?.name ?? plan;
   return (
-    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full capitalize ${styles[plan] || styles.free}`}>
-      {plan}
+    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${styles[plan] || styles.free}`}>
+      {displayName}
     </span>
   );
 }

@@ -2,76 +2,18 @@
 
 import { useState } from "react";
 import { PageHeader } from "@/components/ui";
-import { Check, Zap, Crown, Loader2 } from "lucide-react";
+import { Check, X, Zap, Crown, Loader2 } from "lucide-react";
 import { useDashboard } from "@/lib/dashboard-context";
 import { PLAN_LIMITS } from "@/data/admin-mock";
 import { useTranslation } from "@/lib/i18n/i18n-context";
-
-const PLANS = [
-  {
-    id: "free",
-    name: "Free",
-    price: 0,
-    yearlyPrice: 0,
-    features: [
-      "1 menu",
-      "Up to 15 dishes",
-      "200 scans / month",
-      "Standard QR Code",
-      "Scanini branding",
-    ],
-    bestFor: "Small cafes testing the product",
-  },
-  {
-    id: "starter",
-    name: "Starter",
-    price: 9,
-    yearlyPrice: 90,
-    features: [
-      "1 menu",
-      "Up to 30 dishes",
-      "1,500 scans / month",
-      "Standard QR Code",
-      "Scanini branding",
-    ],
-    bestFor: "Small restaurants",
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: 29,
-    yearlyPrice: 240,
-    popular: true,
-    features: [
-      "Up to 5 menus",
-      "Up to 60 dishes per menu",
-      "6,000 scans / month",
-      "Custom QR Code",
-      "White label (no Scanini logo)",
-    ],
-    bestFor: "Medium restaurants",
-  },
-  {
-    id: "business",
-    name: "Business",
-    price: 49,
-    yearlyPrice: 490,
-    features: [
-      "Unlimited menus",
-      "Unlimited dishes",
-      "20,000 scans / month",
-      "Custom QR Code",
-      "Full white label",
-      "Priority support",
-    ],
-    bestFor: "Large restaurants and chains",
-  },
-];
+import { COMPARISON_FEATURES, type PlanId } from "@/lib/plan-config";
+import { usePlanConfigs } from "@/lib/use-plan-configs";
 
 export default function BillingPage() {
   const { restaurant, usage, loading } = useDashboard();
   const { t } = useTranslation();
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+  const { plans: plansMap, orderedPlans } = usePlanConfigs();
 
   if (loading) {
     return (
@@ -81,9 +23,10 @@ export default function BillingPage() {
     );
   }
 
-  const currentPlanId = restaurant?.plan ?? "free";
-  const currentPlan = PLANS.find((p) => p.id === currentPlanId)!;
+  const currentPlanId = (restaurant?.plan ?? "free") as PlanId;
+  const currentPlan = plansMap[currentPlanId];
   const limits = PLAN_LIMITS[currentPlanId] ?? PLAN_LIMITS.free;
+  const plans = orderedPlans;
 
   return (
     <>
@@ -105,7 +48,7 @@ export default function BillingPage() {
                   </span>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  {currentPlan.price === 0 ? t("billing.freeForever") : `${currentPlan.price} DT ${t("billing.perMonth")}`}
+                  {currentPlan.monthlyPrice === 0 ? t("billing.freeForever") : `${currentPlan.monthlyPrice} DT ${t("billing.perMonth")}`}
                 </p>
               </div>
               <a
@@ -169,9 +112,9 @@ export default function BillingPage() {
 
           <div className="p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {PLANS.map((plan) => {
+              {plans.map((plan) => {
                 const isCurrent = plan.id === currentPlanId;
-                const price = billing === "yearly" ? plan.yearlyPrice : plan.price;
+                const price = billing === "yearly" ? plan.yearlyPrice : plan.monthlyPrice;
                 const period = billing === "yearly" ? "/ year" : "/ month";
 
                 return (
@@ -204,15 +147,51 @@ export default function BillingPage() {
                     </div>
 
                     <ul className="space-y-2 flex-1 mb-5">
-                      {plan.features.map((f) => (
-                        <li key={f} className="flex items-start gap-2">
+                      <li className="flex items-start gap-2">
+                        <Check size={14} className="text-indigo-600 shrink-0 mt-0.5" />
+                        <span className="text-xs text-gray-600">
+                          {plan.features.maxMenus >= 999 ? "Menus illimites" : `${plan.features.maxMenus} menu${plan.features.maxMenus > 1 ? "s" : ""}`}
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check size={14} className="text-indigo-600 shrink-0 mt-0.5" />
+                        <span className="text-xs text-gray-600">
+                          {plan.features.maxDishes >= 999 ? "Plats illimites" : `Jusqu'a ${plan.features.maxDishes} plats`}
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check size={14} className="text-indigo-600 shrink-0 mt-0.5" />
+                        <span className="text-xs text-gray-600">
+                          {plan.features.maxScansPerMonth >= 999999 ? "Scans illimites" : `${plan.features.maxScansPerMonth.toLocaleString("fr-FR")} scans / mois`}
+                        </span>
+                      </li>
+                      {plan.features.reviewsEnabled && (
+                        <li className="flex items-start gap-2">
                           <Check size={14} className="text-indigo-600 shrink-0 mt-0.5" />
-                          <span className="text-xs text-gray-600">{f}</span>
+                          <span className="text-xs text-gray-600">Avis clients</span>
                         </li>
-                      ))}
+                      )}
+                      {plan.features.searchEnabled && (
+                        <li className="flex items-start gap-2">
+                          <Check size={14} className="text-indigo-600 shrink-0 mt-0.5" />
+                          <span className="text-xs text-gray-600">Recherche</span>
+                        </li>
+                      )}
+                      {plan.features.whiteLabel && (
+                        <li className="flex items-start gap-2">
+                          <Check size={14} className="text-indigo-600 shrink-0 mt-0.5" />
+                          <span className="text-xs text-gray-600">Marque blanche</span>
+                        </li>
+                      )}
+                      {plan.features.supportHours && (
+                        <li className="flex items-start gap-2">
+                          <Check size={14} className="text-indigo-600 shrink-0 mt-0.5" />
+                          <span className="text-xs text-gray-600">Support {plan.features.supportHours}</span>
+                        </li>
+                      )}
                     </ul>
 
-                    <p className="text-[10px] text-gray-400 mb-3">{t("billing.bestFor")} {plan.bestFor}</p>
+                    <p className="text-[10px] text-gray-400 mb-3">{plan.description}</p>
 
                     {isCurrent ? (
                       <button
@@ -240,6 +219,50 @@ export default function BillingPage() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+
+          {/* Comparison table */}
+          <div className="px-6 pb-6">
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">Comparaison detaillee</h3>
+            <div className="overflow-x-auto border border-gray-200 rounded-lg">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="text-left py-2.5 px-3 font-medium text-gray-500">Fonctionnalite</th>
+                    {plans.map((plan) => (
+                      <th key={plan.id} className={`text-center py-2.5 px-3 font-semibold ${plan.id === currentPlanId ? "text-indigo-600" : "text-gray-700"}`}>
+                        {plan.name}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPARISON_FEATURES.map((row) => (
+                    <tr key={row.key} className="border-b border-gray-100">
+                      <td className="py-2 px-3 text-gray-600 font-medium">{row.label}</td>
+                      {plans.map((plan) => {
+                        const value = plan.features[row.key as keyof typeof plan.features];
+                        const formatted = (row.format as (v: any) => string)(value);
+                        const isCheck = formatted === "Oui";
+                        const isDash = formatted === "\u2014";
+
+                        return (
+                          <td key={plan.id} className="text-center py-2 px-3">
+                            {isCheck ? (
+                              <Check size={14} className="mx-auto text-emerald-500" />
+                            ) : isDash ? (
+                              <X size={12} className="mx-auto text-gray-300" />
+                            ) : (
+                              <span className="text-gray-700">{formatted}</span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

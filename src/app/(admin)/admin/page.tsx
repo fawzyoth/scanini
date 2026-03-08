@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Users, DollarSign, QrCode, TrendingUp, ArrowRight, Clock, Loader2 } from "lucide-react";
 import { PLAN_PRICES } from "@/data/admin-mock";
+import { PLANS } from "@/lib/plan-config";
 
 export default function AdminDashboardPage() {
   const [restaurants, setRestaurants] = useState<any[]>([]);
@@ -128,7 +129,7 @@ export default function AdminDashboardPage() {
               return (
                 <div key={plan}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-gray-700 capitalize">{plan}</span>
+                    <span className="text-sm text-gray-700">{PLANS[plan]?.name ?? plan}</span>
                     <span className="text-sm text-gray-500">{count} users ({pct}%)</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -238,9 +239,10 @@ function PlanBadge({ plan }: { plan: string }) {
     pro: "bg-indigo-50 text-indigo-700",
     business: "bg-amber-50 text-amber-700",
   };
+  const displayName = PLANS[plan as keyof typeof PLANS]?.name ?? plan;
   return (
-    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full capitalize ${styles[plan] || styles.free}`}>
-      {plan}
+    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${styles[plan] || styles.free}`}>
+      {displayName}
     </span>
   );
 }

@@ -5,12 +5,18 @@ import { Toggle } from "@/components/ui/toggle";
 import { Badge } from "@/components/ui/badge";
 import { useDashboard } from "@/lib/dashboard-context";
 import { useTranslation } from "@/lib/i18n/i18n-context";
+import { getPlan, type PlanId } from "@/lib/plan-config";
+import { UpgradeOverlay } from "@/components/ui/upgrade-badge";
 
 export function ReviewsSection() {
   const { restaurant, updateRestaurant } = useDashboard();
   const { t } = useTranslation();
   const [enabled, setEnabled] = useState(true);
   const [showReviews, setShowReviews] = useState<"rating" | "all">("all");
+
+  const currentPlan = ((restaurant as any)?.plan ?? "free") as PlanId;
+  const plan = getPlan(currentPlan);
+  const locked = !plan.features.reviewsEnabled;
 
   useEffect(() => {
     if (restaurant) {
@@ -29,7 +35,7 @@ export function ReviewsSection() {
     await updateRestaurant({ reviews_display: mode } as any);
   }
 
-  return (
+  const content = (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -78,4 +84,10 @@ export function ReviewsSection() {
       )}
     </div>
   );
+
+  if (locked) {
+    return <UpgradeOverlay requiredPlan="pro">{content}</UpgradeOverlay>;
+  }
+
+  return content;
 }

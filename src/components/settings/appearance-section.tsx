@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/lib/dashboard-context";
 import { useTranslation } from "@/lib/i18n/i18n-context";
 import type { MenuTemplate } from "@/types";
-import { Check } from "lucide-react";
+import { Check, Lock } from "lucide-react";
+import { canUseTemplate, getMinPlanForTemplate, type PlanId } from "@/lib/plan-config";
+import { UpgradeBadge } from "@/components/ui/upgrade-badge";
 
 export function AppearanceSection() {
   const { restaurant, updateRestaurant } = useDashboard();
@@ -16,6 +18,8 @@ export function AppearanceSection() {
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
   const [saved, setSaved] = useState(false);
 
+  const currentPlan = ((restaurant as any)?.plan ?? "free") as PlanId;
+
   useEffect(() => {
     if (restaurant) {
       setPrimaryColor((restaurant as any).primary_color ?? "#4F46E5");
@@ -23,6 +27,12 @@ export function AppearanceSection() {
       setAnimationsEnabled((restaurant as any).animations_enabled ?? true);
     }
   }, [restaurant]);
+
+  function handleTemplateSelect(t: MenuTemplate) {
+    if (canUseTemplate(currentPlan, t)) {
+      setTemplate(t);
+    }
+  }
 
   async function handleSave() {
     await updateRestaurant({ primary_color: primaryColor, template, animations_enabled: animationsEnabled } as any);
@@ -40,10 +50,11 @@ export function AppearanceSection() {
         <div className="grid grid-cols-4 gap-3">
           <TemplateOption
             active={template === "classic"}
-            onClick={() => setTemplate("classic")}
+            locked={!canUseTemplate(currentPlan, "classic")}
+            requiredPlan={getMinPlanForTemplate("classic")}
+            onClick={() => handleTemplateSelect("classic")}
             label={t("appearance.templateClassic")}
           >
-            {/* Classic template preview */}
             <div className="space-y-1.5">
               <div className="h-8 bg-gradient-to-r from-amber-200 to-orange-200 rounded-t" />
               <div className="px-1.5 space-y-1">
@@ -65,10 +76,11 @@ export function AppearanceSection() {
 
           <TemplateOption
             active={template === "card"}
-            onClick={() => setTemplate("card")}
+            locked={!canUseTemplate(currentPlan, "card")}
+            requiredPlan={getMinPlanForTemplate("card")}
+            onClick={() => handleTemplateSelect("card")}
             label={t("appearance.templateCard")}
           >
-            {/* Card template preview */}
             <div className="space-y-1.5">
               <div className="h-8 bg-gradient-to-r from-amber-200 to-orange-200 rounded-t" />
               <div className="px-1.5 flex gap-1">
@@ -96,10 +108,11 @@ export function AppearanceSection() {
 
           <TemplateOption
             active={template === "profile"}
-            onClick={() => setTemplate("profile")}
+            locked={!canUseTemplate(currentPlan, "profile")}
+            requiredPlan={getMinPlanForTemplate("profile")}
+            onClick={() => handleTemplateSelect("profile")}
             label={t("appearance.templateProfile")}
           >
-            {/* Profile template preview */}
             <div className="space-y-1">
               <div className="h-6 bg-gradient-to-r from-amber-200 to-orange-200 rounded-t" />
               <div className="flex justify-center -mt-2.5 relative z-10">
@@ -123,10 +136,11 @@ export function AppearanceSection() {
 
           <TemplateOption
             active={template === "dark"}
-            onClick={() => setTemplate("dark")}
+            locked={!canUseTemplate(currentPlan, "dark")}
+            requiredPlan={getMinPlanForTemplate("dark")}
+            onClick={() => handleTemplateSelect("dark")}
             label={t("appearance.templateDark")}
           >
-            {/* Dark template preview */}
             <div className="space-y-1.5" style={{ backgroundColor: "#1a1a1a" }}>
               <div className="mx-1.5 mt-1.5 h-7 bg-gray-700 rounded" />
               <div className="flex justify-center">
@@ -186,11 +200,15 @@ export function AppearanceSection() {
 
 function TemplateOption({
   active,
+  locked,
+  requiredPlan,
   onClick,
   label,
   children,
 }: {
   active: boolean;
+  locked: boolean;
+  requiredPlan: PlanId;
   onClick: () => void;
   label: string;
   children: React.ReactNode;
@@ -199,20 +217,34 @@ function TemplateOption({
     <button
       onClick={onClick}
       className={`relative rounded-xl border-2 p-2 transition-all text-left ${
-        active
+        locked
+          ? "border-gray-200 bg-gray-50 opacity-70 cursor-not-allowed"
+          : active
           ? "border-indigo-500 bg-indigo-50/50"
           : "border-gray-200 bg-white hover:border-gray-300"
       }`}
     >
-      {active && (
+      {active && !locked && (
         <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center">
           <Check size={12} className="text-white" />
         </div>
       )}
-      <div className="rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
+      {locked && (
+        <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
+          <Lock size={10} className="text-white" />
+        </div>
+      )}
+      <div className={`rounded-lg overflow-hidden bg-gray-50 border border-gray-100 ${locked ? "grayscale" : ""}`}>
         {children}
       </div>
-      <p className="text-xs font-medium text-gray-700 mt-2 text-center">{label}</p>
+      <div className="mt-2 text-center">
+        <p className="text-xs font-medium text-gray-700">{label}</p>
+        {locked && (
+          <div className="mt-1">
+            <UpgradeBadge requiredPlan={requiredPlan} size="sm" />
+          </div>
+        )}
+      </div>
     </button>
   );
 }

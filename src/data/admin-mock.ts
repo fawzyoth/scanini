@@ -21,17 +21,17 @@ export interface AdminUser {
 }
 
 export const PLAN_LIMITS: Record<string, { menus: number; dishes: number; scans: number }> = {
-  free: { menus: 1, dishes: 15, scans: 200 },
-  starter: { menus: 1, dishes: 30, scans: 1500 },
-  pro: { menus: 5, dishes: 60, scans: 6000 },
-  business: { menus: 999, dishes: 999, scans: 20000 },
+  free: { menus: 1, dishes: 15, scans: 1000 },
+  starter: { menus: 3, dishes: 50, scans: 3000 },
+  pro: { menus: 10, dishes: 100, scans: 5000 },
+  business: { menus: 999, dishes: 999, scans: 999999 },
 };
 
 export const PLAN_PRICES: Record<string, { monthly: number; yearly: number }> = {
   free: { monthly: 0, yearly: 0 },
-  starter: { monthly: 9, yearly: 90 },
-  pro: { monthly: 29, yearly: 240 },
-  business: { monthly: 49, yearly: 490 },
+  starter: { monthly: 19, yearly: 190 },
+  pro: { monthly: 39, yearly: 490 },
+  business: { monthly: 69, yearly: 790 },
 };
 
 export const mockAdminUsers: AdminUser[] = [
